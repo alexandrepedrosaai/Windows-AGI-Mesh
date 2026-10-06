@@ -1,0 +1,144 @@
+name: Windows Zenith Plataforma Auto Review
+ 
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+ 
+jobs:
+  build-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+ 
+      # Instalar Quantum Development Kit (QDK)
+      - name: Setup .NET for Q#
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+      - name: Install QDK
+        run: dotnet tool install -g Microsoft.Quantum.IQSharp
+ 
+      # Q# (Azure Quantum official language)
+      - name: Lint Q# files
+        run: qsharp-lint modules/**/*.qs
+      - name: Run Q# tests with coverage
+        run: qsharp-test --coverage modules/
+      - name: Enforce coverage >= 80%
+        run: |
+          COVERAGE=$(cat coverage/summary.txt | grep "Total" | awk '{print $4}' | sed 's/%//')
+          if [ "$COVERAGE" -lt 80 ]; then
+            echo "Coverage $COVERAGE% is below threshold (80%)"
+            exit 1
+          fi
+ 
+      # Python, Rust, C++, Frontend, Infra, Docs checks podem ser adicionados aqui...
+ 
+  artifacts:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build binaries
+        run: |
+          mkdir -p build
+          make all
+          cp bin/* build/
+      - name: Generate cryptographic keys and hashes
+        run: |
+          openssl genrsa -out build/release-key.pem 2048
+          sha256sum build/* > build/hashes.txt
+      - name: Sign binaries with RSA
+        run: |
+          for f in build/*; do
+            if [ -f "$f" ]; then
+              openssl dgst -sha256 -sign build/release-key.pem -out "$f.sig" "$f"
+            fi
+          done
+      - name: Create verify-release.sh script
+        run: |
+          cat << 'EOF' > build/verify-release.sh
+          #!/bin/bash
+          set -e
+          echo "🔑 Verifying release artifacts..."
+          sha256sum -c hashes.txt
+          openssl rsa -in release-key.pem -pubout -out release-pub.pem
+          for f in *; do
+            if [[ "$f" != *.pem && "$f" != *.sig && -f "$f" ]]; then
+              if [ -f "$f.sig" ]; then
+                echo "Verifying $f..."
+                openssl dgst -sha256 -verify release-pub.pem -signature "$f.sig" "$f"
+              fi
+            fi
+          done
+          echo "✅ All artifacts verified successfully."
+          EOF
+          chmod +x build/verify-release.sh
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mesh-binaries
+          path: build/
+ 
+  verify-signatures:
+    needs: artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: mesh-binaries
+          path: build/
+      - name: Verify RSA signatures
+        run: |
+          openssl rsa -in build/release-key.pem -pubout -out build/release-pub.pem
+          for f in build/*; do
+            if [[ "$f" != *.pem && "$f" != *.sig && -f "$f" ]]; then
+              if [ -f "$f.sig" ]; then
+                openssl dgst -sha256 -verify build/release-pub.pem -signature "$f.sig" "$f" || exit 1
+              fi
+            fi
+          done
+ 
+  release:
+    needs: [artifacts, verify-signatures]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: mesh-binaries
+          path: build/
+      - name: Determine Semantic Version
+        id: version
+        run: |
+          echo "VERSION=v1.${GITHUB_RUN_NUMBER}.0" >> $GITHUB_ENV
+      - name: Generate Conventional Changelog
+        run: |
+          git log --pretty=format:"%s" $(git describe --tags --abbrev=0 || echo "")..HEAD > commits.txt
+          echo "## Changelog" > build/CHANGELOG.md
+          echo "" >> build/CHANGELOG.md
+          echo "### Features" >> build/CHANGELOG.md
+          grep "^feat" commits.txt | sed 's/^feat: /- /' >> build/CHANGELOG.md || true
+          echo "" >> build/CHANGELOG.md
+          echo "### Fixes" >> build/CHANGELOG.md
+          grep "^fix" commits.txt | sed 's/^fix: /- /' >> build/CHANGELOG.md || true
+          echo "" >> build/CHANGELOG.md
+          echo "### Docs" >> build/CHANGELOG.md
+          grep "^docs" commits.txt | sed 's/^docs: /- /' >> build/CHANGELOG.md || true
+          echo "" >> build/CHANGELOG.md
+          echo "### Infra" >> build/CHANGELOG.md
+          grep "^infra" commits.txt | sed 's/^infra: /- /' >> build/CHANGELOG.md || true
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: "Windows-AGI-Mesh Release ${{ env.VERSION }}"
+          body_path: build/CHANGELOG.md
+          files: |
+            build/*
+            build/CHANGELOG.md
+            build/release-pub.pem
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
