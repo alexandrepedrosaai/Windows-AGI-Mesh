@@ -51,7 +51,7 @@ jobs:
       - name: Generate cryptographic keys and hashes
         run: |
           openssl genrsa -out build/release-key.pem 2048
-          sha256sum build/* > build/hashes.txt
+          (cd build && sha256sum -- * > hashes.txt)
       - name: Sign binaries with RSA
         run: |
           for f in build/*; do
