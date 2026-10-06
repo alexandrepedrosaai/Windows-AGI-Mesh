@@ -1,0 +1,97 @@
+circuit Windows-AGI-Mesh {
+  format_version: "1.0"
+  status: "reference architecture"
+
+  objective {
+    statement: "Evaluate and integrate interoperable AGI architectures across the Microsoft Windows ecosystem."
+    principles: [
+      "Keep user data and model execution under operator control.",
+      "Support local-first operation with optional, policy-governed cloud collaboration.",
+      "Measure capability, reliability, safety, and resource use; do not infer general intelligence from one score."
+    ]
+  }
+
+  architecture {
+    topology: "federated, capability-scoped mesh"
+    nodes: [
+      "Windows PCs hosting local or embedded models",
+      "opt-in edge peers with authenticated, encrypted links",
+      "optional cloud services connected through explicit policy gateways"
+    ]
+    contracts: [
+      "Versioned module manifests and typed input/output records.",
+      "Explicit data classification, provenance, and retention on every transfer.",
+      "Local scheduling and offline operation where a module declares support."
+    ]
+    trust_boundaries: [
+      "Treat module outputs, datasets, and peer messages as untrusted input.",
+      "Require operator authorization before crossing device or cloud boundaries.",
+      "Isolate model workloads from the Windows host and other mesh modules."
+    ]
+  }
+
+  modules {
+    module "Nemotron" {
+      file: "modules/Nemotron.q#circuite"
+      role: "reasoning and adaptability dataset"
+    }
+    module "AGI_Mesh_Web" {
+      file: "benchmarks/AGI_Mesh_Web.q#circuite"
+      role: "general-intelligence evaluation benchmark"
+    }
+    module "DeepSpace" {
+      file: "modules/DeepSpace.q#circuite"
+      role: "storage resilience in extreme environments"
+    }
+    module "MagneticMajorana" {
+      file: "modules/MagneticMajorana.q#circuite"
+      role: "quantum persistence research and simulation"
+    }
+    module "XboxQuantumXR" {
+      file: "modules/XboxQuantumXR.q#circuite"
+      role: "immersive, quantum-inspired AI experiences"
+    }
+    module "EdgeAIApp" {
+      file: "modules/EdgeAIApp.q#circuite"
+      role: "sovereign edge intelligence on Windows PCs"
+    }
+  }
+
+  integration_pipeline {
+    stage 1: "Discover manifests and verify module signatures and versions."
+    stage 2: "Authorize requested capabilities against device and user policy."
+    stage 3: "Route classified inputs only to approved local, peer, or cloud endpoints."
+    stage 4: "Execute modules in isolated workloads and validate output contracts."
+    stage 5: "Record privacy-preserving provenance, resource metrics, and audit events."
+    stage 6: "Allow operator review, export, retention, and deletion according to policy."
+  }
+
+  security {
+    rules: [
+      "Use least-privilege identities and authenticated, encrypted transport.",
+      "Protect secrets with Windows-supported credential storage; never embed credentials in manifests.",
+      "Require signed artifacts, dependency review, and policy checks before execution.",
+      "Apply consent, data minimization, retention limits, and deletion to user data.",
+      "Keep audit records tamper-evident and exclude raw prompts and sensitive payloads by default."
+    ]
+  }
+
+  roadmap {
+    quantum_ready {
+      goal: "Define pluggable interfaces and simulation-based studies; make no assumption of production quantum hardware."
+      exit_criteria: "Reproducible experiments, documented limitations, and reviewed threat model."
+    }
+    hybrid_scaling {
+      goal: "Evaluate local, peer, and cloud scheduling under explicit data and resource policies."
+      exit_criteria: "Benchmark latency, availability, energy, and data-boundary compliance."
+    }
+    copilot_integration {
+      goal: "Explore an opt-in integration through supported Windows and Copilot extension points."
+      exit_criteria: "Documented permissions, user consent, and validated isolation boundaries."
+    }
+    pc_embedded_ai {
+      goal: "Run appropriately sized models locally on Windows PCs, with offline behavior where feasible."
+      exit_criteria: "Measure hardware compatibility, responsiveness, accessibility, and local data handling."
+    }
+  }
+}

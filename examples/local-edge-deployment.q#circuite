@@ -1,0 +1,36 @@
+circuit LocalEdgeDeployment {
+  format_version: "1.0"
+  example_only: true
+  description: "Illustrative, local-first configuration for a single Windows PC."
+
+  deployment {
+    host: "Windows PC"
+    enabled_modules: ["EdgeAIApp", "Nemotron"]
+    inference_route: "local only"
+    network_access: "disabled unless explicitly authorized per task"
+    workload_isolation: "required"
+    model_source: "operator-approved, signature-verified package"
+  }
+
+  policy {
+    user_data: "process locally; do not retain inputs or outputs by default"
+    telemetry: "disabled unless separately opted in"
+    external_routes: "deny by default"
+    consequential_actions: "require explicit operator approval"
+  }
+
+  metrics {
+    metric inference_latency: { unit: "milliseconds", target: "measure on deployment hardware" }
+    metric peak_memory: { unit: "megabytes", target: "measure for selected model" }
+    metric external_data_transfer: { unit: "bytes", target: "expect zero for local-only tasks; verify" }
+  }
+
+  security {
+    rules: [
+      "Verify package signatures before installation.",
+      "Grant only the file and device access required for a user-approved task.",
+      "Do not store credentials in this example configuration.",
+      "Expose execution state and allow the operator to stop the workload."
+    ]
+  }
+}

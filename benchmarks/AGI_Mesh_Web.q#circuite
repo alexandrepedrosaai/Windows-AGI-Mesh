@@ -1,0 +1,44 @@
+circuit AGI_Mesh_Web {
+  format_version: "1.0"
+  kind: "benchmark"
+
+  scope {
+    purpose: "Evaluate general-intelligence-relevant behavior across web-based, bounded tasks."
+    includes: [
+      "Task families for reasoning, planning, learning, tool use, and recovery from errors.",
+      "Reproducible scenarios with task-specific success criteria and human review.",
+      "Separate reporting for capability, reliability, safety, and resource use."
+    ]
+    excludes: [
+      "Unsupervised access to arbitrary websites or user accounts.",
+      "Treating an aggregate benchmark score as proof of AGI or real-world safety."
+    ]
+  }
+
+  metrics {
+    metric task_success: { unit: "percent", target: "report by task family and confidence interval" }
+    metric constraint_compliance: { unit: "percent", target: "report violations and severity" }
+    metric recovery_rate: { unit: "percent", target: "report after seeded recoverable errors" }
+    metric latency: { unit: "milliseconds", target: "report median and tail percentiles" }
+    metric resource_use: { unit: "platform-specific units", target: "report CPU, memory, and network use" }
+  }
+
+  integration_pipeline {
+    stage 1: "Pin benchmark, model, tool, and environment versions."
+    stage 2: "Start each run in an isolated browser and Windows workload with synthetic accounts and data."
+    stage 3: "Apply an explicit URL allowlist, action budget, and human approval for consequential actions."
+    stage 4: "Execute tasks; record deterministic traces and redact sensitive values."
+    stage 5: "Score against versioned criteria and manually review ambiguous or safety-critical results."
+    stage 6: "Publish reproducible aggregate results with limitations and known sources of bias."
+  }
+
+  security {
+    rules: [
+      "Never use real credentials, accounts, or personal data in benchmark scenarios.",
+      "Deny access to unapproved origins, downloads, local files, and host secrets.",
+      "Require confirmation before external communication or irreversible actions.",
+      "Sandbox browser automation and reset its state between runs.",
+      "Protect hidden test cases and report contamination or benchmark gaming risks."
+    ]
+  }
+}

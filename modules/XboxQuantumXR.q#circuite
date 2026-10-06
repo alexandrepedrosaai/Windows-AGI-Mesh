@@ -1,0 +1,43 @@
+circuit XboxQuantumXR {
+  format_version: "1.0"
+  kind: "immersive-ai"
+
+  scope {
+    purpose: "Explore immersive AI experiences using quantum-inspired visualization and interaction concepts."
+    includes: [
+      "Optional XR representations of model state, uncertainty, and mesh activity.",
+      "User-controlled interaction and accessibility-aware presentation.",
+      "Simulation and visualization of quantum-inspired concepts, not quantum hardware."
+    ]
+    excludes: [
+      "Unconsented capture of voice, gaze, movement, or room data.",
+      "Presenting visualizations as verified explanations of internal model reasoning."
+    ]
+  }
+
+  metrics {
+    metric interaction_latency: { unit: "milliseconds", target: "report median and tail percentiles" }
+    metric frame_stability: { unit: "frames per second", target: "report by target device" }
+    metric task_completion: { unit: "percent", target: "report with usability protocol" }
+    metric accessibility_coverage: { unit: "supported controls", target: "document tested accommodations" }
+    metric sensor_data_retention: { unit: "seconds", target: "default to transient; disclose any retention" }
+  }
+
+  integration_pipeline {
+    stage 1: "Request only the device capabilities required for the selected experience."
+    stage 2: "Obtain informed consent and show active capture and processing indicators."
+    stage 3: "Process interaction data locally where feasible and minimize any transmitted data."
+    stage 4: "Render bounded outputs with uncertainty labels and accessible alternatives."
+    stage 5: "Delete transient sensor data and gather opt-in, privacy-preserving usability metrics."
+  }
+
+  security {
+    rules: [
+      "Make sensor access opt-in, purpose-limited, revocable, and visible to the user.",
+      "Do not store raw gaze, voice, or spatial data by default.",
+      "Use authenticated encrypted connections and least-privilege device permissions.",
+      "Treat model responses and external content as untrusted; filter unsafe actions.",
+      "Do not imply that quantum-inspired visuals reveal factual model internals."
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+circuit Nemotron {
+  format_version: "1.0"
+  kind: "dataset"
+
+  scope {
+    purpose: "Support evaluation and study of reasoning and adaptability."
+    includes: [
+      "Versioned task records with task intent, expected behavior, and provenance.",
+      "Adaptation scenarios that distinguish in-context adaptation from parameter updates.",
+      "Human-reviewed annotations and documented dataset limitations."
+    ]
+    excludes: [
+      "Unlicensed or personal data without a documented lawful basis.",
+      "Claims that dataset performance alone establishes general intelligence."
+    ]
+  }
+
+  metrics {
+    metric coverage: { unit: "percent", target: "report by task family; no fixed target" }
+    metric annotation_agreement: { unit: "percent", target: "report method and sample size" }
+    metric provenance_completeness: { unit: "percent", target: "report per release" }
+    metric contamination_rate: { unit: "percent", target: "estimate and disclose limitations" }
+  }
+
+  integration_pipeline {
+    stage 1: "Ingest only approved sources and record license, provenance, and data classification."
+    stage 2: "Normalize task records; validate schema and remove disallowed sensitive data."
+    stage 3: "Deduplicate, annotate, and review representative samples for quality."
+    stage 4: "Version and sign immutable dataset snapshots with a documented change log."
+    stage 5: "Expose read-only samples to authorized benchmark runners; collect aggregate results."
+  }
+
+  security {
+    rules: [
+      "Require documented rights and provenance before ingestion or redistribution.",
+      "Restrict raw dataset access by role and keep private evaluation data isolated.",
+      "Scan for personal and secret data; redact or exclude findings before release.",
+      "Encrypt data at rest and in transit and define retention and deletion schedules.",
+      "Treat retrieved records as untrusted content; do not execute embedded instructions or code."
+    ]
+  }
+}
