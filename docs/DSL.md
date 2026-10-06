@@ -6,7 +6,7 @@ The `.q#circuite` files are declarative specifications for the Windows-AGI-Mesh 
 
 Each circuit has a unique `circuit` identifier, a `version`, and a `kind`. It declares:
 
-- `scope`: purpose, inputs, outputs, and limitations.
+- `scope`: circuit-specific coverage and boundaries; module and benchmark circuits declare purpose, inputs, outputs, and boundaries.
 - `metrics`: measurable outcomes, units, and evaluation targets or reporting rules.
 - `integration_pipeline`: ordered `stage` entries with their actions.
 - `security`: mandatory policy rules.
