@@ -122,7 +122,12 @@ jobs:
           echo "VERSION=v1.${GITHUB_RUN_NUMBER}.0" >> $GITHUB_ENV
       - name: Generate Conventional Changelog
         run: |
-          git log --pretty=format:"%s" $(git describe --tags --abbrev=0 || echo "")..HEAD > commits.txt
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          if [ -n "$LAST_TAG" ]; then
+            git log --pretty=format:"%s" "${LAST_TAG}..HEAD" > commits.txt
+          else
+            git log --pretty=format:"%s" HEAD > commits.txt
+          fi
           echo "## Changelog" > build/CHANGELOG.md
           echo "" >> build/CHANGELOG.md
           echo "### Features" >> build/CHANGELOG.md
