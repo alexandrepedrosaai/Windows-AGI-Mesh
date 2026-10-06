@@ -28,6 +28,7 @@ jobs:
       - name: Run Q# tests with coverage
         run: qsharp-test --coverage modules/
       - name: Enforce coverage >= 80%
+        shell: bash
         run: |
           COVERAGE=$(cat coverage/summary.txt | grep "Total" | awk '{print $4}' | sed 's/%//')
           if [ "$COVERAGE" -lt 80 ]; then
