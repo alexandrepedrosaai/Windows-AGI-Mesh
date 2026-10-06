@@ -11,6 +11,26 @@ circuit Windows-AGI-Mesh {
     ]
   }
 
+  scope {
+    includes: [
+      "Windows-hosted local and embedded inference with optional, explicitly authorized mesh connections.",
+      "Research, evaluation, and integration contracts for all six declared modules.",
+      "Simulation and quantum-inspired studies with documented limitations."
+    ]
+    excludes: [
+      "A claim that any included system achieves AGI or is independently safe.",
+      "Production quantum hardware capability without experimental validation.",
+      "Unconsented transfer of user data to peers or cloud services."
+    ]
+  }
+
+  metrics {
+    metric module_contract_coverage: { unit: "percent", target: "report modules with complete scope, metrics, pipeline, and security sections" }
+    metric security_policy_coverage: { unit: "percent", target: "report implemented and tested mesh security requirements" }
+    metric reproducible_evaluation_rate: { unit: "percent", target: "report repeatable benchmark runs by module and environment" }
+    metric transfer_audit_coverage: { unit: "percent", target: "report external transfers with recorded authorization and destination" }
+  }
+
   architecture {
     topology: "federated, capability-scoped mesh"
     nodes: [

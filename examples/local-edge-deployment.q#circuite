@@ -3,6 +3,12 @@ circuit LocalEdgeDeployment {
   example_only: true
   description: "Illustrative, local-first configuration for a single Windows PC."
 
+  scope {
+    purpose: "Demonstrate a local-only edge inference deployment on one Windows PC."
+    includes: ["Signature-verified model execution and user-approved local inputs."]
+    excludes: ["Peer and cloud routing, persistent prompt storage, and unattended consequential actions."]
+  }
+
   deployment {
     host: "Windows PC"
     enabled_modules: ["EdgeAIApp", "Nemotron"]
@@ -17,6 +23,13 @@ circuit LocalEdgeDeployment {
     telemetry: "disabled unless separately opted in"
     external_routes: "deny by default"
     consequential_actions: "require explicit operator approval"
+  }
+
+  integration_pipeline {
+    stage 1: "Verify the model package signature and operator approval."
+    stage 2: "Start the model in an isolated workload with local-only network policy."
+    stage 3: "Process user-approved input locally and validate the response."
+    stage 4: "Report resource use and remove transient task data when the task ends."
   }
 
   metrics {
