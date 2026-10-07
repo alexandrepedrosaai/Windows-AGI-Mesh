@@ -72,12 +72,7 @@ ScoreFromTrials(10, 10) == 100.0,
 operation TestWeightedCapabilityIndex() : Unit {
 
 let benchmark = RunAGICapabilityBenchmark(
-80.0,
-60.0,
-100.0,
-50.0,
-75.0,
-100.0,
+CapabilityScores(80.0, 60.0, 100.0, 50.0, 75.0, 100.0),
 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 );
 
@@ -85,6 +80,20 @@ Fact(
 AbsD(benchmark::CapabilityIndex - 77.5) < 1e-9 and
 benchmark::Version == AGIMeshCapabilityBenchmarkVersion(),
 "The capability index must normalize and apply its weights."
+);
+}
+
+@Test("QuantumSimulator")
+operation TestNonUniformCapabilityWeights() : Unit {
+
+let benchmark = RunAGICapabilityBenchmark(
+CapabilityScores(80.0, 60.0, 100.0, 50.0, 75.0, 100.0),
+[6.0, 5.0, 4.0, 3.0, 2.0, 1.0]
+);
+
+Fact(
+AbsD(benchmark::CapabilityIndex - 1580.0 / 21.0) < 1e-9,
+"Each configured weight must apply to its corresponding capability."
 );
 }
 

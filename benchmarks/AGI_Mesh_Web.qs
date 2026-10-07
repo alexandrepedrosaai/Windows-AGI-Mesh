@@ -31,7 +31,16 @@ SelfCorrection : Double,
 AgentCoordination : Double,
 QuantumConsensus : Double
 );
- 
+
+newtype CapabilityScores = (
+Reasoning : Double,
+ToolUsage : Double,
+Memory : Double,
+SelfCorrection : Double,
+AgentCoordination : Double,
+QuantumConsensus : Double
+);
+
 function WeightedAverage(metrics : Metric[]) : Double {
  
 mutable weightedSum = 0.0;
@@ -160,18 +169,20 @@ return 100.0 * IntAsDouble(agreements) / IntAsDouble(shots);
 }
 
 function RunAGICapabilityBenchmark(
-reasoning : Double,
-toolUsage : Double,
-memory : Double,
-selfCorrection : Double,
-agentCoordination : Double,
-quantumConsensus : Double,
+scores : CapabilityScores,
 weights : Double[]
 ) : CapabilityBenchmarkResult {
 
 if not IsValidCapabilityWeights(weights) {
 fail "Provide six nonnegative capability weights with a positive total.";
 }
+
+let reasoning = scores::Reasoning;
+let toolUsage = scores::ToolUsage;
+let memory = scores::Memory;
+let selfCorrection = scores::SelfCorrection;
+let agentCoordination = scores::AgentCoordination;
+let quantumConsensus = scores::QuantumConsensus;
 
 let metrics = [
 Metric("reasoning", reasoning, weights[0]),
