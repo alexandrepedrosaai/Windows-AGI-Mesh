@@ -69,47 +69,20 @@ function AGIMeshCapabilityBenchmarkVersion() : String {
 return "0.2";
 }
 
-function IsValidCapabilityWeights(weights : Double[]) : Bool {
+function CapabilityWeightValidationError(
+weights : Double[],
+expectedCount : Int
+) : String {
 
-if Length(weights) != 6 {
-return false;
+if expectedCount >= 0 and Length(weights) != expectedCount {
+return $"Exactly {expectedCount} weights are required.";
 }
 
 mutable totalWeight = 0.0;
 
 for weight in weights {
 if weight < 0.0 {
-return false;
-}
-
-set totalWeight += weight;
-}
-
-return totalWeight > 0.0;
-}
-
-function IsValidTrialCount(successes : Int, trials : Int) : Bool {
-return trials > 0 and successes >= 0 and successes <= trials;
-}
-
-function IsValidShotCount(shots : Int) : Bool {
-return shots > 0;
-}
-
-function CapabilityMetricValidationError(metrics : Metric[]) : String {
-
-mutable totalWeight = 0.0;
-
-for metric in metrics {
-
-let (name, value, weight) = metric!;
-
-if not IsValidCapabilityScore(value) {
-return $"Capability score '{name}' must be between 0 and 100.";
-}
-
-if weight < 0.0 {
-return $"Capability weight '{name}' cannot be negative.";
+return "Capability weights cannot be negative.";
 }
 
 set totalWeight += weight;
@@ -120,6 +93,44 @@ return "At least one capability weight must be greater than zero.";
 }
 
 return "";
+}
+
+function TrialCountValidationError(successes : Int, trials : Int) : String {
+if trials <= 0 {
+return "trials must be greater than zero.";
+}
+
+if successes < 0 or successes > trials {
+return "successes must be between zero and trials.";
+}
+
+return "";
+}
+
+function ShotCountValidationError(shots : Int) : String {
+if shots <= 0 {
+return "shots must be greater than zero.";
+}
+
+return "";
+}
+
+function CapabilityMetricValidationError(metrics : Metric[]) : String {
+
+mutable weights : Double[] = [];
+
+for metric in metrics {
+
+let (name, value, weight) = metric!;
+
+if not IsValidCapabilityScore(value) {
+return $"Capability score '{name}' must be between 0 and 100.";
+}
+
+set weights += [weight];
+}
+
+return CapabilityWeightValidationError(weights, -1);
 }
 
 function CalculateAGICapabilityIndex(metrics : Metric[]) : Double {
@@ -135,8 +146,10 @@ return WeightedAverage(metrics);
 
 function ScoreFromTrials(successes : Int, trials : Int) : Double {
 
-if not IsValidTrialCount(successes, trials) {
-fail "trials must be positive and successes must be between zero and trials.";
+let validationError = TrialCountValidationError(successes, trials);
+
+if validationError != "" {
+fail validationError;
 }
 
 return 100.0 * IntAsDouble(successes) / IntAsDouble(trials);
@@ -144,8 +157,10 @@ return 100.0 * IntAsDouble(successes) / IntAsDouble(trials);
 
 operation RunQuantumConsensusBenchmark(shots : Int) : Double {
 
-if not IsValidShotCount(shots) {
-fail "shots must be greater than zero.";
+let validationError = ShotCountValidationError(shots);
+
+if validationError != "" {
+fail validationError;
 }
 
 mutable agreements = 0;
@@ -173,8 +188,10 @@ scores : CapabilityScores,
 weights : Double[]
 ) : CapabilityBenchmarkResult {
 
-if not IsValidCapabilityWeights(weights) {
-fail "Provide six nonnegative capability weights with a positive total.";
+let weightValidationError = CapabilityWeightValidationError(weights, 6);
+
+if weightValidationError != "" {
+fail weightValidationError;
 }
 
 let reasoning = scores::Reasoning;
@@ -209,8 +226,10 @@ quantumConsensus
 }
  
 operation QuantumConfidence(samples : Int) : Double {
-if not IsValidShotCount(samples) {
-fail "samples must be greater than zero.";
+let validationError = ShotCountValidationError(samples);
+
+if validationError != "" {
+fail validationError;
 }
  
 mutable hits = 0;

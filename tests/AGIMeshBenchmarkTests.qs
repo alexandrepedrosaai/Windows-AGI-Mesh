@@ -16,11 +16,13 @@ not IsValidCapabilityScore(100.1),
 );
 
 Fact(
-IsValidCapabilityWeights([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) and
-not IsValidCapabilityWeights([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) and
-not IsValidCapabilityWeights([-1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) and
-not IsValidCapabilityWeights([1.0]),
-"Capability weights must be six nonnegative values with a positive total."
+CapabilityWeightValidationError([1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 6) == "" and
+CapabilityWeightValidationError([0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 6) ==
+    "At least one capability weight must be greater than zero." and
+CapabilityWeightValidationError([-1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 6) ==
+    "Capability weights cannot be negative." and
+CapabilityWeightValidationError([1.0], 6) == "Exactly 6 weights are required.",
+"Capability weight validation must reject invalid weights and lengths."
 );
 
 Fact(
@@ -28,7 +30,7 @@ CapabilityMetricValidationError([Metric("valid", 50.0, 1.0)]) == "" and
 CapabilityMetricValidationError([Metric("invalid_score", 100.1, 1.0)]) ==
     "Capability score 'invalid_score' must be between 0 and 100." and
 CapabilityMetricValidationError([Metric("invalid_weight", 50.0, -1.0)]) ==
-    "Capability weight 'invalid_weight' cannot be negative." and
+    "Capability weights cannot be negative." and
 CapabilityMetricValidationError([Metric("zero_weight", 50.0, 0.0)]) ==
     "At least one capability weight must be greater than zero." and
 CapabilityMetricValidationError([]) ==
@@ -41,19 +43,19 @@ CapabilityMetricValidationError([]) ==
 operation TestTrialAndShotValidation() : Unit {
 
 Fact(
-IsValidTrialCount(0, 1) and
-IsValidTrialCount(1, 1) and
-not IsValidTrialCount(-1, 1) and
-not IsValidTrialCount(2, 1) and
-not IsValidTrialCount(0, 0),
-"Trial counts must be positive and successes must be within the trial count."
+TrialCountValidationError(0, 1) == "" and
+TrialCountValidationError(1, 1) == "" and
+TrialCountValidationError(-1, 1) == "successes must be between zero and trials." and
+TrialCountValidationError(2, 1) == "successes must be between zero and trials." and
+TrialCountValidationError(0, 0) == "trials must be greater than zero.",
+"Trial validation must report invalid counts."
 );
 
 Fact(
-IsValidShotCount(1) and
-not IsValidShotCount(0) and
-not IsValidShotCount(-1),
-"The number of shots must be positive."
+ShotCountValidationError(1) == "" and
+ShotCountValidationError(0) == "shots must be greater than zero." and
+ShotCountValidationError(-1) == "shots must be greater than zero.",
+"Shot validation must report nonpositive shot counts."
 );
 }
 
