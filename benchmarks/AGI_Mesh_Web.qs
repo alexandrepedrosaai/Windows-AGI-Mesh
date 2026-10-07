@@ -87,28 +87,38 @@ function IsValidShotCount(shots : Int) : Bool {
 return shots > 0;
 }
 
-function IsValidCapabilityMetrics(metrics : Metric[]) : Bool {
+function CapabilityMetricValidationError(metrics : Metric[]) : String {
 
 mutable totalWeight = 0.0;
 
 for metric in metrics {
 
-let (_, value, weight) = metric!;
+let (name, value, weight) = metric!;
 
-if not IsValidCapabilityScore(value) or weight < 0.0 {
-return false;
+if not IsValidCapabilityScore(value) {
+return $"Capability score '{name}' must be between 0 and 100.";
+}
+
+if weight < 0.0 {
+return $"Capability weight '{name}' cannot be negative.";
 }
 
 set totalWeight += weight;
 }
 
-return totalWeight > 0.0;
+if totalWeight <= 0.0 {
+return "At least one capability weight must be greater than zero.";
+}
+
+return "";
 }
 
 function CalculateAGICapabilityIndex(metrics : Metric[]) : Double {
 
-if not IsValidCapabilityMetrics(metrics) {
-fail "Capability scores must be between 0 and 100 and weights must be nonnegative with a positive total.";
+let validationError = CapabilityMetricValidationError(metrics);
+
+if validationError != "" {
+fail validationError;
 }
 
 return WeightedAverage(metrics);
@@ -149,7 +159,7 @@ set agreements += 1;
 return 100.0 * IntAsDouble(agreements) / IntAsDouble(shots);
 }
 
-operation RunAGICapabilityBenchmark(
+function RunAGICapabilityBenchmark(
 reasoning : Double,
 toolUsage : Double,
 memory : Double,
@@ -158,30 +168,6 @@ agentCoordination : Double,
 quantumConsensus : Double,
 weights : Double[]
 ) : CapabilityBenchmarkResult {
-
-if not IsValidCapabilityScore(reasoning) {
-fail "Capability score 'reasoning' must be between 0 and 100.";
-}
-
-if not IsValidCapabilityScore(toolUsage) {
-fail "Capability score 'tool_usage' must be between 0 and 100.";
-}
-
-if not IsValidCapabilityScore(memory) {
-fail "Capability score 'memory' must be between 0 and 100.";
-}
-
-if not IsValidCapabilityScore(selfCorrection) {
-fail "Capability score 'self_correction' must be between 0 and 100.";
-}
-
-if not IsValidCapabilityScore(agentCoordination) {
-fail "Capability score 'agent_coordination' must be between 0 and 100.";
-}
-
-if not IsValidCapabilityScore(quantumConsensus) {
-fail "Capability score 'quantum_consensus' must be between 0 and 100.";
-}
 
 if not IsValidCapabilityWeights(weights) {
 fail "Provide six nonnegative capability weights with a positive total.";

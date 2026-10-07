@@ -24,12 +24,16 @@ not IsValidCapabilityWeights([1.0]),
 );
 
 Fact(
-IsValidCapabilityMetrics([Metric("valid", 50.0, 1.0)]) and
-not IsValidCapabilityMetrics([Metric("invalid_score", 100.1, 1.0)]) and
-not IsValidCapabilityMetrics([Metric("invalid_weight", 50.0, -1.0)]) and
-not IsValidCapabilityMetrics([Metric("zero_weight", 50.0, 0.0)]) and
-not IsValidCapabilityMetrics([]),
-"Capability metrics must have valid scores and nonnegative weights with a positive total."
+CapabilityMetricValidationError([Metric("valid", 50.0, 1.0)]) == "" and
+CapabilityMetricValidationError([Metric("invalid_score", 100.1, 1.0)]) ==
+    "Capability score 'invalid_score' must be between 0 and 100." and
+CapabilityMetricValidationError([Metric("invalid_weight", 50.0, -1.0)]) ==
+    "Capability weight 'invalid_weight' cannot be negative." and
+CapabilityMetricValidationError([Metric("zero_weight", 50.0, 0.0)]) ==
+    "At least one capability weight must be greater than zero." and
+CapabilityMetricValidationError([]) ==
+    "At least one capability weight must be greater than zero.",
+"Capability metric validation must report invalid scores and weights."
 );
 }
 
