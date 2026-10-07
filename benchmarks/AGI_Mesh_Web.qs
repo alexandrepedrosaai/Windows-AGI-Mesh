@@ -83,7 +83,7 @@ function IsValidShotCount(shots : Int) : Bool {
 return shots > 0;
 }
 
-function CalculateAGICapabilityIndex(metrics : Metric[]) : Double {
+function IsValidCapabilityMetrics(metrics : Metric[]) : Bool {
 
 mutable totalWeight = 0.0;
 
@@ -91,19 +91,20 @@ for metric in metrics {
 
 let (_, value, weight) = metric!;
 
-if not IsValidCapabilityScore(value) {
-fail "Capability scores must be between 0 and 100.";
-}
-
-if weight < 0.0 {
-fail "Capability weights cannot be negative.";
+if not IsValidCapabilityScore(value) or weight < 0.0 {
+return false;
 }
 
 set totalWeight += weight;
 }
 
-if totalWeight <= 0.0 {
-fail "At least one capability weight must be greater than zero.";
+return totalWeight > 0.0;
+}
+
+function CalculateAGICapabilityIndex(metrics : Metric[]) : Double {
+
+if not IsValidCapabilityMetrics(metrics) {
+fail "Capability scores must be between 0 and 100 and weights must be nonnegative with a positive total.";
 }
 
 return WeightedAverage(metrics);
@@ -116,26 +117,6 @@ fail "trials must be positive and successes must be between zero and trials.";
 }
 
 return 100.0 * IntAsDouble(successes) / IntAsDouble(trials);
-}
-
-function RunReasoningBenchmark(successes : Int, trials : Int) : Double {
-return ScoreFromTrials(successes, trials);
-}
-
-function RunToolUsageBenchmark(successes : Int, trials : Int) : Double {
-return ScoreFromTrials(successes, trials);
-}
-
-function RunMemoryBenchmark(successes : Int, trials : Int) : Double {
-return ScoreFromTrials(successes, trials);
-}
-
-function RunSelfCorrectionBenchmark(successes : Int, trials : Int) : Double {
-return ScoreFromTrials(successes, trials);
-}
-
-function RunAgentCoordinationBenchmark(successes : Int, trials : Int) : Double {
-return ScoreFromTrials(successes, trials);
 }
 
 operation RunQuantumConsensusBenchmark(shots : Int) : Double {

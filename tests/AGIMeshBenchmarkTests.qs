@@ -1,6 +1,7 @@
 namespace AGIMesh.Tests {
 
 open Microsoft.Quantum.Diagnostics;
+open Microsoft.Quantum.Math;
 open AGIMesh.Benchmarks;
 
 @Test("QuantumSimulator")
@@ -20,6 +21,15 @@ not IsValidCapabilityWeights([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) and
 not IsValidCapabilityWeights([-1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) and
 not IsValidCapabilityWeights([1.0]),
 "Capability weights must be six nonnegative values with a positive total."
+);
+
+Fact(
+IsValidCapabilityMetrics([Metric("valid", 50.0, 1.0)]) and
+not IsValidCapabilityMetrics([Metric("invalid_score", 100.1, 1.0)]) and
+not IsValidCapabilityMetrics([Metric("invalid_weight", 50.0, -1.0)]) and
+not IsValidCapabilityMetrics([Metric("zero_weight", 50.0, 0.0)]) and
+not IsValidCapabilityMetrics([]),
+"Capability metrics must have valid scores and nonnegative weights with a positive total."
 );
 }
 
@@ -47,12 +57,10 @@ not IsValidShotCount(-1),
 operation TestCapabilityScoring() : Unit {
 
 Fact(
-RunReasoningBenchmark(7, 10) == 70.0 and
-RunToolUsageBenchmark(7, 10) == 70.0 and
-RunMemoryBenchmark(7, 10) == 70.0 and
-RunSelfCorrectionBenchmark(7, 10) == 70.0 and
-RunAgentCoordinationBenchmark(7, 10) == 70.0,
-"Capability benchmark scores must report successful trials as percentages."
+AbsD(ScoreFromTrials(7, 10) - 70.0) < 1e-9 and
+ScoreFromTrials(0, 10) == 0.0 and
+ScoreFromTrials(10, 10) == 100.0,
+"Trial scores must report successful trials as percentages."
 );
 }
 
@@ -69,10 +77,8 @@ let benchmark = RunAGICapabilityBenchmark(
 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 );
 
-let (_, score, _, _, _, _, _, _) = benchmark!;
-
 Fact(
-score == 77.5,
+AbsD(benchmark::CapabilityIndex - 77.5) < 1e-9,
 "The capability index must normalize and apply its weights."
 );
 }
