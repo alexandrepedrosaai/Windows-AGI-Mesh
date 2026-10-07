@@ -41,7 +41,7 @@ AgentCoordination : Double,
 QuantumConsensus : Double
 );
 
-/// Returns a metric value average normalized by total weight, or zero when the total weight is zero.
+/// Returns the weighted average of metric values, normalizing each weight by the total weight; returns zero when the total weight is zero.
 function WeightedAverage(metrics : Metric[]) : Double {
  
 mutable totalWeight = 0.0;
