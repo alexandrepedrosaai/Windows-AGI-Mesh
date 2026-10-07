@@ -69,6 +69,10 @@ function AGIMeshCapabilityBenchmarkVersion() : String {
 return "0.2";
 }
 
+function CapabilityMetricCount() : Int {
+return 6;
+}
+
 function CapabilityWeightValidationError(
 weights : Double[]
 ) : String {
@@ -195,7 +199,10 @@ scores : CapabilityScores,
 weights : Double[]
 ) : CapabilityBenchmarkResult {
 
-let weightValidationError = CapabilityWeightCountValidationError(weights, 6);
+let weightValidationError = CapabilityWeightCountValidationError(
+weights,
+CapabilityMetricCount()
+);
 
 if weightValidationError != "" {
 fail weightValidationError;

@@ -2,6 +2,7 @@ namespace AGIMesh.Tests {
 
 open Microsoft.Quantum.Diagnostics;
 open Microsoft.Quantum.Math;
+open Microsoft.Quantum.Simulation.XUnit;
 open AGIMesh.Benchmarks;
 
 @Test("QuantumSimulator")
@@ -16,7 +17,10 @@ not IsValidCapabilityScore(100.1),
 );
 
 Fact(
-CapabilityWeightCountValidationError([1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 6) == "" and
+CapabilityWeightCountValidationError(
+[1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+CapabilityMetricCount()
+) == "" and
 CapabilityWeightValidationError([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ==
     "At least one capability weight must be greater than zero." and
 CapabilityWeightValidationError([-1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) ==
@@ -25,7 +29,8 @@ CapabilityWeightValidationError([0.0 / 0.0]) ==
     "Capability weights must be finite and nonnegative." and
 CapabilityWeightValidationError([1.0 / 0.0]) ==
     "Capability weights must be finite and nonnegative." and
-CapabilityWeightCountValidationError([1.0], 6) == "Exactly 6 weights are required.",
+CapabilityWeightCountValidationError([1.0], CapabilityMetricCount()) ==
+    "Exactly 6 weights are required.",
 "Capability weight validation must reject invalid weights and lengths."
 );
 
@@ -111,6 +116,42 @@ let score = RunQuantumConsensusBenchmark(100);
 Fact(
 score == 100.0,
 "Bell-pair measurements must be correlated on every shot."
+);
+}
+
+@ExpectedFail("Invalid trial count must fail.")
+@Test("QuantumSimulator")
+operation TestInvalidTrialCountFails() : Unit {
+let score = ScoreFromTrials(0, 0);
+}
+
+@ExpectedFail("Nonpositive shot count must fail.")
+@Test("QuantumSimulator")
+operation TestInvalidShotCountFails() : Unit {
+let score = RunQuantumConsensusBenchmark(0);
+}
+
+@ExpectedFail("Invalid metrics must fail ACI calculation.")
+@Test("QuantumSimulator")
+operation TestInvalidCapabilityMetricsFail() : Unit {
+let score = CalculateAGICapabilityIndex([Metric("invalid", 101.0, 1.0)]);
+}
+
+@ExpectedFail("An out-of-range score must fail at the ACI entry point.")
+@Test("QuantumSimulator")
+operation TestInvalidCapabilityScoreFails() : Unit {
+let result = RunAGICapabilityBenchmark(
+CapabilityScores(101.0, 60.0, 100.0, 50.0, 75.0, 100.0),
+[1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+);
+}
+
+@ExpectedFail("A malformed weight count must fail at the ACI entry point.")
+@Test("QuantumSimulator")
+operation TestInvalidCapabilityWeightCountFails() : Unit {
+let result = RunAGICapabilityBenchmark(
+CapabilityScores(80.0, 60.0, 100.0, 50.0, 75.0, 100.0),
+[1.0]
 );
 }
 }
