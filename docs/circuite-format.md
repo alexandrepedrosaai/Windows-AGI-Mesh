@@ -6,8 +6,6 @@ or parser is available. The benchmark `.qs` file contains executable Q# source.
 
 ## Conventions
 
-- Each module and example circuit file declares one `circuit` with a stable
-  identifier, `version`, and `kind`; the root circuit uses `: Architecture`.
 - `scope` states purpose, supported boundaries, and relevant exclusions.
 - `metrics` names observable measures, units, and evaluation targets. A target
   that says "report" is a measurement requirement, not an asserted result.
