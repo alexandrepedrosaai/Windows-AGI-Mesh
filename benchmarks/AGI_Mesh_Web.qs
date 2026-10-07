@@ -1,4 +1,5 @@
 namespace AGIMesh.Benchmarks {
+open Microsoft.Quantum.Arrays;
 open Microsoft.Quantum.Intrinsic;
  
 open Microsoft.Quantum.Math;
@@ -144,6 +145,12 @@ return $"{name} must be greater than zero.";
 return "";
 }
 
+/// Extracts a metric's weight for the capability validation projection.
+function MetricWeight(metric : Metric) : Double {
+let (_, _, weight) = metric!;
+return weight;
+}
+
 /// Validates named capability scores first, then weights, returning an empty string when valid.
 function CapabilityMetricValidationError(metrics : Metric[]) : String {
 
@@ -156,13 +163,7 @@ return $"Capability score '{name}' must be finite and between 0 and 100.";
 }
 }
 
-mutable weights : Double[] = [];
-
-for metric in metrics {
-
-let (_, _, weight) = metric!;
-set weights += [weight];
-}
+let weights = Mapped(MetricWeight, metrics);
 
 return CapabilityWeightValidationError(weights);
 }
@@ -200,9 +201,8 @@ if validationError != "" {
 fail validationError;
 }
 
-mutable agreements = 0;
-
 use register = Qubit[2];
+mutable agreements = 0;
 
 for _ in 1..shots {
 

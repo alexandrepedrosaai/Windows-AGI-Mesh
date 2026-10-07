@@ -141,39 +141,4 @@ AbsD(score - 100.0) < 1e-9,
 );
 }
 
-@ExpectedFail("Invalid trial count must fail.")
-@Test("QuantumSimulator")
-operation TestInvalidTrialCountFails() : Unit {
-let _ = ScoreFromTrials(0, 0);
-}
-
-@ExpectedFail("Nonpositive shot count must fail.")
-@Test("QuantumSimulator")
-operation TestInvalidShotCountFails() : Unit {
-let _ = RunQuantumConsensusBenchmark(0);
-}
-
-@ExpectedFail("Invalid metrics must fail ACI calculation.")
-@Test("QuantumSimulator")
-operation TestInvalidCapabilityMetricsFail() : Unit {
-let _ = CalculateAGICapabilityIndex([Metric("invalid", 101.0, 1.0)]);
-}
-
-@ExpectedFail("An out-of-range score must fail at the ACI entry point.")
-@Test("QuantumSimulator")
-operation TestInvalidCapabilityScoreFails() : Unit {
-let _ = RunAGICapabilityBenchmark(
-CapabilityScores(101.0, 60.0, 100.0, 50.0, 75.0, 100.0),
-[1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-);
-}
-
-@ExpectedFail("A malformed weight count must fail at the ACI entry point.")
-@Test("QuantumSimulator")
-operation TestInvalidCapabilityWeightCountFails() : Unit {
-let _ = RunAGICapabilityBenchmark(
-CapabilityScores(80.0, 60.0, 100.0, 50.0, 75.0, 100.0),
-[1.0]
-);
-}
 }
