@@ -25,9 +25,9 @@ CapabilityWeightValidationError([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ==
     "At least one capability weight must be greater than zero." and
 CapabilityWeightValidationError([-1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) ==
     "Capability weights must be finite and nonnegative." and
-CapabilityWeightValidationError([0.0 / 0.0]) ==
+CapabilityWeightValidationError([Sqrt(-1.0)]) ==
     "Capability weights must be finite and nonnegative." and
-CapabilityWeightValidationError([1.0 / 0.0]) ==
+CapabilityWeightValidationError([ExpD(1000.0)]) ==
     "Capability weights must be finite and nonnegative." and
 CapabilityWeightCountValidationError([1.0], CapabilityMetricCount()) ==
     "Exactly 6 weights are required.",
@@ -122,25 +122,25 @@ score == 100.0,
 @ExpectedFail("Invalid trial count must fail.")
 @Test("QuantumSimulator")
 operation TestInvalidTrialCountFails() : Unit {
-let score = ScoreFromTrials(0, 0);
+let _ = ScoreFromTrials(0, 0);
 }
 
 @ExpectedFail("Nonpositive shot count must fail.")
 @Test("QuantumSimulator")
 operation TestInvalidShotCountFails() : Unit {
-let score = RunQuantumConsensusBenchmark(0);
+let _ = RunQuantumConsensusBenchmark(0);
 }
 
 @ExpectedFail("Invalid metrics must fail ACI calculation.")
 @Test("QuantumSimulator")
 operation TestInvalidCapabilityMetricsFail() : Unit {
-let score = CalculateAGICapabilityIndex([Metric("invalid", 101.0, 1.0)]);
+let _ = CalculateAGICapabilityIndex([Metric("invalid", 101.0, 1.0)]);
 }
 
 @ExpectedFail("An out-of-range score must fail at the ACI entry point.")
 @Test("QuantumSimulator")
 operation TestInvalidCapabilityScoreFails() : Unit {
-let result = RunAGICapabilityBenchmark(
+let _ = RunAGICapabilityBenchmark(
 CapabilityScores(101.0, 60.0, 100.0, 50.0, 75.0, 100.0),
 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 );
@@ -149,7 +149,7 @@ CapabilityScores(101.0, 60.0, 100.0, 50.0, 75.0, 100.0),
 @ExpectedFail("A malformed weight count must fail at the ACI entry point.")
 @Test("QuantumSimulator")
 operation TestInvalidCapabilityWeightCountFails() : Unit {
-let result = RunAGICapabilityBenchmark(
+let _ = RunAGICapabilityBenchmark(
 CapabilityScores(80.0, 60.0, 100.0, 50.0, 75.0, 100.0),
 [1.0]
 );
