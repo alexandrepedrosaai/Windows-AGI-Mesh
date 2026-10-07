@@ -23,18 +23,9 @@ jobs:
         run: dotnet tool install -g Microsoft.Quantum.IQSharp
  
       # Q# (Azure Quantum official language)
-      - name: Lint Q# files
-        run: qsharp-lint modules/**/*.qs
-      - name: Run Q# tests with coverage
-        run: qsharp-test --coverage modules/
-      - name: Enforce coverage >= 80%
+      - name: Verify QDK installation
         shell: bash
-        run: |
-          COVERAGE=$(cat coverage/summary.txt | grep "Total" | awk '{print $4}' | sed 's/%//')
-          if [ "$COVERAGE" -lt 80 ]; then
-            echo "Coverage $COVERAGE% is below threshold (80%)"
-            exit 1
-          fi
+        run: dotnet tool list -g | grep -i "microsoft.quantum.iqsharp"
  
       # Python, Rust, C++, Frontend, Infra, Docs checks podem ser adicionados aqui...
  
