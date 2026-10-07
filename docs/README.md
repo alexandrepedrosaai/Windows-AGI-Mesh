@@ -1,6 +1,6 @@
 # Documentation
 
-See [DSL.md](DSL.md) for the `.q#circuite` conventions, repository layout, and interpretation of declared metrics and security policies.
+See [DSL.md](DSL.md) for the `.qs` circuit conventions, repository layout, and interpretation of declared metrics and security policies.
 
 ## Q# capability benchmark
 
