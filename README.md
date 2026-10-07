@@ -3,10 +3,10 @@ Windows-AGI-Mesh is a technical framework to evaluate and integrate AGI architec
 
 ## Repository layout
 
-- `Windows-AGI-Mesh.q#circuite` describes the architecture, module contracts, and roadmap.
+- `Windows-AGI-Mesh.qs` describes the architecture, module contracts, and roadmap.
 - `modules/` contains module specifications for reasoning data, resilient storage, quantum persistence research, immersive AI, and local edge intelligence.
-- `benchmarks/` contains the general-intelligence evaluation benchmark specification.
-- `docs/` documents the `.q#circuite` conventions.
+- `benchmarks/` contains the Q# general-intelligence evaluation benchmark.
+- `docs/` documents the `.qs` circuit conventions.
 - `examples/` contains an illustrative local-first Windows PC deployment.
 
-The `.q#circuite` files are declarative design manifests, not executable code. Their security rules describe requirements for a future implementation and do not enforce them by themselves. See [the format reference](docs/circuite-format.md).
+The architecture and module `.qs` circuits are declarative design manifests, not executable code. Their security rules describe requirements for a future implementation and do not enforce them by themselves. The benchmark `.qs` file is Q# source. See [the format reference](docs/circuite-format.md).
