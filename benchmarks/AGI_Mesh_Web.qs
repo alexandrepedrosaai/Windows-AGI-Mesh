@@ -69,7 +69,8 @@ return weightedAverage;
 
 /// Returns whether a capability score is within the inclusive 0 to 100 range.
 function IsValidCapabilityScore(score : Double) : Bool {
-return score >= 0.0 and score <= 100.0;
+return not IsNaN(score) and not IsInfinite(score) and
+    score >= 0.0 and score <= 100.0;
 }
 
 /// Returns the version identifier for the AGI capability benchmark.
@@ -143,19 +144,23 @@ return $"{name} must be greater than zero.";
 return "";
 }
 
-/// Validates named capability scores and their weights, returning an empty string when valid.
+/// Validates named capability scores first, then weights, returning an empty string when valid.
 function CapabilityMetricValidationError(metrics : Metric[]) : String {
+
+for metric in metrics {
+
+let (name, value, _) = metric!;
+
+if not IsValidCapabilityScore(value) {
+return $"Capability score '{name}' must be finite and between 0 and 100.";
+}
+}
 
 mutable weights : Double[] = [];
 
 for metric in metrics {
 
-let (name, value, weight) = metric!;
-
-if not IsValidCapabilityScore(value) {
-return $"Capability score '{name}' must be between 0 and 100.";
-}
-
+let (_, _, weight) = metric!;
 set weights += [weight];
 }
 
@@ -215,7 +220,7 @@ set agreements += 1;
 return 100.0 * IntAsDouble(agreements) / IntAsDouble(shots);
 }
 
-/// Combines caller-supplied capability scores (each 0 to 100) using exactly six finite, nonnegative weights with a positive finite total. The caller supplies the quantum-consensus score; this function does not run the Bell-pair experiment. Invalid inputs fail.
+/// Combines caller-supplied finite capability scores (each 0 to 100) using exactly six finite, nonnegative weights with a positive finite total. The caller supplies the quantum-consensus score; this function does not run the Bell-pair experiment. Invalid inputs fail.
 function RunAGICapabilityBenchmark(
 scores : CapabilityScores,
 weights : Double[]

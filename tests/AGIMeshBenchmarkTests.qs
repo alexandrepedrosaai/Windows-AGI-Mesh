@@ -12,8 +12,10 @@ Fact(
 IsValidCapabilityScore(0.0) and
 IsValidCapabilityScore(100.0) and
 not IsValidCapabilityScore(-0.1) and
-not IsValidCapabilityScore(100.1),
-"Capability scores must be limited to 0 through 100."
+not IsValidCapabilityScore(100.1) and
+not IsValidCapabilityScore(Sqrt(-1.0)) and
+not IsValidCapabilityScore(ExpD(1000.0)),
+"Capability scores must be finite and limited to 0 through 100."
 );
 
 Fact(
@@ -39,7 +41,9 @@ CapabilityWeightCountValidationError([1.0], CapabilityMetricCount()) ==
 Fact(
 CapabilityMetricValidationError([Metric("valid", 50.0, 1.0)]) == "" and
 CapabilityMetricValidationError([Metric("invalid_score", 100.1, 1.0)]) ==
-    "Capability score 'invalid_score' must be between 0 and 100." and
+    "Capability score 'invalid_score' must be finite and between 0 and 100." and
+CapabilityMetricValidationError([Metric("nan_score", Sqrt(-1.0), 1.0)]) ==
+    "Capability score 'nan_score' must be finite and between 0 and 100." and
 CapabilityMetricValidationError([Metric("invalid_weight", 50.0, -1.0)]) ==
     "Capability weights must be finite and nonnegative." and
 CapabilityMetricValidationError([Metric("zero_weight", 50.0, 0.0)]) ==
@@ -111,12 +115,28 @@ AbsD(benchmark::CapabilityIndex - 1580.0 / 21.0) < 1e-9,
 }
 
 @Test("QuantumSimulator")
+operation TestLargeFiniteWeights() : Unit {
+
+let score = CalculateAGICapabilityIndex([
+Metric("high", 100.0, 1.0e308),
+Metric("low", 0.0, 1.0e307)
+]);
+
+Fact(
+not IsNaN(score) and
+not IsInfinite(score) and
+AbsD(score - 100.0 * (1.0e308 / 1.1e308)) < 1e-9,
+"Large finite weights must produce a finite, correctly normalized score."
+);
+}
+
+@Test("QuantumSimulator")
 operation TestBellPairCorrelation() : Unit {
 
 let score = RunQuantumConsensusBenchmark(100);
 
 Fact(
-score == 100.0,
+AbsD(score - 100.0) < 1e-9,
 "Bell-pair measurements must be correlated on every shot."
 );
 }
