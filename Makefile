@@ -2,6 +2,8 @@
 
 all:
 	@echo "Building Windows-AGI-Mesh..."
+	mkdir -p bin
+	cp Windows-AGI-Mesh.qs bin/
 	# Add your build commands here
 	# Examples:
 	# dotnet build
