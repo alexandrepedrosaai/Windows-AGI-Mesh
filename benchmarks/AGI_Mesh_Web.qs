@@ -40,6 +40,9 @@ return weightedSum / totalWeight;
 }
  
 operation QuantumConfidence(samples : Int) : Double {
+if samples <= 0 {
+fail "samples must be greater than zero.";
+}
  
 mutable hits = 0;
  
