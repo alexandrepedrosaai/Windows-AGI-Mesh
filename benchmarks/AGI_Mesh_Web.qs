@@ -40,6 +40,7 @@ AgentCoordination : Double,
 QuantumConsensus : Double
 );
 
+/// Returns a metric value average normalized by total weight, or zero when the total weight is zero.
 function WeightedAverage(metrics : Metric[]) : Double {
  
 mutable totalWeight = 0.0;
@@ -66,18 +67,22 @@ set weightedAverage += value * (weight / totalWeight);
 return weightedAverage;
 }
 
+/// Returns whether a capability score is within the inclusive 0 to 100 range.
 function IsValidCapabilityScore(score : Double) : Bool {
 return score >= 0.0 and score <= 100.0;
 }
 
+/// Returns the version identifier for the AGI capability benchmark.
 function AGIMeshCapabilityBenchmarkVersion() : String {
 return "0.2";
 }
 
+/// Returns the number of capability scores and weights required by the ACI.
 function CapabilityMetricCount() : Int {
 return 6;
 }
 
+/// Returns an error message if weights are negative, non-finite, overflow in aggregate, or have no positive total.
 function CapabilityWeightValidationError(
 weights : Double[]
 ) : String {
@@ -103,6 +108,7 @@ return "At least one capability weight must be greater than zero.";
 return "";
 }
 
+/// Validates a weight array's expected length and values, returning an empty string when valid.
 function CapabilityWeightCountValidationError(
 weights : Double[],
 expectedCount : Int
@@ -115,6 +121,7 @@ return $"Exactly {expectedCount} weights are required.";
 return CapabilityWeightValidationError(weights);
 }
 
+/// Returns an error message unless trials are positive and successes are between zero and trials.
 function TrialCountValidationError(successes : Int, trials : Int) : String {
 if trials <= 0 {
 return "trials must be greater than zero.";
@@ -127,6 +134,7 @@ return "successes must be between zero and trials.";
 return "";
 }
 
+/// Returns an error message if a sample or shot count is not positive.
 function ShotCountValidationError(name : String, count : Int) : String {
 if count <= 0 {
 return $"{name} must be greater than zero.";
@@ -135,6 +143,7 @@ return $"{name} must be greater than zero.";
 return "";
 }
 
+/// Validates named capability scores and their weights, returning an empty string when valid.
 function CapabilityMetricValidationError(metrics : Metric[]) : String {
 
 mutable weights : Double[] = [];
@@ -153,6 +162,7 @@ set weights += [weight];
 return CapabilityWeightValidationError(weights);
 }
 
+/// Calculates the normalized ACI for validated metrics and fails when a score or weight is invalid.
 function CalculateAGICapabilityIndex(metrics : Metric[]) : Double {
 
 let validationError = CapabilityMetricValidationError(metrics);
@@ -176,7 +186,7 @@ fail validationError;
 return 100.0 * IntAsDouble(successes) / IntAsDouble(trials);
 }
 
-/// Measures Bell-pair agreement over positive simulator shots and returns a percentage from 0 to 100. Invalid shot counts fail; this does not measure agent consensus.
+/// Measures Bell-pair agreement over positive simulator shots and returns a percentage from 0 to 100. MResetZ resets qubits between shots. Invalid shot counts fail; this does not measure agent consensus.
 operation RunQuantumConsensusBenchmark(shots : Int) : Double {
 
 let validationError = ShotCountValidationError("shots", shots);
@@ -251,6 +261,7 @@ quantumConsensus
 );
 }
  
+/// Estimates the one-qubit measurement probability over positive samples, returning a value from 0 to 1.
 operation QuantumConfidence(samples : Int) : Double {
 let validationError = ShotCountValidationError("samples", samples);
 
@@ -274,6 +285,7 @@ set hits += 1;
 return IntAsDouble(hits) / IntAsDouble(samples);
 }
  
+/// Calculates the baseline AGI Mesh benchmark using its predefined metric values and weights.
 operation ExecuteAGIMeshBenchmark() : BenchmarkResult {
  
 let taskAccuracy = 88.2;
