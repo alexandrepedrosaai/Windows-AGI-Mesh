@@ -61,10 +61,10 @@ TrialCountValidationError(0, 0) == "trials must be greater than zero.",
 );
 
 Fact(
-ShotCountValidationError(1) == "" and
-ShotCountValidationError(0) == "shots must be greater than zero." and
-ShotCountValidationError(-1) == "shots must be greater than zero.",
-"Shot validation must report nonpositive shot counts."
+ShotCountValidationError("shots", 1) == "" and
+ShotCountValidationError("shots", 0) == "shots must be greater than zero." and
+ShotCountValidationError("samples", -1) == "samples must be greater than zero.",
+"Shot and sample validation must report nonpositive counts."
 );
 }
 

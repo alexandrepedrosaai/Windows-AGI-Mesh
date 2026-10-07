@@ -1,5 +1,4 @@
 namespace AGIMesh.Benchmarks {
-open Microsoft.Quantum.Arrays;
 open Microsoft.Quantum.Intrinsic;
  
 open Microsoft.Quantum.Math;
@@ -118,9 +117,9 @@ return "successes must be between zero and trials.";
 return "";
 }
 
-function ShotCountValidationError(shots : Int) : String {
-if shots <= 0 {
-return "shots must be greater than zero.";
+function ShotCountValidationError(name : String, count : Int) : String {
+if count <= 0 {
+return $"{name} must be greater than zero.";
 }
 
 return "";
@@ -168,7 +167,7 @@ return 100.0 * IntAsDouble(successes) / IntAsDouble(trials);
 
 operation RunQuantumConsensusBenchmark(shots : Int) : Double {
 
-let validationError = ShotCountValidationError(shots);
+let validationError = ShotCountValidationError("shots", shots);
 
 if validationError != "" {
 fail validationError;
@@ -240,7 +239,7 @@ quantumConsensus
 }
  
 operation QuantumConfidence(samples : Int) : Double {
-let validationError = ShotCountValidationError(samples);
+let validationError = ShotCountValidationError("samples", samples);
 
 if validationError != "" {
 fail validationError;
