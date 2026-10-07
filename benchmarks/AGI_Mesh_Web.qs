@@ -67,7 +67,6 @@ let transferRetention = 83.7;
 let toolSafety = 96.1;
 let runReproducibility = 100.0;
  
-let confidence = QuantumConfidence(1024);
  
 let metrics = [
  
