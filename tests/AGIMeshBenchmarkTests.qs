@@ -29,6 +29,8 @@ CapabilityWeightValidationError([Sqrt(-1.0)]) ==
     "Capability weights must be finite and nonnegative." and
 CapabilityWeightValidationError([ExpD(1000.0)]) ==
     "Capability weights must be finite and nonnegative." and
+CapabilityWeightValidationError([1.0e308, 1.0e308]) ==
+    "Total capability weight must be finite." and
 CapabilityWeightCountValidationError([1.0], CapabilityMetricCount()) ==
     "Exactly 6 weights are required.",
 "Capability weight validation must reject invalid weights and lengths."

@@ -42,14 +42,11 @@ QuantumConsensus : Double
 
 function WeightedAverage(metrics : Metric[]) : Double {
  
-mutable weightedSum = 0.0;
 mutable totalWeight = 0.0;
  
 for metric in metrics {
  
-let (name, value, weight) = metric!;
- 
-set weightedSum += value * weight;
+let (_, _, weight) = metric!;
 set totalWeight += weight;
 }
  
@@ -57,7 +54,16 @@ if totalWeight == 0.0 {
 return 0.0;
 }
  
-return weightedSum / totalWeight;
+mutable weightedAverage = 0.0;
+
+for metric in metrics {
+
+let (_, value, weight) = metric!;
+
+set weightedAverage += value * (weight / totalWeight);
+}
+
+return weightedAverage;
 }
 
 function IsValidCapabilityScore(score : Double) : Bool {
@@ -84,6 +90,10 @@ return "Capability weights must be finite and nonnegative.";
 }
 
 set totalWeight += weight;
+
+if IsInfinite(totalWeight) {
+return "Total capability weight must be finite.";
+}
 }
 
 if totalWeight <= 0.0 {
@@ -154,6 +164,7 @@ fail validationError;
 return WeightedAverage(metrics);
 }
 
+/// Returns the percentage of successful trials. `trials` must be positive and `successes` must be within its range; invalid inputs fail.
 function ScoreFromTrials(successes : Int, trials : Int) : Double {
 
 let validationError = TrialCountValidationError(successes, trials);
@@ -165,6 +176,7 @@ fail validationError;
 return 100.0 * IntAsDouble(successes) / IntAsDouble(trials);
 }
 
+/// Measures Bell-pair agreement over positive simulator shots and returns a percentage from 0 to 100. Invalid shot counts fail; this does not measure agent consensus.
 operation RunQuantumConsensusBenchmark(shots : Int) : Double {
 
 let validationError = ShotCountValidationError("shots", shots);
@@ -193,6 +205,7 @@ set agreements += 1;
 return 100.0 * IntAsDouble(agreements) / IntAsDouble(shots);
 }
 
+/// Combines caller-supplied capability scores (each 0 to 100) using exactly six finite, nonnegative weights with a positive finite total. The caller supplies the quantum-consensus score; this function does not run the Bell-pair experiment. Invalid inputs fail.
 function RunAGICapabilityBenchmark(
 scores : CapabilityScores,
 weights : Double[]
