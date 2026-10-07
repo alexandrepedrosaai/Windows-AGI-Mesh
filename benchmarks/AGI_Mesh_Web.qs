@@ -41,9 +41,15 @@ AgentCoordination : Double,
 QuantumConsensus : Double
 );
 
-/// Returns the weighted average of metric values, normalizing each weight by the total weight; returns zero when the total weight is zero.
+/// Returns the weighted average of validated metric values, normalizing each weight by the total weight; returns zero when the total weight is zero.
 function WeightedAverage(metrics : Metric[]) : Double {
- 
+
+let validationError = CapabilityMetricValidationError(metrics, false);
+
+if validationError != "" {
+fail validationError;
+}
+
 mutable totalWeight = 0.0;
  
 for metric in metrics {
@@ -84,9 +90,10 @@ function CapabilityMetricCount() : Int {
 return 6;
 }
 
-/// Returns an error message if weights are negative, non-finite, overflow in aggregate, or have no positive total.
+/// Returns an error message for negative or non-finite weights, overflow, or a nonpositive total when required.
 function CapabilityWeightValidationError(
-weights : Double[]
+weights : Double[],
+requirePositiveTotal : Bool
 ) : String {
 
 mutable totalWeight = 0.0;
@@ -103,7 +110,7 @@ return "Total capability weight must be finite.";
 }
 }
 
-if totalWeight <= 0.0 {
+if requirePositiveTotal and totalWeight <= 0.0 {
 return "At least one capability weight must be greater than zero.";
 }
 
@@ -120,7 +127,7 @@ if Length(weights) != expectedCount {
 return $"Exactly {expectedCount} weights are required.";
 }
 
-return CapabilityWeightValidationError(weights);
+return CapabilityWeightValidationError(weights, true);
 }
 
 /// Returns an error message unless trials are positive and successes are between zero and trials.
@@ -151,8 +158,11 @@ let (_, _, weight) = metric!;
 return weight;
 }
 
-/// Validates named capability scores first, then weights, returning an empty string when valid.
-function CapabilityMetricValidationError(metrics : Metric[]) : String {
+/// Validates named capability scores first, then weights, optionally requiring a positive total.
+function CapabilityMetricValidationError(
+metrics : Metric[],
+requirePositiveTotal : Bool
+) : String {
 
 for metric in metrics {
 
@@ -165,13 +175,13 @@ return $"Capability score '{name}' must be finite and between 0 and 100.";
 
 let weights = Mapped(MetricWeight, metrics);
 
-return CapabilityWeightValidationError(weights);
+return CapabilityWeightValidationError(weights, requirePositiveTotal);
 }
 
 /// Calculates the normalized ACI for validated metrics and fails when a score or weight is invalid.
 function CalculateAGICapabilityIndex(metrics : Metric[]) : Double {
 
-let validationError = CapabilityMetricValidationError(metrics);
+let validationError = CapabilityMetricValidationError(metrics, true);
 
 if validationError != "" {
 fail validationError;

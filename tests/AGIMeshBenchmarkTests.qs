@@ -23,15 +23,15 @@ CapabilityWeightCountValidationError(
 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
 CapabilityMetricCount()
 ) == "" and
-CapabilityWeightValidationError([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ==
+CapabilityWeightValidationError([0.0, 0.0, 0.0, 0.0, 0.0, 0.0], true) ==
     "At least one capability weight must be greater than zero." and
-CapabilityWeightValidationError([-1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) ==
+CapabilityWeightValidationError([-1.0, 1.0, 1.0, 1.0, 1.0, 1.0], true) ==
     "Capability weights must be finite and nonnegative." and
-CapabilityWeightValidationError([Sqrt(-1.0)]) ==
+CapabilityWeightValidationError([Sqrt(-1.0)], true) ==
     "Capability weights must be finite and nonnegative." and
-CapabilityWeightValidationError([ExpD(1000.0)]) ==
+CapabilityWeightValidationError([ExpD(1000.0)], true) ==
     "Capability weights must be finite and nonnegative." and
-CapabilityWeightValidationError([1.0e308, 1.0e308]) ==
+CapabilityWeightValidationError([1.0e308, 1.0e308], true) ==
     "Total capability weight must be finite." and
 CapabilityWeightCountValidationError([1.0], CapabilityMetricCount()) ==
     "Exactly 6 weights are required.",
@@ -39,18 +39,24 @@ CapabilityWeightCountValidationError([1.0], CapabilityMetricCount()) ==
 );
 
 Fact(
-CapabilityMetricValidationError([Metric("valid", 50.0, 1.0)]) == "" and
-CapabilityMetricValidationError([Metric("invalid_score", 100.1, 1.0)]) ==
+CapabilityMetricValidationError([Metric("valid", 50.0, 1.0)], true) == "" and
+CapabilityMetricValidationError([Metric("invalid_score", 100.1, 1.0)], true) ==
     "Capability score 'invalid_score' must be finite and between 0 and 100." and
-CapabilityMetricValidationError([Metric("nan_score", Sqrt(-1.0), 1.0)]) ==
+CapabilityMetricValidationError([Metric("nan_score", Sqrt(-1.0), 1.0)], true) ==
     "Capability score 'nan_score' must be finite and between 0 and 100." and
-CapabilityMetricValidationError([Metric("invalid_weight", 50.0, -1.0)]) ==
+CapabilityMetricValidationError([Metric("invalid_weight", 50.0, -1.0)], true) ==
     "Capability weights must be finite and nonnegative." and
-CapabilityMetricValidationError([Metric("zero_weight", 50.0, 0.0)]) ==
+CapabilityMetricValidationError([Metric("zero_weight", 50.0, 0.0)], true) ==
     "At least one capability weight must be greater than zero." and
-CapabilityMetricValidationError([]) ==
+CapabilityMetricValidationError([], true) ==
     "At least one capability weight must be greater than zero.",
 "Capability metric validation must report invalid scores and weights."
+);
+
+Fact(
+CapabilityMetricValidationError([Metric("zero_weight", 50.0, 0.0)], false) == "" and
+WeightedAverage([Metric("zero_weight", 50.0, 0.0)]) == 0.0,
+"WeightedAverage must preserve the zero-total-weight result."
 );
 }
 
@@ -82,6 +88,17 @@ AbsD(ScoreFromTrials(7, 10) - 70.0) < 1e-9 and
 ScoreFromTrials(0, 10) == 0.0 and
 ScoreFromTrials(10, 10) == 100.0,
 "Trial scores must report successful trials as percentages."
+);
+}
+
+@Test("QuantumSimulator")
+operation TestQuantumConfidence() : Unit {
+
+let confidence = QuantumConfidence(100);
+
+Fact(
+confidence >= 0.0 and confidence <= 1.0,
+"Quantum confidence must remain between zero and one."
 );
 }
 
