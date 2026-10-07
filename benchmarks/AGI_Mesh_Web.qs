@@ -41,14 +41,8 @@ AgentCoordination : Double,
 QuantumConsensus : Double
 );
 
-/// Returns the weighted average of validated metric values, normalizing each weight by the total weight; returns zero when the total weight is zero.
-function WeightedAverage(metrics : Metric[]) : Double {
-
-let validationError = CapabilityMetricValidationError(metrics, false);
-
-if validationError != "" {
-fail validationError;
-}
+/// Computes a normalized average for metrics already checked by the public entry points.
+internal function WeightedAverageValidated(metrics : Metric[]) : Double {
 
 mutable totalWeight = 0.0;
  
@@ -72,6 +66,18 @@ set weightedAverage += value * (weight / totalWeight);
 }
 
 return weightedAverage;
+}
+
+/// Returns the weighted average of metric values, normalizing each weight by the total; returns zero for zero total weight and fails for invalid metrics.
+function WeightedAverage(metrics : Metric[]) : Double {
+
+let validationError = CapabilityMetricValidationError(metrics, false);
+
+if validationError != "" {
+fail validationError;
+}
+
+return WeightedAverageValidated(metrics);
 }
 
 /// Returns whether a capability score is within the inclusive 0 to 100 range.
@@ -187,7 +193,7 @@ if validationError != "" {
 fail validationError;
 }
 
-return WeightedAverage(metrics);
+return WeightedAverageValidated(metrics);
 }
 
 /// Returns the percentage of successful trials. `trials` must be positive and `successes` must be within its range; invalid inputs fail.
