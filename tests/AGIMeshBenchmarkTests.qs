@@ -78,7 +78,8 @@ let benchmark = RunAGICapabilityBenchmark(
 );
 
 Fact(
-AbsD(benchmark::CapabilityIndex - 77.5) < 1e-9,
+AbsD(benchmark::CapabilityIndex - 77.5) < 1e-9 and
+benchmark::Version == AGIMeshCapabilityBenchmarkVersion(),
 "The capability index must normalize and apply its weights."
 );
 }

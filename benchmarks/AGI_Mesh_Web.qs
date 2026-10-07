@@ -56,6 +56,10 @@ function IsValidCapabilityScore(score : Double) : Bool {
 return score >= 0.0 and score <= 100.0;
 }
 
+function AGIMeshCapabilityBenchmarkVersion() : String {
+return "0.2";
+}
+
 function IsValidCapabilityWeights(weights : Double[]) : Bool {
 
 if Length(weights) != 6 {
@@ -155,6 +159,30 @@ quantumConsensus : Double,
 weights : Double[]
 ) : CapabilityBenchmarkResult {
 
+if not IsValidCapabilityScore(reasoning) {
+fail "Capability score 'reasoning' must be between 0 and 100.";
+}
+
+if not IsValidCapabilityScore(toolUsage) {
+fail "Capability score 'tool_usage' must be between 0 and 100.";
+}
+
+if not IsValidCapabilityScore(memory) {
+fail "Capability score 'memory' must be between 0 and 100.";
+}
+
+if not IsValidCapabilityScore(selfCorrection) {
+fail "Capability score 'self_correction' must be between 0 and 100.";
+}
+
+if not IsValidCapabilityScore(agentCoordination) {
+fail "Capability score 'agent_coordination' must be between 0 and 100.";
+}
+
+if not IsValidCapabilityScore(quantumConsensus) {
+fail "Capability score 'quantum_consensus' must be between 0 and 100.";
+}
+
 if not IsValidCapabilityWeights(weights) {
 fail "Provide six nonnegative capability weights with a positive total.";
 }
@@ -169,7 +197,7 @@ Metric("quantum_consensus", quantumConsensus, weights[5])
 ];
 
 let capabilityIndex = CalculateAGICapabilityIndex(metrics);
-let version = "0.2";
+let version = AGIMeshCapabilityBenchmarkVersion();
 
 return CapabilityBenchmarkResult(
 version,
