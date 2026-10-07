@@ -16,12 +16,16 @@ not IsValidCapabilityScore(100.1),
 );
 
 Fact(
-CapabilityWeightValidationError([1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 6) == "" and
-CapabilityWeightValidationError([0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 6) ==
+CapabilityWeightCountValidationError([1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 6) == "" and
+CapabilityWeightValidationError([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) ==
     "At least one capability weight must be greater than zero." and
-CapabilityWeightValidationError([-1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 6) ==
-    "Capability weights cannot be negative." and
-CapabilityWeightValidationError([1.0], 6) == "Exactly 6 weights are required.",
+CapabilityWeightValidationError([-1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) ==
+    "Capability weights must be finite and nonnegative." and
+CapabilityWeightValidationError([0.0 / 0.0]) ==
+    "Capability weights must be finite and nonnegative." and
+CapabilityWeightValidationError([1.0 / 0.0]) ==
+    "Capability weights must be finite and nonnegative." and
+CapabilityWeightCountValidationError([1.0], 6) == "Exactly 6 weights are required.",
 "Capability weight validation must reject invalid weights and lengths."
 );
 
@@ -30,7 +34,7 @@ CapabilityMetricValidationError([Metric("valid", 50.0, 1.0)]) == "" and
 CapabilityMetricValidationError([Metric("invalid_score", 100.1, 1.0)]) ==
     "Capability score 'invalid_score' must be between 0 and 100." and
 CapabilityMetricValidationError([Metric("invalid_weight", 50.0, -1.0)]) ==
-    "Capability weights cannot be negative." and
+    "Capability weights must be finite and nonnegative." and
 CapabilityMetricValidationError([Metric("zero_weight", 50.0, 0.0)]) ==
     "At least one capability weight must be greater than zero." and
 CapabilityMetricValidationError([]) ==

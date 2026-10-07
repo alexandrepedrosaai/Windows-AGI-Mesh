@@ -70,19 +70,14 @@ return "0.2";
 }
 
 function CapabilityWeightValidationError(
-weights : Double[],
-expectedCount : Int
+weights : Double[]
 ) : String {
-
-if expectedCount >= 0 and Length(weights) != expectedCount {
-return $"Exactly {expectedCount} weights are required.";
-}
 
 mutable totalWeight = 0.0;
 
 for weight in weights {
-if weight < 0.0 {
-return "Capability weights cannot be negative.";
+if IsNaN(weight) or IsInfinite(weight) or weight < 0.0 {
+return "Capability weights must be finite and nonnegative.";
 }
 
 set totalWeight += weight;
@@ -93,6 +88,18 @@ return "At least one capability weight must be greater than zero.";
 }
 
 return "";
+}
+
+function CapabilityWeightCountValidationError(
+weights : Double[],
+expectedCount : Int
+) : String {
+
+if Length(weights) != expectedCount {
+return $"Exactly {expectedCount} weights are required.";
+}
+
+return CapabilityWeightValidationError(weights);
 }
 
 function TrialCountValidationError(successes : Int, trials : Int) : String {
@@ -130,7 +137,7 @@ return $"Capability score '{name}' must be between 0 and 100.";
 set weights += [weight];
 }
 
-return CapabilityWeightValidationError(weights, -1);
+return CapabilityWeightValidationError(weights);
 }
 
 function CalculateAGICapabilityIndex(metrics : Metric[]) : Double {
@@ -188,7 +195,7 @@ scores : CapabilityScores,
 weights : Double[]
 ) : CapabilityBenchmarkResult {
 
-let weightValidationError = CapabilityWeightValidationError(weights, 6);
+let weightValidationError = CapabilityWeightCountValidationError(weights, 6);
 
 if weightValidationError != "" {
 fail weightValidationError;
