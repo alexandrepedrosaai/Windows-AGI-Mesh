@@ -44,25 +44,35 @@ QuantumConsensus : Double
 /// Computes a normalized average for metrics already checked by the public entry points.
 internal function WeightedAverageValidated(metrics : Metric[]) : Double {
 
-mutable totalWeight = 0.0;
- 
+mutable maximumWeight = 0.0;
+
 for metric in metrics {
- 
+
 let (_, _, weight) = metric!;
-set totalWeight += weight;
+if weight > maximumWeight {
+set maximumWeight = weight;
 }
- 
-if totalWeight == 0.0 {
+}
+
+if maximumWeight == 0.0 {
 return 0.0;
 }
- 
+
+mutable scaledWeightTotal = 0.0;
+
+for metric in metrics {
+
+let (_, _, weight) = metric!;
+set scaledWeightTotal += weight / maximumWeight;
+}
+
 mutable weightedAverage = 0.0;
 
 for metric in metrics {
 
 let (_, value, weight) = metric!;
 
-set weightedAverage += value * (weight / totalWeight);
+set weightedAverage += value * ((weight / maximumWeight) / scaledWeightTotal);
 }
 
 return weightedAverage;
@@ -96,27 +106,25 @@ function CapabilityMetricCount() : Int {
 return 6;
 }
 
-/// Returns an error message for negative or non-finite weights, overflow, or a nonpositive total when required.
+/// Returns an error message for negative or non-finite weights or when no positive weight exists and one is required.
 function CapabilityWeightValidationError(
 weights : Double[],
 requirePositiveTotal : Bool
 ) : String {
 
-mutable totalWeight = 0.0;
+mutable hasPositiveWeight = false;
 
 for weight in weights {
 if IsNaN(weight) or IsInfinite(weight) or weight < 0.0 {
 return "Capability weights must be finite and nonnegative.";
 }
 
-set totalWeight += weight;
-
-if IsInfinite(totalWeight) {
-return "Total capability weight must be finite.";
+if weight > 0.0 {
+set hasPositiveWeight = true;
 }
 }
 
-if requirePositiveTotal and totalWeight <= 0.0 {
+if requirePositiveTotal and not hasPositiveWeight {
 return "At least one capability weight must be greater than zero.";
 }
 

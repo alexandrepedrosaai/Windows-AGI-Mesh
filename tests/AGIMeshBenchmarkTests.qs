@@ -31,8 +31,7 @@ CapabilityWeightValidationError([Sqrt(-1.0)], true) ==
     "Capability weights must be finite and nonnegative." and
 CapabilityWeightValidationError([ExpD(1000.0)], true) ==
     "Capability weights must be finite and nonnegative." and
-CapabilityWeightValidationError([1.0e308, 1.0e308], true) ==
-    "Total capability weight must be finite." and
+CapabilityWeightValidationError([1.0e308, 1.0e308], true) == "" and
 CapabilityWeightCountValidationError([1.0], CapabilityMetricCount()) ==
     "Exactly 6 weights are required.",
 "Capability weight validation must reject invalid weights and lengths."
@@ -144,6 +143,22 @@ not IsNaN(score) and
 not IsInfinite(score) and
 AbsD(score - 100.0 * (1.0e308 / 1.1e308)) < 1e-9,
 "Large finite weights must produce a finite, correctly normalized score."
+);
+}
+
+@Test("QuantumSimulator")
+operation TestExtremeWeightRatios() : Unit {
+
+let score = CalculateAGICapabilityIndex([
+Metric("dominant", 100.0, 1.0e308),
+Metric("negligible", 0.0, 1.0e-300)
+]);
+
+Fact(
+not IsNaN(score) and
+not IsInfinite(score) and
+AbsD(score - 100.0) < 1e-9,
+"Extreme weight ratios must preserve the dominant metric without overflow."
 );
 }
 
