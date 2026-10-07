@@ -93,9 +93,7 @@ runReproducibility,
 )
 ];
  
-let aggregate =
-WeightedAverage(metrics)
-* confidence;
+let aggregate = WeightedAverage(metrics);
  
 return BenchmarkResult(
 "0.1",
