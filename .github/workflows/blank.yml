@@ -1,19 +1,23 @@
 name: Windows Zenith Plataforma Auto Review
- 
+
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
- 
+
+permissions: {}
+
 jobs:
   build-test:
+    permissions:
+      contents: read
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
- 
+
       # Instalar Quantum Development Kit (QDK)
       - name: Setup .NET for Q#
         uses: actions/setup-dotnet@v4
@@ -21,16 +25,18 @@ jobs:
           dotnet-version: '6.0.x'
       - name: Install QDK
         run: dotnet tool install -g Microsoft.Quantum.IQSharp
- 
+
       # Q# (Azure Quantum official language)
       - name: Verify QDK installation
         shell: bash
         run: dotnet tool list -g | grep -i "microsoft.quantum.iqsharp"
- 
+
       # Python, Rust, C++, Frontend, Infra, Docs checks podem ser adicionados aqui...
- 
+
   artifacts:
     needs: build-test
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,13 +47,14 @@ jobs:
           cp bin/* build/
       - name: Generate cryptographic keys and hashes
         run: |
-          openssl genrsa -out build/release-key.pem 2048
-          (cd build && sha256sum -- * > hashes.txt)
+          openssl genrsa -out "$RUNNER_TEMP/release-key.pem" 2048
+          openssl rsa -in "$RUNNER_TEMP/release-key.pem" -pubout -out build/release-pub.pem
+          (cd build && sha256sum -- *.qs > hashes.txt)
       - name: Sign binaries with RSA
         run: |
-          for f in build/*; do
+          for f in build/*.qs; do
             if [ -f "$f" ]; then
-              openssl dgst -sha256 -sign build/release-key.pem -out "$f.sig" "$f"
+              openssl dgst -sha256 -sign "$RUNNER_TEMP/release-key.pem" -out "$f.sig" "$f"
             fi
           done
       - name: Create verify-release.sh script
@@ -57,7 +64,6 @@ jobs:
           set -e
           echo "🔑 Verifying release artifacts..."
           sha256sum -c hashes.txt
-          openssl rsa -in release-key.pem -pubout -out release-pub.pem
           for f in *; do
             if [[ "$f" != *.pem && "$f" != *.sig && -f "$f" ]]; then
               if [ -f "$f.sig" ]; then
@@ -74,9 +80,10 @@ jobs:
         with:
           name: mesh-binaries
           path: build/
- 
+
   verify-signatures:
     needs: artifacts
+    permissions: {}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -84,16 +91,8 @@ jobs:
           name: mesh-binaries
           path: build/
       - name: Verify RSA signatures
-        run: |
-          openssl rsa -in build/release-key.pem -pubout -out build/release-pub.pem
-          for f in build/*; do
-            if [[ "$f" != *.pem && "$f" != *.sig && -f "$f" ]]; then
-              if [ -f "$f.sig" ]; then
-                openssl dgst -sha256 -verify build/release-pub.pem -signature "$f.sig" "$f" || exit 1
-              fi
-            fi
-          done
- 
+        run: (cd build && ./verify-release.sh)
+
   release:
     needs: [artifacts, verify-signatures]
     runs-on: ubuntu-latest
