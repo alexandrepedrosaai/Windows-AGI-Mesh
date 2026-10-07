@@ -91,7 +91,7 @@ jobs:
           name: mesh-binaries
           path: build/
       - name: Verify RSA signatures
-        run: (cd build && ./verify-release.sh)
+        run: (cd build && bash ./verify-release.sh)
 
   release:
     needs: [artifacts, verify-signatures]
