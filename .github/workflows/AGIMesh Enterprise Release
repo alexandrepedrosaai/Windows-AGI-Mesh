@@ -1,0 +1,306 @@
+name: AGIMesh Enterprise Release
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+
+  pull_request:
+    branches:
+      - main
+      - release/*
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+
+  build:
+
+    name: Build AGIMesh
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 40
+
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+
+    steps:
+
+      ####################################################
+      # CHECKOUT
+      ####################################################
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+          persist-credentials: false
+
+      ####################################################
+      # VERSION
+      ####################################################
+
+      - name: Generate Version
+        id: version
+        run: |
+
+          VERSION="v$(date +'%Y.%m.%d').${GITHUB_RUN_NUMBER}"
+
+          echo "tag=$VERSION" >> $GITHUB_OUTPUT
+
+      ####################################################
+      # .NET / Q#
+      ####################################################
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: |
+          dotnet build AGIMesh/AGIMesh.csproj \
+            -c Release \
+            --no-restore
+
+      - name: Test
+        run: |
+          dotnet test \
+            -c Release \
+            --no-build \
+            --verbosity normal
+
+      ####################################################
+      # NODE (OPTIONAL)
+      ####################################################
+
+      - name: Setup Node
+        if: hashFiles('package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache Node Modules
+        if: hashFiles('package-lock.json') != ''
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install NPM Packages
+        if: hashFiles('package.json') != ''
+        run: npm ci
+
+      - name: Run Lint
+        if: hashFiles('package.json') != ''
+        run: npm run lint --if-present
+
+      - name: Run Frontend Tests
+        if: hashFiles('package.json') != ''
+        run: npm test --if-present
+
+      ####################################################
+      # PUBLISH
+      ####################################################
+
+      - name: Publish
+        run: |
+
+          dotnet publish \
+            -c Release \
+            -o publish
+
+      ####################################################
+      # BUILD INFO
+      ####################################################
+
+      - name: Generate Build Metadata
+        run: |
+
+          mkdir -p publish/metadata
+
+          cat > publish/metadata/build-info.txt << EOF
+          Repository=${GITHUB_REPOSITORY}
+          Commit=${GITHUB_SHA}
+          Ref=${GITHUB_REF}
+          RunNumber=${GITHUB_RUN_NUMBER}
+          RunId=${GITHUB_RUN_ID}
+          Actor=${GITHUB_ACTOR}
+          Workflow=${GITHUB_WORKFLOW}
+          Runner=${RUNNER_OS}
+          BuildDateUTC=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          EOF
+
+      ####################################################
+      # MANIFEST
+      ####################################################
+
+      - name: Generate Manifest
+        run: |
+
+          cat > publish/manifest.json << EOF
+          {
+            "repository": "${GITHUB_REPOSITORY}",
+            "commit": "${GITHUB_SHA}",
+            "ref": "${GITHUB_REF}",
+            "run_id": "${GITHUB_RUN_ID}",
+            "run_number": "${GITHUB_RUN_NUMBER}",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "generated_utc": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          }
+          EOF
+
+      ####################################################
+      # SOURCE SNAPSHOT
+      ####################################################
+
+      - name: Archive Source Snapshot
+        run: |
+
+          git archive \
+            --format=zip \
+            --output=publish/source.zip \
+            HEAD
+
+      ####################################################
+      # SBOM (CycloneDX)
+      ####################################################
+
+      - name: Install CycloneDX
+        continue-on-error: true
+        run: |
+
+          dotnet tool install \
+            --global CycloneDX
+
+      - name: Generate SBOM
+        continue-on-error: true
+        run: |
+
+          mkdir -p publish/sbom
+
+          PROJECT=$(find . -name "*.csproj" | head -n 1)
+
+          if [ -n "$PROJECT" ]; then
+
+            ~/.dotnet/tools/dotnet-CycloneDX \
+              "$PROJECT" \
+              -o publish/sbom
+
+          fi
+
+      ####################################################
+      # RELEASE ZIP
+      ####################################################
+
+      - name: Create Release Package
+        run: |
+
+          mkdir -p dist
+
+          VERSION=${{ steps.version.outputs.tag }}
+
+          cd publish
+
+          zip -r \
+            ../dist/AGIMesh-${VERSION}.zip \
+            .
+
+      ####################################################
+      # SHA256
+      ####################################################
+
+      - name: Generate SHA256
+        run: |
+
+          cd dist
+
+          sha256sum *.zip \
+            > SHA256SUMS.txt
+
+      ####################################################
+      # ARTIFACTS
+      ####################################################
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AGIMesh
+          path: dist
+
+  release:
+
+    name: Publish Release
+
+    if: github.event_name != 'pull_request'
+
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      ####################################################
+      # DOWNLOAD
+      ####################################################
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AGIMesh
+          path: dist
+
+      ####################################################
+      # CHECK TAG
+      ####################################################
+
+      - name: Verify Tag
+        env:
+          TAG: ${{ needs.build.outputs.tag }}
+        run: |
+
+          if git ls-remote \
+            --tags \
+            https://github.com/${{ github.repository }}.git \
+            | grep -q "refs/tags/${TAG}$"
+          then
+            echo "Tag already exists."
+            exit 1
+          fi
+
+      ####################################################
+      # RELEASE
+      ####################################################
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+
+          tag_name: ${{ needs.build.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+
+          generate_release_notes: true
+
+          make_latest: true
+
+          files: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
