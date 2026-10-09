@@ -94,7 +94,7 @@ jobs:
             --no-restore
 
       - name: Test
-        continue-on-error: true
+        continue-on-error: false
         run: |
           dotnet test \
             AGIMesh/AGIMesh.csproj \
