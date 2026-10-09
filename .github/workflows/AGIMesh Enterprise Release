@@ -295,6 +295,7 @@ EOF
         with:
 
           tag_name: ${{ needs.build.outputs.tag }}
+          target_commitish: ${{ github.sha }}
 
           generate_release_notes: true
 
