@@ -76,7 +76,7 @@ jobs:
 
       - name: Build
         run: |
-          dotnet build \
+          dotnet build AGIMesh/AGIMesh.csproj \
             -c Release \
             --no-restore
 
