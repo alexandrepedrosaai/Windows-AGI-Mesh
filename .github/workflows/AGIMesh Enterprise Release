@@ -138,16 +138,16 @@ jobs:
           mkdir -p publish/metadata
 
           cat > publish/metadata/build-info.txt << EOF
-Repository=${GITHUB_REPOSITORY}
-Commit=${GITHUB_SHA}
-Ref=${GITHUB_REF}
-RunNumber=${GITHUB_RUN_NUMBER}
-RunId=${GITHUB_RUN_ID}
-Actor=${GITHUB_ACTOR}
-Workflow=${GITHUB_WORKFLOW}
-Runner=${RUNNER_OS}
-BuildDateUTC=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-EOF
+          Repository=${GITHUB_REPOSITORY}
+          Commit=${GITHUB_SHA}
+          Ref=${GITHUB_REF}
+          RunNumber=${GITHUB_RUN_NUMBER}
+          RunId=${GITHUB_RUN_ID}
+          Actor=${GITHUB_ACTOR}
+          Workflow=${GITHUB_WORKFLOW}
+          Runner=${RUNNER_OS}
+          BuildDateUTC=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          EOF
 
       ####################################################
       # MANIFEST
