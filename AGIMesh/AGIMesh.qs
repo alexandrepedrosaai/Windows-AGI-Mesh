@@ -52,8 +52,8 @@ namespace AGIMesh {
                 fail "Invalid score.";
             }
 
-            if weight < 0.0 {
-                fail "Negative weight.";
+            if IsNaN(weight) or IsInfinite(weight) or weight < 0.0 {
+                fail "Weight must be finite and nonnegative.";
             }
 
             set totalWeight += weight;
