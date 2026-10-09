@@ -114,8 +114,8 @@ namespace AGIMesh {
             H(pair[0]);
             CNOT(pair[0], pair[1]);
 
-            let a = MResetZ(pair[0]);
-            let b = MResetZ(pair[1]);
+            let a = Microsoft.Quantum.Measurement.MResetZ(pair[0]);
+            let b = Microsoft.Quantum.Measurement.MResetZ(pair[1]);
 
             if a == b {
                 set matches += 1;
