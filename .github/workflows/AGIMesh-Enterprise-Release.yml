@@ -49,10 +49,21 @@ jobs:
       - name: Generate Version
         id: version
         run: |
-
           VERSION="v$(date +'%Y.%m.%d').${GITHUB_RUN_NUMBER}"
-
           echo "tag=$VERSION" >> $GITHUB_OUTPUT
+
+      ####################################################
+      # DIAGNOSTICS
+      ####################################################
+
+      - name: Show .NET Info
+        run: dotnet --info
+
+      - name: List SDKs
+        run: dotnet --list-sdks
+
+      - name: Show NuGet Sources
+        run: dotnet nuget list source
 
       ####################################################
       # .NET / Q#
@@ -72,23 +83,25 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore
-        run: dotnet restore AGIMesh/AGIMesh.csproj
+        run: |
+          dotnet restore AGIMesh/AGIMesh.csproj
 
       - name: Build
         run: |
-          dotnet build AGIMesh/AGIMesh.csproj \
+          dotnet build \
+            AGIMesh/AGIMesh.csproj \
             -c Release \
             --no-restore
 
       - name: Test
+        continue-on-error: false
         run: |
           dotnet test \
-            -c Release \
-            --no-build \
-            --verbosity normal
+            AGIMesh/AGIMesh.csproj \
+            -c Release
 
       ####################################################
-      # NODE (OPTIONAL)
+      # NODE OPCIONAL
       ####################################################
 
       - name: Setup Node
@@ -109,11 +122,11 @@ jobs:
         if: hashFiles('package.json') != ''
         run: npm ci
 
-      - name: Run Lint
+      - name: Lint
         if: hashFiles('package.json') != ''
         run: npm run lint --if-present
 
-      - name: Run Frontend Tests
+      - name: Frontend Tests
         if: hashFiles('package.json') != ''
         run: npm test --if-present
 
@@ -123,13 +136,13 @@ jobs:
 
       - name: Publish
         run: |
-
-          dotnet publish AGIMesh/AGIMesh.csproj \
+          dotnet publish \
+            AGIMesh/AGIMesh.csproj \
             -c Release \
             -o publish
 
       ####################################################
-      # BUILD INFO
+      # BUILD METADATA
       ####################################################
 
       - name: Generate Build Metadata
@@ -146,161 +159,4 @@ jobs:
           Actor=${GITHUB_ACTOR}
           Workflow=${GITHUB_WORKFLOW}
           Runner=${RUNNER_OS}
-          BuildDateUTC=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          EOF
-
-      ####################################################
-      # MANIFEST
-      ####################################################
-
-      - name: Generate Manifest
-        run: |
-
-          cat > publish/manifest.json << EOF
-          {
-            "repository": "${GITHUB_REPOSITORY}",
-            "commit": "${GITHUB_SHA}",
-            "ref": "${GITHUB_REF}",
-            "run_id": "${GITHUB_RUN_ID}",
-            "run_number": "${GITHUB_RUN_NUMBER}",
-            "workflow": "${GITHUB_WORKFLOW}",
-            "generated_utc": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-          }
-          EOF
-
-      ####################################################
-      # SOURCE SNAPSHOT
-      ####################################################
-
-      - name: Archive Source Snapshot
-        run: |
-
-          git archive \
-            --format=zip \
-            --output=publish/source.zip \
-            HEAD
-
-      ####################################################
-      # SBOM (CycloneDX)
-      ####################################################
-
-      - name: Install CycloneDX
-        continue-on-error: true
-        run: |
-
-          dotnet tool install \
-            --global CycloneDX
-
-      - name: Generate SBOM
-        continue-on-error: true
-        run: |
-
-          mkdir -p publish/sbom
-
-          PROJECT=$(find . -name "*.csproj" | head -n 1)
-
-          if [ -n "$PROJECT" ]; then
-
-            ~/.dotnet/tools/dotnet-CycloneDX \
-              "$PROJECT" \
-              -o publish/sbom
-
-          fi
-
-      ####################################################
-      # RELEASE ZIP
-      ####################################################
-
-      - name: Create Release Package
-        run: |
-
-          mkdir -p dist
-
-          VERSION=${{ steps.version.outputs.tag }}
-
-          cd publish
-
-          zip -r \
-            ../dist/AGIMesh-${VERSION}.zip \
-            .
-
-      ####################################################
-      # SHA256
-      ####################################################
-
-      - name: Generate SHA256
-        run: |
-
-          cd dist
-
-          sha256sum *.zip \
-            > SHA256SUMS.txt
-
-      ####################################################
-      # ARTIFACTS
-      ####################################################
-
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: AGIMesh
-          path: dist
-
-  release:
-
-    name: Publish Release
-
-    if: github.event_name != 'pull_request'
-
-    needs: build
-
-    runs-on: ubuntu-latest
-
-    steps:
-
-      ####################################################
-      # DOWNLOAD
-      ####################################################
-
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: AGIMesh
-          path: dist
-
-      ####################################################
-      # CHECK TAG
-      ####################################################
-
-      - name: Verify Tag
-        env:
-          TAG: ${{ needs.build.outputs.tag }}
-        run: |
-
-          if git ls-remote \
-            --tags \
-            https://github.com/${{ github.repository }}.git \
-            | grep -q "refs/tags/${TAG}$"
-          then
-            echo "Tag already exists."
-            exit 1
-          fi
-
-      ####################################################
-      # RELEASE
-      ####################################################
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-
-          tag_name: ${{ needs.build.outputs.tag }}
-          target_commitish: ${{ github.sha }}
-
-          generate_release_notes: true
-
-          make_latest: true
-
-          files: |
-            dist/*.zip
-            dist/SHA256SUMS.txt
+          BuildDateUTC=$(date -u +"%Y-%m-%dT
