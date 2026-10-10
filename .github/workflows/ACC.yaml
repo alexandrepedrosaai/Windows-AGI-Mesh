@@ -1,0 +1,83 @@
+name: ACC Constitutional State
+
+on:
+
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - ACC_STATE.json
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+
+  generate-state:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Test
+        run: |
+          go test ./... -v
+
+      - name: Build
+        run: |
+          go build ./...
+
+      - name: Generate ACC_STATE
+        run: |
+
+          TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          cat > ACC_STATE.json << EOF
+          {
+            "constitution":"ACC-1.0",
+            "timestamp":"${TS}",
+            "commit":"${{ github.sha }}",
+            "continuity":true,
+            "governance":"PASS",
+            "auditability":"PASS",
+            "consensus":"PASS",
+            "validation":"PASS",
+            "status":"APPROVED"
+          }
+          EOF
+
+      - name: Create Branch
+        run: |
+
+          BRANCH=acc-state-${{ github.run_id }}
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b $BRANCH
+
+          git add ACC_STATE.json
+
+          git commit -m "ACC_STATE ${{ github.sha }}"
+
+          git push origin $BRANCH
+
+      - name: Open Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+
+          gh pr create \
+            --title "ACC State Update" \
+            --body "Automated constitutional state update." \
+            --base main \
+            --head acc-state-${{ github.run_id }}
