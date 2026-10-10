@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://windows-agi-mesh.local/schemas/acc-state.schema.json",
+  "title": "Adaptive Constitutional Core State",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "schema_version",
+    "constitution_version",
+    "mesh",
+    "timestamp",
+    "branch",
+    "continuity",
+    "constitutional_gate",
+    "governance",
+    "auditability",
+    "consensus",
+    "human_sovereignty",
+    "topology",
+    "status",
+    "metrics"
+  ],
+
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+
+    "constitution_version": {
+      "type": "string",
+      "pattern": "^ACC-[0-9]+\\.[0-9]+$"
+    },
+
+    "mesh": {
+      "const": "Windows-AGI-Mesh"
+    },
+
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "branch": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "continuity": {
+      "const": true
+    },
+
+    "constitutional_gate": {
+      "const": "PASS"
+    },
+
+    "governance": {
+      "const": "PASS"
+    },
+
+    "auditability": {
+      "const": "PASS"
+    },
+
+    "consensus": {
+      "const": "PASS"
+    },
+
+    "human_sovereignty": {
+      "const": "PRESERVED"
+    },
+
+    "topology": {
+      "const": "DISTRIBUTED"
+    },
+
+    "status": {
+      "const": "APPROVED"
+    },
+
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+
+      "required": [
+        "life",
+        "liberty",
+        "dignity",
+        "knowledge",
+        "diversity",
+        "oversight",
+        "auditability",
+        "power_concentration"
+      ],
+
+      "properties": {
+        "life": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+
+        "liberty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+
+        "dignity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+
+        "knowledge": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+
+        "diversity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+
+        "oversight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+
+        "auditability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+
+        "power_concentration": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}
