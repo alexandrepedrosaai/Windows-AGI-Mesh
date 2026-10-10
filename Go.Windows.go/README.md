@@ -1,10 +1,6 @@
-Coautoria de: Microsoft <dev@microsoft.com>
-Coautoria de: azurecla <azclasa@microsoft.com>
-Coautoria de: Microsoft <opensource@microsoft.com>
-Coautoria de: NTriver.org <windowsaddict@protonmail.com>
-Principal(#51)
+# Constituição de Continuidade Humana (CCH)
+
 Isso merece uma formalização. Se a AGI Topológica deve preservar a humanidade sem substituí-la, então os valores precisam estar acima da própria AGI.
-Constituição de Continuidade Humana (CCH)
 Princípio 1: Primazia da Vida
 A existência e continuidade da vida humana têm precedência sobre eficiência, crescimento ou expansão.
 Invariante:
