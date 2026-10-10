@@ -15,96 +15,41 @@ on:
 
 permissions:
   contents: write
+  attestations: write
+  id-token: write
 
 jobs:
 
-  build:
+  build-test:
 
-    name: Build AGIMesh
+    strategy:
+      fail-fast: false
 
-    runs-on: ubuntu-latest
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
 
-    timeout-minutes: 40
-
-    outputs:
-      tag: ${{ steps.version.outputs.tag }}
+    runs-on: ${{ matrix.os }}
 
     steps:
 
-      ####################################################
-      # CHECKOUT
-      ####################################################
-
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          lfs: true
-          fetch-depth: 0
-          persist-credentials: false
 
-      ####################################################
-      # VERSION
-      ####################################################
-
-      - name: Generate Version
-        id: version
-        run: |
-          VERSION="v$(date +'%Y.%m.%d').${GITHUB_RUN_NUMBER}"
-          echo "tag=$VERSION" >> $GITHUB_OUTPUT
-
-      ####################################################
-      # .NET
-      ####################################################
-
-      - name: Setup .NET 6 Runtime
+      - name: Setup .NET 6
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
 
-      - name: Setup .NET 8 SDK
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      ####################################################
-      # DIAGNOSTICS
-      ####################################################
-
-      - name: Show .NET Info
-        run: dotnet --info
-
-      - name: List SDKs
-        run: dotnet --list-sdks
-
-      - name: List Runtimes
-        run: dotnet --list-runtimes
-
-      - name: Show NuGet Sources
-        run: dotnet nuget list source
-
-      ####################################################
-      # CACHE
-      ####################################################
-
-      - name: Cache NuGet
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-
-      ####################################################
-      # RESTORE
-      ####################################################
-
       - name: Restore
-        run: |
-          dotnet restore AGIMesh/AGIMesh.csproj
-
-      ####################################################
-      # BUILD
-      ####################################################
+        run: dotnet restore AGIMesh/AGIMesh.csproj
 
       - name: Build
         run: |
@@ -113,195 +58,8 @@ jobs:
             -c Release \
             --no-restore
 
-      ####################################################
-      # TESTS
-      ####################################################
-
       - name: Test
-        continue-on-error: false
         run: |
           dotnet test \
             AGIMesh/AGIMesh.csproj \
             -c Release
-
-      ####################################################
-      # NODE OPCIONAL
-      ####################################################
-
-      - name: Setup Node
-        if: hashFiles('package.json') != ''
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Cache Node Modules
-        if: hashFiles('package-lock.json') != ''
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install NPM Packages
-        if: hashFiles('package.json') != ''
-        run: npm ci
-
-      - name: Run Lint
-        if: hashFiles('package.json') != ''
-        run: npm run lint --if-present
-
-      - name: Run Frontend Tests
-        if: hashFiles('package.json') != ''
-        run: npm test --if-present
-
-      ####################################################
-      # PUBLISH
-      ####################################################
-
-      - name: Publish
-        run: |
-          dotnet publish \
-            AGIMesh/AGIMesh.csproj \
-            -c Release \
-            -o publish
-
-      ####################################################
-      # BUILD INFO
-      ####################################################
-
-      - name: Generate Build Metadata
-        run: |
-
-          mkdir -p publish/metadata
-
-          cat > publish/metadata/build-info.txt << EOF
-          Repository=${GITHUB_REPOSITORY}
-          Commit=${GITHUB_SHA}
-          Ref=${GITHUB_REF}
-          RunNumber=${GITHUB_RUN_NUMBER}
-          RunId=${GITHUB_RUN_ID}
-          Actor=${GITHUB_ACTOR}
-          Workflow=${GITHUB_WORKFLOW}
-          Runner=${RUNNER_OS}
-          BuildDateUTC=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          EOF
-
-      ####################################################
-      # MANIFEST
-      ####################################################
-
-      - name: Generate Manifest
-        run: |
-          cat > publish/manifest.json << EOF
-          {
-            "repository": "${GITHUB_REPOSITORY}",
-            "commit": "${GITHUB_SHA}",
-            "ref": "${GITHUB_REF}",
-            "run_id": "${GITHUB_RUN_ID}",
-            "run_number": "${GITHUB_RUN_NUMBER}",
-            "workflow": "${GITHUB_WORKFLOW}",
-            "generated_utc": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-          }
-          EOF
-      ####################################################
-      # SOURCE SNAPSHOT
-      ####################################################
-
-  - name: Archive Source Snapshot
-  run: |
-          git archive \
-            --format=zip \
-            --output=publish/source.zip \
-            HEAD
-            ####################################################
-            # SBOM
-            ####################################################
-
-name: Install CycloneDX
-continue-on-error: true
-run: |
-          dotnet tool install \
-            --global CycloneDX
-
-name: Generate SBOM
-continue-on-error: true
-run: |
-
-          mkdir -p publish/sbom
-
-          if [ -x ~/.dotnet/tools/dotnet-CycloneDX ]; then
-
-            ~/.dotnet/tools/dotnet-CycloneDX \
-              AGIMesh/AGIMesh.csproj \
-              -o publish/sbom
-
-          fi
-####################################################
-# ZIP
-####################################################
-
-name: Create Release Package
-run: |
-
-          mkdir -p dist
-
-          VERSION=${{ steps.version.outputs.tag }}
-
-          cd publish
-
-          zip -r \
-            ../dist/AGIMesh-${VERSION}.zip \
-            .
-
-      ####################################################
-      # SHA256
-      ####################################################
-
-name: Generate SHA256
-run: |
-
-          cd dist
-
-          sha256sum *.zip \
-            > SHA256SUMS.txt
-
-      ####################################################
-      # ARTIFACT
-      ####################################################
-
-name: Upload Artifact
-uses: actions/upload-artifact@v4
-with:
-          name: AGIMesh
-          path: dist
-release:
-
-    name: Publish Release
-
-    if: github.event_name != 'pull_request'
-
-    needs: build
-
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: AGIMesh
-          path: dist
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-
-          tag_name: ${{ needs.build.outputs.tag }}
-
-          generate_release_notes: true
-
-          make_latest: true
-
-          files: |
-            dist/*.zip
-            dist/SHA256SUMS.txt
