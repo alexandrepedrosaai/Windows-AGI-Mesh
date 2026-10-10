@@ -42,29 +42,31 @@ namespace AGIMesh {
     function WeightedAverage(metrics : Metric[]) : Double {
 
         mutable totalWeight = 0.0;
-        mutable sum = 0.0;
+        mutable weightedSum = 0.0;
 
-        for m in metrics {
+        for metric in metrics {
 
-            let (_, value, weight) = m!;
+            let (_, value, weight) = metric!;
 
             if not IsValidScore(value) {
                 fail "Invalid score.";
             }
 
-            if IsNaN(weight) or IsInfinite(weight) or weight < 0.0 {
+            if weight < 0.0
+                or IsNaN(weight)
+                or IsInfinite(weight) {
                 fail "Weight must be finite and nonnegative.";
             }
 
             set totalWeight += weight;
-            set sum += value * weight;
+            set weightedSum += value * weight;
         }
 
         if totalWeight <= 0.0 {
-            fail "Weight sum must be positive.";
+            fail "Total weight must be positive.";
         }
 
-        return sum / totalWeight;
+        return weightedSum / totalWeight;
     }
 
     function MultiAgentConsensus(
@@ -102,22 +104,22 @@ namespace AGIMesh {
     ) : Double {
 
         if shots <= 0 {
-            fail "Invalid shots.";
+            fail "shots must be positive.";
         }
 
         mutable matches = 0;
 
-        for _ in 1 .. shots {
+        for _ in 1..shots {
 
             use pair = Qubit[2];
 
             H(pair[0]);
             CNOT(pair[0], pair[1]);
 
-            let a = MResetZ(pair[0]);
-            let b = MResetZ(pair[1]);
+            let r1 = MResetZ(pair[0]);
+            let r2 = MResetZ(pair[1]);
 
-            if a == b {
+            if r1 == r2 {
                 set matches += 1;
             }
         }
@@ -141,53 +143,27 @@ namespace AGIMesh {
         ) = scores!;
 
         return WeightedAverage([
-            Metric(
-                "reasoning",
-                reasoning,
-                0.25
-            ),
-            Metric(
-                "tool_usage",
-                toolUsage,
-                0.15
-            ),
-            Metric(
-                "memory",
-                memory,
-                0.15
-            ),
-            Metric(
-                "self_correction",
-                selfCorrection,
-                0.15
-            ),
-            Metric(
-                "coordination",
-                coordination,
-                0.15
-            ),
-            Metric(
-                "quantum",
-                quantum,
-                0.15
-            )
+            Metric("reasoning", reasoning, 0.25),
+            Metric("tool_usage", toolUsage, 0.15),
+            Metric("memory", memory, 0.15),
+            Metric("self_correction", selfCorrection, 0.15),
+            Metric("coordination", coordination, 0.15),
+            Metric("quantum", quantum, 0.15)
         ]);
     }
 
     operation RunBenchmark() : BenchmarkResult {
 
-        let scores =
-            CapabilityScores(
-                90.0,
-                88.0,
-                87.0,
-                92.0,
-                81.0,
-                100.0
-            );
+        let scores = CapabilityScores(
+            90.0,
+            88.0,
+            87.0,
+            92.0,
+            81.0,
+            100.0
+        );
 
-        let aci =
-            CalculateACI(scores);
+        let aci = CalculateACI(scores);
 
         let consensus =
             MultiAgentConsensus(
