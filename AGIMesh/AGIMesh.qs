@@ -3,6 +3,8 @@ namespace AGIMesh {
     open Microsoft.Quantum.Convert;
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Math;
+    open Microsoft.Quantum.Diagnostics;
+    open Microsoft.Quantum.Measurement;
 
     newtype Metric = (
         Name : String,
@@ -27,19 +29,17 @@ namespace AGIMesh {
     );
 
     function Version() : String {
-        "2.1.0"
+        return "2.1.0";
     }
 
     function IsValidScore(v : Double) : Bool {
-        not IsNaN(v)
-        and not IsInfinite(v)
-        and v >= 0.0
-        and v <= 100.0
+        return not IsNaN(v)
+            and not IsInfinite(v)
+            and v >= 0.0
+            and v <= 100.0;
     }
 
-    function WeightedAverage(
-        metrics : Metric[]
-    ) : Double {
+    function WeightedAverage(metrics : Metric[]) : Double {
 
         mutable totalWeight = 0.0;
         mutable sum = 0.0;
@@ -64,7 +64,7 @@ namespace AGIMesh {
             fail "Weight sum must be positive.";
         }
 
-        sum / totalWeight
+        return sum / totalWeight;
     }
 
     function MultiAgentConsensus(
@@ -92,9 +92,9 @@ namespace AGIMesh {
             }
         }
 
-        100.0
-        * IntAsDouble(best)
-        / IntAsDouble(Length(agents))
+        return 100.0
+            * IntAsDouble(best)
+            / IntAsDouble(Length(agents));
     }
 
     operation QuantumCorrelation(
@@ -105,72 +105,73 @@ namespace AGIMesh {
             fail "Invalid shots.";
         }
 
-        use pair = Qubit[2];
-
         mutable matches = 0;
 
-        for _ in 1..shots {
+        for _ in 1 .. shots {
+
+            use pair = Qubit[2];
 
             H(pair[0]);
             CNOT(pair[0], pair[1]);
 
-            let a = Microsoft.Quantum.Measurement.MResetZ(pair[0]);
-            let b = Microsoft.Quantum.Measurement.MResetZ(pair[1]);
+            let a = MResetZ(pair[0]);
+            let b = MResetZ(pair[1]);
 
             if a == b {
                 set matches += 1;
             }
         }
 
-        100.0
-        *
-        IntAsDouble(matches)
-        /
-        IntAsDouble(shots)
+        return 100.0
+            * IntAsDouble(matches)
+            / IntAsDouble(shots);
     }
 
     function CalculateACI(
         scores : CapabilityScores
     ) : Double {
 
-        WeightedAverage([
+        let (
+            reasoning,
+            toolUsage,
+            memory,
+            selfCorrection,
+            coordination,
+            quantum
+        ) = scores!;
 
+        return WeightedAverage([
             Metric(
                 "reasoning",
-                scores::Reasoning,
+                reasoning,
                 0.25
             ),
-
             Metric(
                 "tool_usage",
-                scores::ToolUsage,
+                toolUsage,
                 0.15
             ),
-
             Metric(
                 "memory",
-                scores::Memory,
+                memory,
                 0.15
             ),
-
             Metric(
                 "self_correction",
-                scores::SelfCorrection,
+                selfCorrection,
                 0.15
             ),
-
             Metric(
                 "coordination",
-                scores::AgentCoordination,
+                coordination,
                 0.15
             ),
-
             Metric(
                 "quantum",
-                scores::QuantumCorrelation,
+                quantum,
                 0.15
             )
-        ])
+        ]);
     }
 
     operation RunBenchmark() : BenchmarkResult {
@@ -190,7 +191,7 @@ namespace AGIMesh {
 
         let consensus =
             MultiAgentConsensus(
-                [1,1,1,2]
+                [1, 1, 1, 2]
             );
 
         let qc =
@@ -204,5 +205,23 @@ namespace AGIMesh {
             consensus,
             qc
         );
+    }
+
+    @EntryPoint()
+    operation Main() : Unit {
+
+        let result = RunBenchmark();
+
+        let (
+            version,
+            aci,
+            consensus,
+            qc
+        ) = result!;
+
+        Message($"AGI Mesh Version: {version}");
+        Message($"Capability Index: {aci}");
+        Message($"Consensus: {consensus}");
+        Message($"Quantum Correlation: {qc}");
     }
 }
