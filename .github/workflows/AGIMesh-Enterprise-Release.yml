@@ -192,18 +192,17 @@ jobs:
 
       - name: Generate Manifest
         run: |
-
           cat > publish/manifest.json << EOF
           {
-  "repository": "${GITHUB_REPOSITORY}",
-  "commit": "${GITHUB_SHA}",
-  "ref": "${GITHUB_REF}",
-  "run_id": "${GITHUB_RUN_ID}",
-  "run_number": "${GITHUB_RUN_NUMBER}",
-  "workflow": "${GITHUB_WORKFLOW}",
-  "generated_utc": 
-  
-
+            "repository": "${GITHUB_REPOSITORY}",
+            "commit": "${GITHUB_SHA}",
+            "ref": "${GITHUB_REF}",
+            "run_id": "${GITHUB_RUN_ID}",
+            "run_number": "${GITHUB_RUN_NUMBER}",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "generated_utc": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          }
+          EOF
       ####################################################
       # SOURCE SNAPSHOT
       ####################################################
