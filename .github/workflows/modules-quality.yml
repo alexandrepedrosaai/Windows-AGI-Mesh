@@ -1,0 +1,48 @@
+name: AGIMesh Modules Quality
+
+on:
+  push:
+    paths:
+      - "modules/**/*.qs"
+
+  pull_request:
+    paths:
+      - "modules/**/*.qs"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  attestations: write
+  id-token: write
+
+jobs:
+
+  build-test:
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+        module:
+          - modules/DeepSpace.qs
+          - modules/EdgeAIApp.qs
+          - modules/MagneticMajorana.qs
+          - modules/Nemotron.qs
+          - modules/XboxQuantumXR.qs
+
+    runs-on: ${{ matrix.os }}
+✅ CycloneDX SBOM generated
+
+✅ SHA256 generated
+
+✅ Artifact attestation generated
+
+✅ Package generated`
+            })

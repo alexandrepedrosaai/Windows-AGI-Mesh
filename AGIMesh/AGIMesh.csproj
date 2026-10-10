@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.Quantum.Sdk/0.28.302812">
+
+  <PropertyGroup>
+
+    <TargetFramework>net8.0</TargetFramework>
+
+    <OutputType>Exe</OutputType>
+
+    <Nullable>enable</Nullable>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <PackageReference
+      Include="Microsoft.Quantum.Standard"
+      Version="0.28.302812" />
+
+  </ItemGroup>
+
+</Project>antum.Standard"
+      Version="0.28.302812" />
+
+  </ItemGroup>
+
+</Project>

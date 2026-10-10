@@ -1,6 +1,6 @@
 # Circuit DSL
 
-The `.q#circuite` files are declarative specifications for the Windows-AGI-Mesh modules; they are not executable programs or claims that the described capabilities have already been implemented. The syntax is intentionally consistent and human-readable so that a future parser can validate it.
+The architecture and module `.qs` circuits are declarative specifications; they are not executable programs or claims that the described capabilities have already been implemented. The benchmark `.qs` file is Q# source. The circuit syntax is intentionally consistent and human-readable so that a future parser can validate it.
 
 ## Structure
 
@@ -17,9 +17,9 @@ Assignments use `name = value`; strings use double quotes, lists use brackets, a
 
 ## Repository layout
 
-- `Windows-AGI-Mesh.q#circuite`: top-level objective, architecture, integration, metrics, security, and roadmap.
+- `Windows-AGI-Mesh.qs`: top-level objective, architecture, integration, metrics, security, and roadmap.
 - `modules/`: dataset, storage, quantum-persistence study, XR, and local edge application circuits.
-- `benchmarks/`: general-intelligence evaluation circuit.
+- `benchmarks/`: Q# general-intelligence evaluation code.
 - `docs/`: architecture and DSL documentation.
 - `examples/`: an end-to-end example using the declared mesh interfaces.
 
