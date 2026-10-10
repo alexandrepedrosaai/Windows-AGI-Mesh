@@ -1,0 +1,56 @@
+name: .NET CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CONFIGURATION: Release
+
+  # Replace this entire value with the repository-relative path to the
+  # solution or project that CI should restore, build, and test.
+  CI_TARGET: 'REPLACE_WITH_RELATIVE_PATH_TO_SOLUTION_OR_PROJECT'
+
+  DOTNET_NOLOGO: true
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '8.0.x'
+          dotnet-quality: 'ga'
+
+      - name: Restore dependencies
+        run: dotnet restore "$CI_TARGET"
+
+      - name: Build
+        run: >
+          dotnet build "$CI_TARGET"
+          --configuration "$CONFIGURATION"
+          --no-restore
+
+      - name: Test
+        run: >
+          dotnet test "$CI_TARGET"
+          --configuration "$CONFIGURATION"
+          --no-build
+          --verbosity normal
