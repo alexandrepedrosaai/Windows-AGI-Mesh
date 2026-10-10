@@ -69,15 +69,14 @@ func ValidateAuditTrail(
 
 func (m Metrics) GovernanceScore() float64 {
 
-	return
-		m.Life +
-			m.Liberty +
-			m.Dignity +
-			m.Knowledge +
-			m.Diversity +
-			m.Oversight +
-			m.Auditability -
-			m.PowerConcentration
+return m.Life +
+		m.Liberty +
+		m.Dignity +
+		m.Knowledge +
+		m.Diversity +
+		m.Oversight +
+		m.Auditability -
+		m.PowerConcentration
 }
 
 func (m Metrics) HumanContinuityIndex() float64 {
