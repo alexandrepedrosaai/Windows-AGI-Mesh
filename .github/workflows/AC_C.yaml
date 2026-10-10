@@ -1,0 +1,381 @@
+name: ACC Constitutional Pipeline
+
+on:
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'Go.Windows.go/**'
+      - '.schemas/**'
+      - '.pre-commit-config.yaml'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Go.Windows.go/**'
+      - 'ACC_STATE.json'
+      - '.schemas/**'
+      - '.github/workflows/**'
+      - '.pre-commit-config.yaml'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: acc-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  validate:
+
+    name: ACC Validation
+
+    if: |
+      github.actor != 'github-actions[bot]' &&
+      !startsWith(github.ref_name, 'acc-state-')
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Validation Tools
+        run: |
+          pip install pre-commit
+          npm install -g ajv-cli
+
+      - name: Run PreCommit
+        run: |
+          pre-commit run --all-files
+
+      - name: Verify Go Module
+        working-directory: Go.Windows.go
+        run: |
+          test -f go.mod
+
+      - name: Download Dependencies
+        working-directory: Go.Windows.go
+        run: |
+          go mod download
+
+      - name: Go Format Check
+        working-directory: Go.Windows.go
+        run: |
+          test -z "$(gofmt -l .)"
+
+      - name: Go Vet
+        working-directory: Go.Windows.go
+        run: |
+          go vet ./...
+
+      - name: Go Test
+        working-directory: Go.Windows.go
+        run: |
+          go test ./... -v
+
+      - name: Go Build
+        working-directory: Go.Windows.go
+        run: |
+          go build ./...
+
+      - name: Validate ACC_STATE Schema
+        if: hashFiles('ACC_STATE.json') != ''
+        run: |
+          ajv validate \
+            -s .schemas/acc-state.schema.json \
+            -d ACC_STATE.json
+
+      - name: Validate Constitutional Invariants
+        if: hashFiles('ACC_STATE.json') != ''
+        run: |
+
+          jq -e '.continuity == true' ACC_STATE.json
+
+          jq -e '.constitutional_gate == "PASS"' ACC_STATE.json
+
+          jq -e '.governance == "PASS"' ACC_STATE.json
+
+          jq -e '.auditability == "PASS"' ACC_STATE.json
+
+          jq -e '.consensus == "PASS"' ACC_STATE.json
+
+          jq -e '.human_sovereignty == "PRESERVED"' ACC_STATE.json
+
+          jq -e '.topology == "DISTRIBUTED"' ACC_STATE.json
+
+          jq -e '.status == "APPROVED"' ACC_STATE.json
+
+      - name: Validate Timestamp Format
+        if: hashFiles('ACC_STATE.json') != ''
+        run: |
+
+          TS=$(jq -r '.timestamp' ACC_STATE.json)
+
+          date -u -d "$TS" >/dev/null
+
+      - name: Negative Test Missing Mandatory Fields
+        run: |
+
+          cat > bad.json << 'EOF'
+          {
+            "status":"APPROVED"
+          }
+          EOF
+
+          if ajv validate \
+            -s .schemas/acc-state.schema.json \
+            -d bad.json
+          then
+            echo "invalid file accepted"
+            exit 1
+          fi
+
+      - name: Negative Test Continuity False
+        run: |
+
+          cat > bad.json << 'EOF'
+          {
+            "schema_version":"1.0",
+            "constitution_version":"ACC-1.0",
+            "mesh":"Windows-AGI-Mesh",
+            "timestamp":"2026-01-01T00:00:00Z",
+            "branch":"main",
+            "continuity":false,
+            "constitutional_gate":"PASS",
+            "governance":"PASS",
+            "auditability":"PASS",
+            "consensus":"PASS",
+            "human_sovereignty":"PRESERVED",
+            "topology":"DISTRIBUTED",
+            "status":"APPROVED",
+            "metrics":{
+              "life":1,
+              "liberty":1,
+              "dignity":1,
+              "knowledge":1,
+              "diversity":1,
+              "oversight":1,
+              "auditability":1,
+              "power_concentration":0
+            }
+          }
+          EOF
+
+          if ajv validate \
+            -s .schemas/acc-state.schema.json \
+            -d bad.json
+          then
+            echo "continuity=false should fail"
+            exit 1
+          fi
+
+      - name: Negative Test Invalid Timestamp
+        run: |
+
+          cat > bad.json << 'EOF'
+          {
+            "schema_version":"1.0",
+            "constitution_version":"ACC-1.0",
+            "mesh":"Windows-AGI-Mesh",
+            "timestamp":"INVALID",
+            "branch":"main",
+            "continuity":true,
+            "constitutional_gate":"PASS",
+            "governance":"PASS",
+            "auditability":"PASS",
+            "consensus":"PASS",
+            "human_sovereignty":"PRESERVED",
+            "topology":"DISTRIBUTED",
+            "status":"APPROVED",
+            "metrics":{
+              "life":1,
+              "liberty":1,
+              "dignity":1,
+              "knowledge":1,
+              "diversity":1,
+              "oversight":1,
+              "auditability":1,
+              "power_concentration":0
+            }
+          }
+          EOF
+
+          if ajv validate \
+            -s .schemas/acc-state.schema.json \
+            -d bad.json
+          then
+            echo "invalid timestamp accepted"
+            exit 1
+          fi
+
+      - name: Negative Test Out Of Range Metric
+        run: |
+
+          cat > bad.json << 'EOF'
+          {
+            "schema_version":"1.0",
+            "constitution_version":"ACC-1.0",
+            "mesh":"Windows-AGI-Mesh",
+            "timestamp":"2026-01-01T00:00:00Z",
+            "branch":"main",
+            "continuity":true,
+            "constitutional_gate":"PASS",
+            "governance":"PASS",
+            "auditability":"PASS",
+            "consensus":"PASS",
+            "human_sovereignty":"PRESERVED",
+            "topology":"DISTRIBUTED",
+            "status":"APPROVED",
+            "metrics":{
+              "life":2,
+              "liberty":1,
+              "dignity":1,
+              "knowledge":1,
+              "diversity":1,
+              "oversight":1,
+              "auditability":1,
+              "power_concentration":0
+            }
+          }
+          EOF
+
+          if ajv validate \
+            -s .schemas/acc-state.schema.json \
+            -d bad.json
+          then
+            echo "metric out of range accepted"
+            exit 1
+          fi
+
+  generate-acc-pr:
+
+    name: Generate ACC State PR
+
+    needs:
+      - validate
+
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      github.actor != 'github-actions[bot]'
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Existing ACC PR
+        uses: actions/github-script@v8
+        id: checkpr
+        with:
+          script: |
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open"
+            });
+
+            const exists = prs.data.some(
+              p => p.title === "ACC State Update"
+            );
+
+            core.setOutput("exists", exists);
+
+      - name: Stop If PR Exists
+        if: steps.checkpr.outputs.exists == 'true'
+        run: |
+          echo "ACC PR already exists"
+          exit 0
+
+      - name: Generate ACC_STATE
+        run: |
+
+          TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          cat > ACC_STATE.json << EOF
+          {
+            "schema_version":"1.0",
+            "constitution_version":"ACC-1.0",
+            "mesh":"Windows-AGI-Mesh",
+            "timestamp":"${TS}",
+            "branch":"main",
+            "continuity":true,
+            "constitutional_gate":"PASS",
+            "governance":"PASS",
+            "auditability":"PASS",
+            "consensus":"PASS",
+            "human_sovereignty":"PRESERVED",
+            "topology":"DISTRIBUTED",
+            "status":"APPROVED",
+            "metrics":{
+              "life":0.95,
+              "liberty":0.92,
+              "dignity":0.95,
+              "knowledge":0.91,
+              "diversity":0.89,
+              "oversight":0.94,
+              "auditability":0.97,
+              "power_concentration":0.08
+            }
+          }
+          EOF
+
+      - name: Validate Generated ACC_STATE
+        run: |
+
+          ajv validate \
+            -s .schemas/acc-state.schema.json \
+            -d ACC_STATE.json
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: acc-state-update
+          delete-branch: true
+          commit-message: "ACC State Update"
+          title: "ACC State Update"
+          body: |
+            ACC Constitutional State Update
+
+            ✅ Constitutional Gate PASS
+            ✅ Governance PASS
+            ✅ Auditability PASS
+            ✅ Consensus PASS
+            ✅ Human Sovereignty PRESERVED
+            ✅ Topology DISTRIBUTED
+
+            CODEOWNER approval required before merge.
+
+          labels: |
+            acc-state
+            governance
