@@ -186,7 +186,7 @@ func ValidateDecision(
 		return ErrLifeViolation
 	}
 
-	if layer < RequiredLayer(d) {
+	if layer < Layer0 || layer > Layer4 || layer < RequiredLayer(d) {
 		return ErrSupervisionViolation
 	}
 
