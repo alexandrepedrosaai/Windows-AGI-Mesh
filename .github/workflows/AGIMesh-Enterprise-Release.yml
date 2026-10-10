@@ -41,25 +41,59 @@ jobs:
       - name: Setup .NET 6
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: '6.0.428'
 
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
+      - name: SDK Diagnostics
+        shell: bash
+        run: |
+          echo "================================="
+          echo "RUNNER"
+          echo "================================="
+          echo "OS=${{ runner.os }}"
+          echo "ARCH=${{ runner.arch }}"
+
+          echo ""
+          echo "================================="
+          echo ".NET VERSION"
+          echo "================================="
+          dotnet --version
+
+          echo ""
+          echo "================================="
+          echo "INSTALLED SDKS"
+          echo "================================="
+          dotnet --list-sdks
+
+          echo ""
+          echo "================================="
+          echo "INSTALLED RUNTIMES"
+          echo "================================="
+          dotnet --list-runtimes
+
+          echo ""
+          echo "================================="
+          echo ".NET INFO"
+          echo "================================="
+          dotnet --info
+
+          echo ""
+          echo "================================="
+          echo "GLOBAL.JSON"
+          echo "================================="
+          if [ -f global.json ]; then
+            cat global.json
+          else
+            echo "global.json not found"
+          fi
+
+      - name: Clear NuGet Cache
+        run: dotnet nuget locals all --clear
 
       - name: Restore
         run: dotnet restore AGIMesh/AGIMesh.csproj
 
       - name: Build
-        run: |
-          dotnet build \
-            AGIMesh/AGIMesh.csproj \
-            -c Release \
-            --no-restore
+        run: dotnet build AGIMesh/AGIMesh.csproj -c Release --no-restore
 
       - name: Test
-        run: |
-          dotnet test \
-            AGIMesh/AGIMesh.csproj \
-            -c Release
+        run: dotnet test AGIMesh/AGIMesh.csproj -c Release --no-build --verbosity normal
