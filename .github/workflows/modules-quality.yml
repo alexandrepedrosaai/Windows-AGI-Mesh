@@ -38,11 +38,11 @@ jobs:
           - modules/XboxQuantumXR.qs
 
     runs-on: ${{ matrix.os }}
-✅ CycloneDX SBOM generated
+            ✅ CycloneDX SBOM generated
 
-✅ SHA256 generated
+            ✅ SHA256 generated
 
-✅ Artifact attestation generated
+            ✅ Artifact attestation generated
 
-✅ Package generated`
+            ✅ Package generated`
             })
