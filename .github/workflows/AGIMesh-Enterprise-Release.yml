@@ -38,28 +38,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET 6
+      - name: Setup .NET 6 (macOS)
+        if: runner.os == 'macOS'
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: '6.0.428'
 
-      - name: Setup .NET 8
+      - name: Setup .NET 8 (Windows/Linux)
+        if: runner.os != 'macOS'
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: '8.0.x'
+
+      - name: Diagnostics
+        run: |
+          dotnet --version
+          dotnet --info
 
       - name: Restore
         run: dotnet restore AGIMesh/AGIMesh.csproj
 
       - name: Build
-        run: |
-          dotnet build \
-            AGIMesh/AGIMesh.csproj \
-            -c Release \
-            --no-restore
+        run: dotnet build AGIMesh/AGIMesh.csproj -c Release --no-restore
 
       - name: Test
-        run: |
-          dotnet test \
-            AGIMesh/AGIMesh.csproj \
-            -c Release
+        run: dotnet test AGIMesh/AGIMesh.csproj -c Release --no-build
