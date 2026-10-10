@@ -242,8 +242,12 @@ func main() {
 		{NodeID: "AGI-C", Yes: false},
 	}
 
-	fmt.Printf("Consensus: %v\n",
-		ConsensusReached(votes, 0.66))
+	consensus := ConsensusReached(votes, 0.66)
+	fmt.Printf("Consensus: %v\n", consensus)
+	if !consensus {
+		fmt.Println("Decision Rejected: consensus not reached")
+		return
+	}
 
 	decision := Decision{
 		ID:          "D-001",
