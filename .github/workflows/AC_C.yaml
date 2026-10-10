@@ -350,9 +350,16 @@ jobs:
           }
           EOF
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Validation Tools
+        run: npm install -g ajv-cli
+
       - name: Validate Generated ACC_STATE
         run: |
-
           ajv validate \
             -s .schemas/acc-state.schema.json \
             -d ACC_STATE.json
