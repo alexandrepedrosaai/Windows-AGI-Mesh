@@ -9,4 +9,7 @@ Windows-AGI-Mesh is a technical framework to evaluate and integrate AGI architec
 - `docs/` documents the `.qs` circuit conventions.
 - `examples/` contains an illustrative local-first Windows PC deployment.
 
-The architecture and module `.qs` circuits are declarative design manifests, not executable code. Their security rules describe requirements for a future implementation and do not enforce them by themselves. The benchmark `.qs` file is Q# source. See [the format reference](docs/circuite-format.md).
+The architecture and module `.qs` circuits are declarative design manifests, not executable code. Their security rules describe requirements for a future implementation and do not enforce them by themselves. The benchmark `.qs` file is Q# source. See [the format reference
+
+
+
