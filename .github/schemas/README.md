@@ -46,7 +46,7 @@ Accordingly, PR #68 is best classified as an **agentic contribution subjected to
 | Alexandre Pedrosa performed the final merge into `main` | Directly established | GitHub PR record | Confirmed |
 | A NASA employee reviewed or approved the contribution | Not supported | No human NASA reviewer or approval appears in the records | Must not be claimed |
 | All six displayed checks passed | Not established | The page shows six checks but reports three of four counted checks passed | Must not be claimed without individual check details |
-| Robots are blocked from autonomously merging into `main` | Maintainer-declared governance rule | Repository governance rule | Operationally supported by this case because Alexandre Pedrosa executed the merge |
+| Autonomous bot merges into `main` are prohibited by the policy stated here | Declared governance policy | PR #68 was merged by Alexandre Pedrosa | This merge establishes the merge actor, not technical enforcement of the policy |
 
 ---
 
