@@ -1,10 +1,16 @@
 name: Validate Code Review Pipeline
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    paths:
+      - ".github/schemas/**"
+      - ".github/workflows/validate-skill.yml"
+      - ".github/skills/code-review/**"
+      - "scripts/policy-check.py"
+
+  push:
+    branches:
+      - main
     paths:
       - ".github/schemas/**"
       - ".github/workflows/validate-skill.yml"
@@ -17,6 +23,10 @@ permissions:
 concurrency:
   group: code-review-validation-${{ github.ref }}
   cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   validate:
@@ -38,9 +48,16 @@ jobs:
 
       - name: Install Validation Tools
         run: |
-          npm install -g ajv-cli@latest
-          sudo apt-get update
-          sudo apt-get install -y jq
+          set -euo pipefail
+
+          npm install -g ajv-cli@5.0.0
+
+          if command -v jq >/dev/null 2>&1; then
+            jq --version
+          else
+            sudo apt-get update
+            sudo apt-get install -y jq
+          fi
 
       ####################################################################
       # REQUIRED FILES
@@ -48,6 +65,8 @@ jobs:
 
       - name: Verify required files exist
         run: |
+          set -euo pipefail
+
           test -f .github/schemas/review-output.schema.json
           test -f .github/schemas/sample-review-output.json
 
@@ -67,10 +86,14 @@ jobs:
 
       - name: Validate schema syntax
         run: |
+          set -euo pipefail
+
           jq empty .github/schemas/review-output.schema.json
 
       - name: Validate all JSON syntax
         run: |
+          set -euo pipefail
+
           for file in .github/schemas/*.json
           do
             echo "Checking syntax: $file"
@@ -83,6 +106,8 @@ jobs:
 
       - name: Compile policy checker
         run: |
+          set -euo pipefail
+
           python -m py_compile scripts/policy-check.py
 
       ####################################################################
@@ -91,6 +116,8 @@ jobs:
 
       - name: Validate positive sample with AJV Draft 2020
         run: |
+          set -euo pipefail
+
           ajv validate \
             --spec=draft2020 \
             -s .github/schemas/review-output.schema.json \
@@ -98,6 +125,8 @@ jobs:
 
       - name: Validate all policy test documents against schema
         run: |
+          set -euo pipefail
+
           for file in \
             .github/schemas/invalid-build-failure.json \
             .github/schemas/invalid-test-failure.json \
@@ -119,6 +148,8 @@ jobs:
 
       - name: Validate invalid schema sample fails
         run: |
+          set -euo pipefail
+
           if ajv validate \
             --spec=draft2020 \
             -s .github/schemas/review-output.schema.json \
@@ -136,6 +167,8 @@ jobs:
 
       - name: Policy validation positive sample
         run: |
+          set -euo pipefail
+
           python scripts/policy-check.py \
             .github/schemas/sample-review-output.json
 
@@ -145,6 +178,8 @@ jobs:
 
       - name: Policy test - High finding
         run: |
+          set -euo pipefail
+
           if python scripts/policy-check.py \
             .github/schemas/invalid-high-finding.json
           then
@@ -156,6 +191,8 @@ jobs:
 
       - name: Policy test - Critical finding
         run: |
+          set -euo pipefail
+
           if python scripts/policy-check.py \
             .github/schemas/invalid-critical-finding.json
           then
@@ -167,6 +204,8 @@ jobs:
 
       - name: Policy test - Build failure
         run: |
+          set -euo pipefail
+
           if python scripts/policy-check.py \
             .github/schemas/invalid-build-failure.json
           then
@@ -178,6 +217,8 @@ jobs:
 
       - name: Policy test - Test failure
         run: |
+          set -euo pipefail
+
           if python scripts/policy-check.py \
             .github/schemas/invalid-test-failure.json
           then
@@ -189,6 +230,8 @@ jobs:
 
       - name: Policy test - Security failure
         run: |
+          set -euo pipefail
+
           if python scripts/policy-check.py \
             .github/schemas/invalid-security-failure.json
           then
@@ -204,16 +247,22 @@ jobs:
 
       - name: Verify output schema reference
         run: |
+          set -euo pipefail
+
           grep -q "review-output.schema.json" \
             .github/skills/code-review/SKILL.md
 
       - name: Verify release readiness rules
         run: |
+          set -euo pipefail
+
           grep -q "release_ready" \
             .github/skills/code-review/SKILL.md
 
       - name: Verify mandatory Q# review coverage
         run: |
+          set -euo pipefail
+
           grep -q "Adjoint" \
             .github/skills/code-review/SKILL.md
 
@@ -241,6 +290,8 @@ jobs:
 
       - name: Verify repository structure
         run: |
+          set -euo pipefail
+
           test -f AGIMesh/AGIMesh.qs
           test -f AGIMesh/AGIMesh.csproj
           test -d benchmarks
@@ -252,6 +303,8 @@ jobs:
 
       - name: Validation Summary
         run: |
+          set -euo pipefail
+
           echo "✅ Schema syntax validated"
           echo "✅ All JSON syntax validated"
           echo "✅ AJV Draft 2020 validation passed"
