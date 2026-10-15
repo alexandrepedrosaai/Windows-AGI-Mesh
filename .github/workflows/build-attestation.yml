@@ -26,8 +26,7 @@ env:
   SBOM_FILE: windows-agi-mesh.spdx.json
   SECURITY_REPORT: windows-agi-mesh-trivy-report.json
   RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
-
-jobs:
+  jobs:
   test:
     name: Test and validate source
     runs-on: ubuntu-latest
@@ -706,6 +705,5 @@ jobs:
     # Configure this environment with Required reviewers in:
     # Repository Settings > Environments > production
     environment:
-      name: production
-     
-   url: https://github.com/${{ github.repository
+           name: production      
+          url: https://github.com/${{ github.repository
