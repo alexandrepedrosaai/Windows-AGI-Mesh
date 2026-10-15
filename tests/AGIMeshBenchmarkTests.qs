@@ -2,7 +2,6 @@ namespace AGIMesh.Tests {
 
 open Microsoft.Quantum.Diagnostics;
 open Microsoft.Quantum.Math;
-open Microsoft.Quantum.Simulation.XUnit;
 open AGIMesh.Benchmarks;
 
 @Test("QuantumSimulator")
