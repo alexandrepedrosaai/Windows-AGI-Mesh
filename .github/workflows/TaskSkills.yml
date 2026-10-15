@@ -1,13 +1,7 @@
 name: Validate Code Review Pipeline
 
 on:
-  pull_request:
-    paths:
-      - ".github/schemas/**"
-      - ".github/workflows/validate-skill.yml"
-      - ".github/skills/code-review/**"
-      - "scripts/policy-check.py"
-
+ 
   push:
     branches:
       - main
