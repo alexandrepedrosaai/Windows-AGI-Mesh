@@ -24,7 +24,7 @@ COPY . .
 RUN dotnet build MajoranaStarship.qsproj -c Release
 
 # Runtime image
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/runtime:10.0 AS runtime
 
 WORKDIR /app/WebGPU/Majoran-Starship
 
