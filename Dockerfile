@@ -1,28 +1,40 @@
-# syntax=docker/dockerfile:1
+# Base image: Ubuntu + .NET + Q#
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
-FROM python:3.12-alpine
+# Instalar dependências básicas
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
-LABEL org.opencontainers.image.title="Windows AGI Mesh" \
-      org.opencontainers.image.description="Windows AGI Mesh application" \
-      org.opencontainers.image.source="https://github.com/alexandrepedrosaai/Windows-AGI-Mesh"
+# Instalar .NET 6.0 SDK
+RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
+    chmod +x dotnet-install.sh && \
+    ./dotnet-install.sh --version 6.0.428 --install-dir /usr/share/dotnet && \
+    rm dotnet-install.sh
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    APP_HOST=0.0.0.0 \
-    APP_PORT=8080
+# Diretório de trabalho
+WORKDIR /app/WebGPU/Majoran-Starship
 
-WORKDIR /app
+# Copiar todos os arquivos para dentro do container
+COPY . .
 
-RUN addgroup -S appgroup \
-    && adduser -S -D -H -u 10001 -G appgroup appuser
+# Compilar o projeto Q#
+RUN dotnet build MajoranaStarship.qsproj -c Release
 
-COPY --chown=appuser:appgroup app.py README.md ./
+# Runtime image
+FROM mcr.microsoft.com/dotnet/runtime:8.0 AS runtime
 
-USER appuser
+WORKDIR /app/WebGPU/Majoran-Starship
 
-EXPOSE 8080
+# Copiar binários compilados
+COPY --from=build /app/WebGPU/Majoran-Starship/bin ./bin
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=3)" || exit 1
+# Labels para integração com GitHub Container Registry
+LABEL org.opencontainers.image.source="https://github.com/alexandrepedrosaai/Edge-AI-APP"
+LABEL org.opencontainers.image.description="Topo-Majorana-Quibits CI CD container para rodar binários Q#"
+LABEL org.opencontainers.image.workflow="Topo-Majorana-Quibits CI CD"
 
-CMD ["python", "app.py"]
+# Comando padrão: rodar o projeto Q#
+CMD ["dotnet", "run", "--project", "MajoranaStarship.qsproj", "-c", "Release"]
