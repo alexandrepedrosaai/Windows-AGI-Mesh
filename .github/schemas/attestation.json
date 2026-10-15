@@ -1,0 +1,427 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "attestation_type": "agentic_provenance_and_transport_inference",
+  "attestation_version": "1.0.0",
+  "document_status": "draft_unsigned",
+  "language": "en",
+  "generated_at": "2026-10-14T21:34:00-03:00",
+  "subject": {
+    "repository": "alexandrepedrosaai/Windows-AGI-Mesh",
+    "platform": "GitHub",
+    "source_lineage_reference": "#33",
+    "integration_pull_request": 70,
+    "origin_orchestration_commit": "e9bc92d4d8a9a608a62e2606020326a9a44c9b1a",
+    "integration_commit": "7b104a07c4fda88bcded114bd8f26f3954e80fd6"
+  },
+  "declared_coauthorship_trailers": [
+    {
+      "trailer": "Co-authored-by",
+      "display_name": "Microsoft",
+      "email": "opensource@microsoft.com",
+      "classification": "commit_message_metadata",
+      "human_approval_inferred": false,
+      "institutional_legal_authorization_inferred": false
+    },
+    {
+      "trailer": "Co-authored-by",
+      "display_name": "Nasa",
+      "email": "hq-open-innovation@mail.nasa.gov",
+      "classification": "commit_message_metadata",
+      "human_approval_inferred": false,
+      "institutional_legal_authorization_inferred": false
+    }
+  ],
+  "transport_inference": {
+    "mechanism": "GitHub Copilot Actions Cloud transport",
+    "claim": "The contribution lineage was transported through a GitHub pull-request workflow containing automated agent participation, review activity, checks, corrective commits, and final human-controlled integration.",
+    "classification": "strong_technical_inference",
+    "confidence": "high",
+    "basis": [
+      "Pull Request #70 transported five commits from a source branch into main.",
+      "The lineage includes co-authorship attributed to copilot-swe-agent[bot] and Copilot Autofix powered by AI.",
+      "GitHub Copilot Balanced was automatically requested and produced review findings.",
+      "A corrective commit was followed by another Copilot review cycle.",
+      "Alexandre Pedrosa performed the final merge into main.",
+      "The integration commit preserves both the source reference #33 and the integration reference #70."
+    ],
+    "not_claimed": [
+      "This attestation does not claim that Microsoft or NASA issued or signed this document.",
+      "This attestation does not claim human approval by Microsoft or NASA.",
+      "This attestation does not claim that Co-authored-by trailers alone prove institutional consent.",
+      "This attestation does not claim that every transported trailer represents a newly executed action in Pull Request #70.",
+      "This attestation does not replace GitHub's raw commit object, signature verification, checks, logs, or ruleset records."
+    ]
+  },
+  "actors": [
+    {
+      "name": "Alexandre Pedrosa",
+      "actor_type": "human",
+      "roles": [
+        "repository_maintainer",
+        "human_signatory_in_lineage",
+        "final_merge_authority",
+        "merge_executor"
+      ],
+      "approval_scope": "final_repository_integration",
+      "institution_represented_by_this_attestation": null
+    },
+    {
+      "name": "copilot-swe-agent[bot]",
+      "actor_type": "automated_agent",
+      "platform_affiliation": "GitHub Copilot",
+      "roles": [
+        "planning",
+        "software_engineering_execution",
+        "pull_request_task_work"
+      ]
+    },
+    {
+      "name": "Copilot Autofix powered by AI",
+      "actor_type": "automated_agent",
+      "platform_affiliation": "GitHub Copilot",
+      "roles": [
+        "automated_repair",
+        "workflow_correction",
+        "technical_hardening"
+      ]
+    },
+    {
+      "name": "GitHub Copilot Balanced",
+      "actor_type": "automated_review_agent",
+      "platform_affiliation": "GitHub Copilot",
+      "roles": [
+        "pull_request_review",
+        "finding_generation",
+        "iterative_re_review"
+      ]
+    },
+    {
+      "name": "SonarQube Cloud",
+      "actor_type": "automated_quality_service",
+      "roles": [
+        "quality_gate",
+        "static_quality_and_security_analysis"
+      ],
+      "pr70_result_in_this_attestation": "not_independently_asserted_without_check_detail"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E1",
+      "type": "pull_request",
+      "url": "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/pull/70",
+      "supports": [
+        "five_commit_transport",
+        "copilot_review_cycle",
+        "corrective_iteration",
+        "human_merge"
+      ]
+    },
+    {
+      "id": "E2",
+      "type": "origin_orchestration_commit",
+      "url": "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/e9bc92d4d8a9a608a62e2606020326a9a44c9b1a",
+      "supports": [
+        "multi_agent_task_history",
+        "copilot_swe_agent_coauthorship",
+        "copilot_autofix_coauthorship",
+        "human_signoff"
+      ]
+    },
+    {
+      "id": "E3",
+      "type": "integration_commit",
+      "url": "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/7b104a07c4fda88bcded114bd8f26f3954e80fd6",
+      "supports": [
+        "source_reference_33",
+        "integration_reference_70",
+        "verified_provenance_consolidation"
+      ]
+    },
+    {
+      "id": "E4",
+      "type": "institutional_agent_contribution_commit",
+      "url": "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/d485665478112f83027d4a8e7d630d9e4b66fb01",
+      "supports": [
+        "microsoft_coauthorship_trailer",
+        "nasa_coauthorship_trailer",
+        "nasa_open_robot_attribution"
+      ]
+    }
+  ],
+  "evidence_table": {
+    "description": "Machine-readable source-evidence matrix separating direct observations, strong technical inferences, declared governance rules, and unsupported claims.",
+    "columns": [
+      "evidence_id",
+      "claim",
+      "classification",
+      "source_ids",
+      "source_urls",
+      "observed_record",
+      "finding",
+      "confidence",
+      "limitations"
+    ],
+    "rows": [
+      {
+        "evidence_id": "EV-001",
+        "claim": "Pull Request #70 transported five commits into main.",
+        "classification": "directly_observed",
+        "source_ids": [
+          "E1"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/pull/70"
+        ],
+        "observed_record": "The PR records five commits merged from the source branch into main.",
+        "finding": "confirmed",
+        "confidence": "high",
+        "limitations": []
+      },
+      {
+        "evidence_id": "EV-002",
+        "claim": "Alexandre Pedrosa performed the final merge into main.",
+        "classification": "directly_observed",
+        "source_ids": [
+          "E1"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/pull/70"
+        ],
+        "observed_record": "The PR identifies Alexandre Pedrosa as the actor who merged the five commits.",
+        "finding": "confirmed",
+        "confidence": "high",
+        "limitations": []
+      },
+      {
+        "evidence_id": "EV-003",
+        "claim": "Commit e9bc92d contains the principal visible history of multi-agent task orchestration.",
+        "classification": "directly_observed",
+        "source_ids": [
+          "E2"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/e9bc92d4d8a9a608a62e2606020326a9a44c9b1a"
+        ],
+        "observed_record": "The commit message aggregates CI/CD, Q#, benchmark, test, build, release, security, and governance tasks with human and Copilot agent attribution.",
+        "finding": "confirmed",
+        "confidence": "high",
+        "limitations": [
+          "The aggregated message may include transported metadata from earlier pull requests."
+        ]
+      },
+      {
+        "evidence_id": "EV-004",
+        "claim": "The lineage attributes work to copilot-swe-agent[bot] and Copilot Autofix powered by AI.",
+        "classification": "directly_observed",
+        "source_ids": [
+          "E2",
+          "E3"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/e9bc92d4d8a9a608a62e2606020326a9a44c9b1a",
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/7b104a07c4fda88bcded114bd8f26f3954e80fd6"
+        ],
+        "observed_record": "Co-authored-by trailers and task descriptions identify both automated GitHub Copilot agents.",
+        "finding": "confirmed",
+        "confidence": "high",
+        "limitations": [
+          "A trailer proves recorded attribution, not necessarily a newly executed action in PR #70."
+        ]
+      },
+      {
+        "evidence_id": "EV-005",
+        "claim": "GitHub Copilot Balanced performed an iterative review cycle in PR #70.",
+        "classification": "directly_observed",
+        "source_ids": [
+          "E1"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/pull/70"
+        ],
+        "observed_record": "Copilot was automatically requested, produced review findings, and was requested again after corrective work.",
+        "finding": "confirmed",
+        "confidence": "high",
+        "limitations": [
+          "The table does not independently reproduce the complete Copilot session logs."
+        ]
+      },
+      {
+        "evidence_id": "EV-006",
+        "claim": "Commit 7b104a0 preserves both the source reference #33 and integration reference #70.",
+        "classification": "directly_observed",
+        "source_ids": [
+          "E3"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/7b104a07c4fda88bcded114bd8f26f3954e80fd6"
+        ],
+        "observed_record": "The commit title includes (#33) (#70), and its message preserves the source-lineage context.",
+        "finding": "confirmed",
+        "confidence": "high",
+        "limitations": []
+      },
+      {
+        "evidence_id": "EV-007",
+        "claim": "The PR workflow operated as an agentic transport and audit mechanism.",
+        "classification": "strong_technical_inference",
+        "source_ids": [
+          "E1",
+          "E2",
+          "E3"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/pull/70",
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/e9bc92d4d8a9a608a62e2606020326a9a44c9b1a",
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/7b104a07c4fda88bcded114bd8f26f3954e80fd6"
+        ],
+        "observed_record": "The lineage combines automated co-authorship, Copilot review, corrective iteration, checks, and final human merge.",
+        "finding": "strongly_supported",
+        "confidence": "high",
+        "limitations": [
+          "GitHub does not label the entire process with this exact attestation term."
+        ]
+      },
+      {
+        "evidence_id": "EV-008",
+        "claim": "Commit 7b104a0 acts as a provenance-consolidation record for the source lineage.",
+        "classification": "strong_technical_inference",
+        "source_ids": [
+          "E2",
+          "E3"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/e9bc92d4d8a9a608a62e2606020326a9a44c9b1a",
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/7b104a07c4fda88bcded114bd8f26f3954e80fd6"
+        ],
+        "observed_record": "The integration commit retains source and integration references plus accumulated human and automated attribution.",
+        "finding": "strongly_supported",
+        "confidence": "high",
+        "limitations": [
+          "The exact immediate-parent SHA should be verified from the raw Git object."
+        ]
+      },
+      {
+        "evidence_id": "EV-009",
+        "claim": "Microsoft and NASA Co-authored-by entries are present as commit-message metadata.",
+        "classification": "directly_observed_metadata",
+        "source_ids": [
+          "E4"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/d485665478112f83027d4a8e7d630d9e4b66fb01"
+        ],
+        "observed_record": "The commit message contains Microsoft <opensource@microsoft.com> and Nasa <hq-open-innovation@mail.nasa.gov> co-authorship trailers.",
+        "finding": "confirmed_as_metadata",
+        "confidence": "high",
+        "limitations": [
+          "The trailers do not independently prove human approval.",
+          "The trailers do not independently prove legal institutional authorization."
+        ]
+      },
+      {
+        "evidence_id": "EV-010",
+        "claim": "Microsoft or NASA provided human or legal institutional approval.",
+        "classification": "unsupported_without_additional_evidence",
+        "source_ids": [
+          "E4"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/commit/d485665478112f83027d4a8e7d630d9e4b66fb01"
+        ],
+        "observed_record": "Co-authorship metadata is present, but no cited record establishes human or legal institutional approval.",
+        "finding": "not_established",
+        "confidence": "high",
+        "limitations": [
+          "A separate authorized human approval or institutional signature would be required."
+        ]
+      },
+      {
+        "evidence_id": "EV-011",
+        "claim": "SonarQube Cloud produced a specific passing result for PR #70.",
+        "classification": "not_independently_established_in_current_evidence",
+        "source_ids": [
+          "E1"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/pull/70"
+        ],
+        "observed_record": "PR #70 displays checks, but the presently captured evidence does not expose a complete SonarQube result for that PR.",
+        "finding": "not_asserted",
+        "confidence": "medium",
+        "limitations": [
+          "Export the individual PR #70 check details to establish the result."
+        ]
+      },
+      {
+        "evidence_id": "EV-012",
+        "claim": "Automated agents did not possess final merge authority in the examined integration.",
+        "classification": "directly_observed_for_case_and_governance_inference",
+        "source_ids": [
+          "E1"
+        ],
+        "source_urls": [
+          "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/pull/70"
+        ],
+        "observed_record": "Alexandre Pedrosa, not an automated agent, executed the merge after the review and correction cycle.",
+        "finding": "confirmed_for_pr70",
+        "confidence": "high",
+        "limitations": [
+          "Repository-wide enforcement should be independently verified from the main branch ruleset."
+        ]
+      }
+    ]
+  },
+  "fact_inference_separation": {
+    "directly_observed": [
+      "The cited commit messages contain Microsoft and NASA Co-authored-by trailers.",
+      "Pull Request #70 records five commits merged into main by Alexandre Pedrosa.",
+      "The lineage records automated GitHub Copilot agents as co-authors or reviewers.",
+      "The integration commit references #33 and #70."
+    ],
+    "strong_inferences": [
+      "The pull-request process operated as an agentic transport and audit mechanism.",
+      "The integration commit acts as a provenance-consolidation record for the source lineage.",
+      "Execution, review, and final approval were separated across automated agents and a human authority."
+    ],
+    "unsupported_without_additional_evidence": [
+      "Human approval by Microsoft.",
+      "Human approval by NASA.",
+      "Legal or institutional ratification by Microsoft or NASA.",
+      "Cryptographic endorsement of this attestation by GitHub, Microsoft, NASA, or Sonar."
+    ]
+  },
+  "human_control": {
+    "model": "human_in_the_loop",
+    "final_merge_actor": "Alexandre Pedrosa",
+    "automated_merge_authority": false,
+    "statement": "Automated agents may contribute, review, test, and publish findings, but final integration into main requires human action by the repository maintainer."
+  },
+  "verification": {
+    "recommended_checks": [
+      "Retrieve the raw Git commit objects and verify parent SHAs.",
+      "Verify GitHub signature status for each cited commit.",
+      "Export Pull Request #70 checks and review-session logs.",
+      "Export the main branch ruleset and branch-protection configuration.",
+      "Compute and record SHA-256 digests for the raw evidence payloads."
+    ],
+    "cryptographic_digest": null,
+    "signature": {
+      "algorithm": null,
+      "signer": null,
+      "value": null
+    }
+  },
+  "attestation_statement": "Based on the cited GitHub records, the contribution lineage is attested as a human-controlled, agent-assisted transport and integration process. Microsoft and NASA co-authorship entries are recorded as commit-message metadata and are not represented here as proof of human or legal institutional approval."
+}SHA-256 do payload:
+a4d3f8efb0b02fd48e40064332b426c95c892854a8762022595edb74753800ea
+
+SHA-256 da chave pública:
+005506508e2f6b6e7de1bfaf7516b190603f81733f10d8edcb3ebdba5150ac49
+
+Algoritmo de assinatura:
+Ed25519
+
+Resultado da verificação:
+valid
+
