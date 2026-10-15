@@ -1,0 +1,14 @@
+                ACC
+                 │
+ ┌───────────────┼───────────────┐
+ │               │               │
+ ▼               ▼               ▼
+
+Constitution   Governance     Runtime
+
+ │               │               │
+
+ └──────► Validation ◄───────────┘
+                 │
+                 ▼
+           Human Continuity
