@@ -895,3 +895,791 @@ jobs:
             echo "docker pull ${IMAGE_REFERENCE%@*}@${IMAGE_DIGEST}"
             echo "\`\`\`"
           } >> "${GITHUB_STEP_SUMMARY}"
+    name: Test, secure, build, attest, and release every main commit
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: automated-release-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  LOCAL_IMAGE: windows-agi-mesh:ci
+  IMAGE_ARCHIVE: windows-agi-mesh-docker-image.tar
+  SOURCE_ARCHIVE: windows-agi-mesh-source.tar.gz
+  CHECKSUM_FILE: SHA256SUMS
+  SBOM_FILE: windows-agi-mesh.spdx.json
+  SECURITY_REPORT: windows-agi-mesh-trivy-report.json
+
+jobs:
+  metadata:
+    name: Generate release metadata
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    outputs:
+      release_tag: ${{ steps.meta.outputs.release_tag }}
+      short_sha: ${{ steps.meta.outputs.short_sha }}
+      image_name: ${{ steps.meta.outputs.image_name }}
+
+    steps:
+      - name: Generate immutable names
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          short_sha="${GITHUB_SHA::12}"
+          release_tag="main-${GITHUB_RUN_NUMBER}-${short_sha}"
+
+          image_name="$(
+            printf '%s/%s' \
+              "${REGISTRY}" \
+              "${GITHUB_REPOSITORY}" |
+            tr '[:upper:]' '[:lower:]'
+          )"
+
+          echo "short_sha=${short_sha}" >> "${GITHUB_OUTPUT}"
+          echo "release_tag=${release_tag}" >> "${GITHUB_OUTPUT}"
+          echo "image_name=${image_name}" >> "${GITHUB_OUTPUT}"
+
+  test:
+    name: Test and validate source
+    needs:
+      - metadata
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out current commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate repository structure
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -d .git
+          test -f Dockerfile
+          test -f app.py
+          test -f requirements.txt
+          test -n "$(git ls-files)"
+
+          if [ ! -f .dockerignore ]; then
+            echo "::warning::No .dockerignore file was found."
+          fi
+
+      - name: Reject tracked credentials and private keys
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          forbidden_files="$(
+            git ls-files |
+            grep -Ei \
+              '(^|/)(id_rsa|id_dsa|id_ecdsa|id_ed25519)(\.pub)?$|(^|/)\.env$|\.p12$|\.pfx$|\.pem$|\.key$|credentials\.json$' \
+            || true
+          )"
+
+          if [ -n "${forbidden_files}" ]; then
+            echo "::error::Potential credentials or private keys are tracked:"
+            printf '%s\n' "${forbidden_files}"
+            exit 1
+          fi
+
+      - name: Validate JSON files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          while IFS= read -r -d '' file; do
+            echo "Validating ${file}"
+            jq empty "${file}"
+          done < <(
+            find . \
+              -path './.git' -prune -o \
+              -path './node_modules' -prune -o \
+              -type f -name '*.json' -print0
+          )
+
+      - name: Validate shell scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          while IFS= read -r -d '' file; do
+            echo "Checking ${file}"
+            bash -n "${file}"
+          done < <(
+            find . \
+              -path './.git' -prune -o \
+              -path './node_modules' -prune -o \
+              -type f -name '*.sh' -print0
+          )
+
+      - name: Validate Python syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 -m compileall \
+            -q \
+            -x '(^|/)(\.git|\.venv|venv|dist|build|node_modules)/' \
+            .
+
+      - name: Install Python test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 -m pip install \
+            --disable-pip-version-check \
+            --requirement requirements-dev.txt
+
+      - name: Run Python tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pytest -q
+
+      - name: Install Node.js dependencies
+        if: hashFiles('package-lock.json') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+
+      - name: Run Node.js tests
+        if: hashFiles('package-lock.json') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if jq -e \
+            '.scripts.test? and
+             .scripts.test != "" and
+             .scripts.test != "echo \"Error: no test specified\" && exit 1"' \
+            package.json >/dev/null; then
+            npm test
+          else
+            echo "No functional npm test script is configured."
+          fi
+
+      - name: Remove generated test caches
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          find . \
+            -type d \
+            $$ -name '__pycache__' -o -name '.pytest_cache' $$ \
+            -prune \
+            -exec rm -rf {} +
+
+      - name: Confirm tracked source is unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          changes="$(git status --short --untracked-files=no)"
+
+          if [ -n "${changes}" ]; then
+            echo "::error::Tests modified tracked files."
+            printf '%s\n' "${changes}"
+            exit 1
+          fi
+
+  source-security:
+    name: Source and Dockerfile security
+    needs:
+      - metadata
+      - test
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out current commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: warning
+          format: tty
+          no-color: true
+
+      - name: Scan source, dependencies, secrets, and configuration
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Enforce Dockerfile security rules
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if grep -Ein \
+            '^[[:space:]]*ADD[[:space:]]+https?://' \
+            Dockerfile; then
+            echo "::error::Remote ADD instructions are not permitted."
+            exit 1
+          fi
+
+          if grep -Ein \
+            '(--privileged|/var/run/docker\.sock)' \
+            Dockerfile; then
+            echo "::error::Privileged execution or Docker socket access was detected."
+            exit 1
+          fi
+
+          final_user="$(
+            awk '
+              BEGIN {
+                IGNORECASE = 1
+                user = ""
+              }
+
+              /^[[:space:]]*FROM[[:space:]]+/ {
+                user = ""
+              }
+
+              /^[[:space:]]*USER[[:space:]]+/ {
+                user = $0
+                sub(/^[[:space:]]*USER[[:space:]]+/, "", user)
+              }
+
+              END {
+                print user
+              }
+            ' Dockerfile
+          )"
+
+          if [ -z "${final_user}" ] ||
+             [ "${final_user}" = "root" ] ||
+             [ "${final_user}" = "0" ]; then
+            echo "::error::The final Docker stage must declare a non-root USER."
+            exit 1
+          fi
+
+          echo "Final Docker runtime user: ${final_user}"
+
+  build:
+    name: Build binary artifacts, SBOM, and attestations
+    needs:
+      - metadata
+      - test
+      - source-security
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Check out tested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build local Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          push: false
+          tags: ${{ env.LOCAL_IMAGE }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ needs.metadata.outputs.release_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run container health smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          container_id="$(
+            docker run \
+              --detach \
+              --rm \
+              --publish 127.0.0.1:18080:8080 \
+              "${LOCAL_IMAGE}"
+          )"
+
+          cleanup() {
+            docker stop "${container_id}" >/dev/null 2>&1 || true
+          }
+
+          trap cleanup EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl \
+              --fail \
+              --silent \
+              http://127.0.0.1:18080/health |
+              jq -e '.status == "healthy"' >/dev/null; then
+              echo "Container health check passed."
+              exit 0
+            fi
+
+            echo "Health attempt ${attempt}/30 failed."
+            sleep 2
+          done
+
+          docker logs "${container_id}" || true
+
+          echo "::error::Container health smoke test failed."
+          exit 1
+
+      - name: Export binary artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p dist
+
+          docker save \
+            --output "dist/${IMAGE_ARCHIVE}" \
+            "${LOCAL_IMAGE}"
+
+          git archive \
+            --format=tar.gz \
+            --prefix=windows-agi-mesh/ \
+            --output="dist/${SOURCE_ARCHIVE}" \
+            "${GITHUB_SHA}"
+
+          test -s "dist/${IMAGE_ARCHIVE}"
+          test -s "dist/${SOURCE_ARCHIVE}"
+
+      - name: Generate SPDX JSON SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.LOCAL_IMAGE }}
+          format: spdx-json
+          output-file: dist/windows-agi-mesh.spdx.json
+          upload-artifact: false
+
+      - name: Generate checksums and validate files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -s "dist/${SBOM_FILE}"
+
+          jq -e \
+            '.spdxVersion and
+             .SPDXID and
+             .name and
+             .creationInfo' \
+            "dist/${SBOM_FILE}" >/dev/null
+
+          cd dist
+
+          sha256sum \
+            "${IMAGE_ARCHIVE}" \
+            "${SOURCE_ARCHIVE}" \
+            "${SBOM_FILE}" \
+            > "${CHECKSUM_FILE}"
+
+          sha256sum --check "${CHECKSUM_FILE}"
+
+      - name: Generate signed build provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            dist/windows-agi-mesh-docker-image.tar
+            dist/windows-agi-mesh-source.tar.gz
+            dist/SHA256SUMS
+
+      - name: Generate signed SBOM attestation
+        uses: actions/attest@v4
+        with:
+          subject-path: dist/windows-agi-mesh-docker-image.tar
+          sbom-path: dist/windows-agi-mesh.spdx.json
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-binaries-${{ needs.metadata.outputs.short_sha }}
+          path: |
+            dist/windows-agi-mesh-docker-image.tar
+            dist/windows-agi-mesh-source.tar.gz
+            dist/windows-agi-mesh.spdx.json
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+
+  image-security:
+    name: Scan built container image
+    needs:
+      - metadata
+      - build
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-binaries-${{ needs.metadata.outputs.short_sha }}
+          path: dist
+
+      - name: Verify checksums
+        working-directory: dist
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum --check "${CHECKSUM_FILE}"
+
+      - name: Block fixed high and critical vulnerabilities
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          input: dist/windows-agi-mesh-docker-image.tar
+          scanners: vuln
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Generate machine-readable security report
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          input: dist/windows-agi-mesh-docker-image.tar
+          scanners: vuln
+          format: json
+          output: dist/windows-agi-mesh-trivy-report.json
+          severity: LOW,MEDIUM,HIGH,CRITICAL
+          ignore-unfixed: false
+          exit-code: "0"
+
+      - name: Validate security report
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -s "dist/${SECURITY_REPORT}"
+          jq empty "dist/${SECURITY_REPORT}"
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report-${{ needs.metadata.outputs.short_sha }}
+          path: dist/windows-agi-mesh-trivy-report.json
+          if-no-files-found: error
+          retention-days: 90
+
+  verify:
+    name: Verify artifacts and attestations
+    needs:
+      - metadata
+      - build
+      - image-security
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      attestations: read
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-binaries-${{ needs.metadata.outputs.short_sha }}
+          path: dist
+
+      - name: Download security report
+        uses: actions/download-artifact@v4
+        with:
+          name: security-report-${{ needs.metadata.outputs.short_sha }}
+          path: dist
+
+      - name: Validate downloaded files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cd dist
+
+          sha256sum --check "${CHECKSUM_FILE}"
+          jq empty "${SBOM_FILE}"
+          jq empty "${SECURITY_REPORT}"
+
+      - name: Verify binary artifact attestations
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          for file in \
+            "dist/${IMAGE_ARCHIVE}" \
+            "dist/${SOURCE_ARCHIVE}" \
+            "dist/${CHECKSUM_FILE}"; do
+
+            verified=false
+
+            for attempt in 1 2 3 4 5; do
+              echo "Verifying ${file}, attempt ${attempt}/5"
+
+              if gh attestation verify \
+                "${file}" \
+                --repo "${GITHUB_REPOSITORY}"; then
+                verified=true
+                break
+              fi
+
+              sleep 10
+            done
+
+            if [ "${verified}" != true ]; then
+              echo "::error::Attestation verification failed for ${file}."
+              exit 1
+            fi
+          done
+
+      - name: Load verified Docker archive
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          docker load \
+            --input "dist/${IMAGE_ARCHIVE}"
+
+          docker image inspect \
+            "${LOCAL_IMAGE}" >/dev/null
+
+  deploy:
+    name: Publish GHCR image and automatic GitHub Release
+    needs:
+      - metadata
+      - build
+      - image-security
+      - verify
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Download verified build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-binaries-${{ needs.metadata.outputs.short_sha }}
+          path: dist
+
+      - name: Download verified security report
+        uses: actions/download-artifact@v4
+        with:
+          name: security-report-${{ needs.metadata.outputs.short_sha }}
+          path: dist
+
+      - name: Revalidate release files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cd dist
+
+          sha256sum --check "${CHECKSUM_FILE}"
+          jq empty "${SBOM_FILE}"
+          jq empty "${SECURITY_REPORT}"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Load, tag, and push image
+        shell: bash
+        env:
+          IMAGE_NAME: ${{ needs.metadata.outputs.image_name }}
+          RELEASE_TAG: ${{ needs.metadata.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+
+          docker load \
+            --input "dist/${IMAGE_ARCHIVE}"
+
+          docker tag \
+            "${LOCAL_IMAGE}" \
+            "${IMAGE_NAME}:${RELEASE_TAG}"
+
+          docker tag \
+            "${LOCAL_IMAGE}" \
+            "${IMAGE_NAME}:main"
+
+          docker tag \
+            "${LOCAL_IMAGE}" \
+            "${IMAGE_NAME}:latest"
+
+          docker push "${IMAGE_NAME}:${RELEASE_TAG}"
+          docker push "${IMAGE_NAME}:main"
+          docker push "${IMAGE_NAME}:latest"
+
+      - name: Resolve published image digest
+        id: digest
+        shell: bash
+        env:
+          IMAGE_NAME: ${{ needs.metadata.outputs.image_name }}
+          RELEASE_TAG: ${{ needs.metadata.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+
+          digest="$(
+            docker buildx imagetools inspect \
+              "${IMAGE_NAME}:${RELEASE_TAG}" \
+              --format '{{.Manifest.Digest}}'
+          )"
+
+          if [[ ! "${digest}" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "::error::A valid registry digest could not be resolved."
+            exit 1
+          fi
+
+          echo "digest=${digest}" >> "${GITHUB_OUTPUT}"
+
+      - name: Attest published image provenance
+        uses: actions/attest@v4
+        with:
+          subject-name: ${{ needs.metadata.outputs.image_name }}
+          subject-digest: ${{ steps.digest.outputs.digest }}
+          push-to-registry: true
+
+      - name: Attest published image SBOM
+        uses: actions/attest@v4
+        with:
+          subject-name: ${{ needs.metadata.outputs.image_name }}
+          subject-digest: ${{ steps.digest.outputs.digest }}
+          sbom-path: dist/windows-agi-mesh.spdx.json
+          push-to-registry: true
+
+      - name: Verify published image attestation
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IMAGE_NAME: ${{ needs.metadata.outputs.image_name }}
+          IMAGE_DIGEST: ${{ steps.digest.outputs.digest }}
+        run: |
+          set -euo pipefail
+
+          for attempt in 1 2 3 4 5; do
+            echo "Registry attestation verification attempt ${attempt}/5"
+
+            if gh attestation verify \
+              "oci://${IMAGE_NAME}@${IMAGE_DIGEST}" \
+              --repo "${GITHUB_REPOSITORY}"; then
+              echo "Published image attestation verified."
+              exit 0
+            fi
+
+            sleep 10
+          done
+
+          echo "::error::Published image attestation verification failed."
+          exit 1
+
+      - name: Create automatic GitHub Release and upload binary artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.metadata.outputs.release_tag }}
+          IMAGE_NAME: ${{ needs.metadata.outputs.image_name }}
+          IMAGE_DIGEST: ${{ steps.digest.outputs.digest }}
+        run: |
+          set -euo pipefail
+
+          notes_file="${RUNNER_TEMP}/release-notes.md"
+
+          cat > "${notes_file}" <<EOF
+          Automated release for commit ${GITHUB_SHA} on the main branch.
+
+          Container image:
+
+          \`${IMAGE_NAME}:${RELEASE_TAG}\`
+
+          Immutable digest:
+
+          \`${IMAGE_NAME}@${IMAGE_DIGEST}\`
+          EOF
+
+          gh release create \
+            "${RELEASE_TAG}" \
+            "dist/${IMAGE_ARCHIVE}" \
+            "dist/${SOURCE_ARCHIVE}" \
+            "dist/${CHECKSUM_FILE}" \
+            "dist/${SBOM_FILE}" \
+            "dist/${SECURITY_REPORT}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "Automated main build ${GITHUB_RUN_NUMBER} (${GITHUB_SHA::12})" \
+            --notes-file "${notes_file}" \
+            --latest
+
+      - name: Publish deployment summary
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ needs.metadata.outputs.release_tag }}
+          IMAGE_NAME: ${{ needs.metadata.outputs.image_name }}
+          IMAGE_DIGEST: ${{ steps.digest.outputs.digest }}
+        run: |
+          {
+            echo "## Automatic release published"
+            echo
+            echo "- Release: \`${RELEASE_TAG}\`"
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Image: \`${IMAGE_NAME}:${RELEASE_TAG}\`"
+            echo "- Digest: \`${IMAGE_DIGEST}\`"
+            echo "- Manual approval: not required"
+          } >> "${GITHUB_STEP_SUMMARY}"
