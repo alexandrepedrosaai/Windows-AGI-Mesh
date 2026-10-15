@@ -1,14 +1,37 @@
-# `dependabot.yml` file with
-# customized schedule for version updates
+nome: Continuous Integration
 
-version: 2
-updates:
-  # Keep npm dependencies up to date
-  - package-ecosystem: "npm"
-    directory: "/"
-    # Check the npm registry every week on Tuesday at 02:00 Japan Standard Time (UTC +09:00)
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "02:00"
-      timezone: "Asia/Tokyo"
+em:
+  pull_request:
+    Ramos:
+      - Principal
+  Empurrão:
+    Ramos:
+      - Principal
+      - "lançamentos/*"
+
+Permissões: {}
+
+Empregos:
+  Teste-Atestado-Proveniência:
+    nome: Ação de atestado de teste
+    Funcionando: Ubuntu-Latest
+    Permissões:
+      Atestados: Escrever
+      Conteúdo: Leia
+      id-token: write
+
+    Etapas:
+      - nome: Checkout
+        ID: Checkout
+        Usos: Ações/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - nome: Executar attest-provenance
+        id: attest-provenance
+        Usos: ./
+        env:
+          INPUT_PRIVATE-ASSINANDO: "verdadeiro"
+        com:
+          Assunto-digesto: "Sha256:7d070F6b64D9BCC530FE99CC21EAAA4b3C364E0B2D367D7735671Fa202A03B32"
+          Nome do assunto: "Sujeito"
+          GitHub-token: ${{ secrets. GITHUB_TOKEN }}
+      - nome: Saída de despejo
+        run: jq < ${{ steps.attest-provenance.outputs.bundle-path }}
