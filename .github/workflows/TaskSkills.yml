@@ -1,10 +1,10 @@
 name: Validate Code Review Pipeline
 
 on:
- 
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
     paths:
       - ".github/schemas/**"
       - ".github/workflows/validate-skill.yml"
