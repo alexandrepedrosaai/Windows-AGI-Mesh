@@ -1,0 +1,270 @@
+name: Validate Code Review Pipeline
+
+on:
+  pull_request:
+    paths:
+      - ".github/schemas/**"
+      - ".github/workflows/validate-skill.yml"
+      - ".github/skills/code-review/**"
+      - "scripts/policy-check.py"
+
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/schemas/**"
+      - ".github/workflows/validate-skill.yml"
+      - ".github/skills/code-review/**"
+      - "scripts/policy-check.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: code-review-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Validation Tools
+        run: |
+          npm install -g ajv-cli@latest
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      ####################################################################
+      # REQUIRED FILES
+      ####################################################################
+
+      - name: Verify required files exist
+        run: |
+          test -f .github/schemas/review-output.schema.json
+          test -f .github/schemas/sample-review-output.json
+
+          test -f .github/schemas/invalid-schema.json
+          test -f .github/schemas/invalid-build-failure.json
+          test -f .github/schemas/invalid-test-failure.json
+          test -f .github/schemas/invalid-security-failure.json
+          test -f .github/schemas/invalid-high-finding.json
+          test -f .github/schemas/invalid-critical-finding.json
+
+          test -f scripts/policy-check.py
+          test -f .github/skills/code-review/SKILL.md
+
+      ####################################################################
+      # JSON SYNTAX VALIDATION
+      ####################################################################
+
+      - name: Validate schema syntax
+        run: |
+          jq empty .github/schemas/review-output.schema.json
+
+      - name: Validate all JSON syntax
+        run: |
+          for file in .github/schemas/*.json
+          do
+            echo "Checking syntax: $file"
+            jq empty "$file"
+          done
+
+      ####################################################################
+      # PYTHON VALIDATION
+      ####################################################################
+
+      - name: Compile policy checker
+        run: |
+          python -m py_compile scripts/policy-check.py
+
+      ####################################################################
+      # AJV DRAFT 2020 VALIDATION
+      ####################################################################
+
+      - name: Validate positive sample with AJV Draft 2020
+        run: |
+          ajv validate \
+            --spec=draft2020 \
+            -s .github/schemas/review-output.schema.json \
+            -d .github/schemas/sample-review-output.json
+
+      - name: Validate all policy test documents against schema
+        run: |
+          for file in \
+            .github/schemas/invalid-build-failure.json \
+            .github/schemas/invalid-test-failure.json \
+            .github/schemas/invalid-security-failure.json \
+            .github/schemas/invalid-high-finding.json \
+            .github/schemas/invalid-critical-finding.json
+          do
+            echo "Schema validation: $file"
+
+            ajv validate \
+              --spec=draft2020 \
+              -s .github/schemas/review-output.schema.json \
+              -d "$file"
+          done
+
+      ####################################################################
+      # NEGATIVE SCHEMA TEST
+      ####################################################################
+
+      - name: Validate invalid schema sample fails
+        run: |
+          if ajv validate \
+            --spec=draft2020 \
+            -s .github/schemas/review-output.schema.json \
+            -d .github/schemas/invalid-schema.json
+          then
+            echo "ERROR: invalid-schema.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: invalid-schema.json failed as expected"
+          fi
+
+      ####################################################################
+      # POSITIVE POLICY TEST
+      ####################################################################
+
+      - name: Policy validation positive sample
+        run: |
+          python scripts/policy-check.py \
+            .github/schemas/sample-review-output.json
+
+      ####################################################################
+      # NEGATIVE POLICY TESTS
+      ####################################################################
+
+      - name: Policy test - High finding
+        run: |
+          if python scripts/policy-check.py \
+            .github/schemas/invalid-high-finding.json
+          then
+            echo "ERROR: invalid-high-finding.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: High finding rejected"
+          fi
+
+      - name: Policy test - Critical finding
+        run: |
+          if python scripts/policy-check.py \
+            .github/schemas/invalid-critical-finding.json
+          then
+            echo "ERROR: invalid-critical-finding.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: Critical finding rejected"
+          fi
+
+      - name: Policy test - Build failure
+        run: |
+          if python scripts/policy-check.py \
+            .github/schemas/invalid-build-failure.json
+          then
+            echo "ERROR: invalid-build-failure.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: Build failure rejected"
+          fi
+
+      - name: Policy test - Test failure
+        run: |
+          if python scripts/policy-check.py \
+            .github/schemas/invalid-test-failure.json
+          then
+            echo "ERROR: invalid-test-failure.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: Test failure rejected"
+          fi
+
+      - name: Policy test - Security failure
+        run: |
+          if python scripts/policy-check.py \
+            .github/schemas/invalid-security-failure.json
+          then
+            echo "ERROR: invalid-security-failure.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: Security failure rejected"
+          fi
+
+      ####################################################################
+      # SKILL VALIDATION
+      ####################################################################
+
+      - name: Verify output schema reference
+        run: |
+          grep -q "review-output.schema.json" \
+            .github/skills/code-review/SKILL.md
+
+      - name: Verify release readiness rules
+        run: |
+          grep -q "release_ready" \
+            .github/skills/code-review/SKILL.md
+
+      - name: Verify mandatory Q# review coverage
+        run: |
+          grep -q "Adjoint" \
+            .github/skills/code-review/SKILL.md
+
+          grep -q "Controlled" \
+            .github/skills/code-review/SKILL.md
+
+          grep -q "Qubit Lifecycle" \
+            .github/skills/code-review/SKILL.md
+
+          grep -q "Reset Compliance" \
+            .github/skills/code-review/SKILL.md
+
+          grep -q "Hermiticity" \
+            .github/skills/code-review/SKILL.md
+
+          grep -q "Operator Algebra" \
+            .github/skills/code-review/SKILL.md
+
+          grep -q "Quantum-State" \
+            .github/skills/code-review/SKILL.md
+
+      ####################################################################
+      # REPOSITORY VALIDATION
+      ####################################################################
+
+      - name: Verify repository structure
+        run: |
+          test -f AGIMesh/AGIMesh.qs
+          test -f AGIMesh/AGIMesh.csproj
+          test -d benchmarks
+          test -d .github
+
+      ####################################################################
+      # SUCCESS
+      ####################################################################
+
+      - name: Validation Summary
+        run: |
+          echo "✅ Schema syntax validated"
+          echo "✅ All JSON syntax validated"
+          echo "✅ AJV Draft 2020 validation passed"
+          echo "✅ Positive schema validation passed"
+          echo "✅ Negative schema validation passed"
+          echo "✅ Release readiness policy validated"
+          echo "✅ All negative policy tests passed"
+          echo "✅ Q# review coverage verified"
+          echo "✅ Repository structure verified"
+          echo "✅ Code review pipeline validation complete"
