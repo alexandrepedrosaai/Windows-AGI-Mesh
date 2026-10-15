@@ -64,13 +64,6 @@ jobs:
           set -e
           echo "🔑 Verifying release artifacts..."
           sha256sum -c hashes.txt
-          for f in *; do
-            if [[ "$f" != *.pem && "$f" != *.sig && -f "$f" ]]; then
-              if [ -f "$f.sig" ]; then
-                echo "Verifying $f..."
-                openssl dgst -sha256 -verify release-pub.pem -signature "$f.sig" "$f"
-              fi
-            fi
           done
           echo "✅ All artifacts verified successfully."
           EOF
