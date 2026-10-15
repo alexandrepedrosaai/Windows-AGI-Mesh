@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://windows-agi-mesh.github.io/schemas/MSFT_NASA_SA_schema.json",
+  "title": "MSFT NASA Software Assets Schema",
+  "description": "Schema de interoperabilidade para catalogação de ativos de software NASA em ambientes Microsoft Windows e AGI Mesh.",
+  "type": "object",
+
+  "required": [
+    "$schema",
+    "version",
+    "agency",
+    "releases"
+  ],
+
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+
+    "agency": {
+      "type": "string",
+      "const": "NASA"
+    },
+
+    "meshMetadata": {
+      "$ref": "#/$defs/meshMetadata"
+    },
+
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+
+    "releases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/release"
+      }
+    }
+  },
+
+  "$defs": {
+    "meshMetadata": {
+      "type": "object",
+      "properties": {
+        "meshVersion": {
+          "type": "string"
+        },
+
+        "windowsCompatibilityScan": {
+          "type": "boolean"
+        },
+
+        "semanticIndexingEnabled": {
+          "type": "boolean"
+        },
+
+        "agentReady": {
+          "type": "boolean"
+        },
+
+        "ragCompatible": {
+          "type": "boolean"
+        }
+      }
+    },
+
+    "source": {
+      "type": "object",
+
+      "required": [
+        "name",
+        "url"
+      ],
+
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+
+        "organization": {
+          "type": "string"
+        }
+      }
+    },
+
+    "release": {
+      "type": "object",
+
+      "required": [
+        "name",
+        "repositoryURL",
+        "description"
+      ],
+
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+
+        "repositoryURL": {
+          "type": "string",
+          "format": "uri"
+        },
+
+        "homepageURL": {
+          "type": "string",
+          "format": "uri"
+        },
+
+        "organization": {
+          "type": "string"
+        },
+
+        "description": {
+          "type": "string"
+        },
+
+        "local-id": {
+          "type": "string"
+        },
+
+        "contact": {
+          "$ref": "#/$defs/contact"
+        },
+
+        "permissions": {
+          "$ref": "#/$defs/permissions"
+        },
+
+        "platforms": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "Windows",
+              "Linux",
+              "Unix",
+              "macOS",
+              "Cloud",
+              "Embedded"
+            ]
+          }
+        },
+
+        "windowsCompatibility": {
+          "$ref": "#/$defs/windowsCompatibility"
+        },
+
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+
+        "sti_keywords_passed_thresholds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+
+        "semanticClassification": {
+          "$ref": "#/$defs/semanticClassification"
+        },
+
+        "service_version": {
+          "type": "string"
+        },
+
+        "date_AI_tags": {
+          "type": "string"
+        }
+      }
+    },
+
+    "contact": {
+      "type": "object",
+
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+
+        "phone": {
+          "type": "string"
+        }
+      }
+    },
+
+    "permissions": {
+      "type": "object",
+
+      "properties": {
+        "usageType": {
+          "type": "string"
+        },
+
+        "exemptionText": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+
+    "windowsCompatibility": {
+      "type": "object",
+
+      "properties": {
+        "supported": {
+          "type": "boolean"
+        },
+
+        "evidence": {
+          "type": "string"
+        },
+
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+
+    "semanticClassification": {
+      "type": "object",
+
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+
+        "category": {
+          "type": "string"
+        },
+
+        "agentUsable": {
+          "type": "boolean"
+        },
+
+        "agiMeshCompatible": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
