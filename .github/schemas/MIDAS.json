@@ -1,0 +1,37 @@
+{
+  "name": "Man-Machine Integration Design and Analysis System (MIDAS) Version 5",
+  "repositoryURL": "https://software.nasa.gov/software/ARC-16050-1A",
+  "homepageURL": "https://software.nasa.gov/software/ARC-16050-1A",
+  "organization": "ARC",
+
+  "description": "MIDAS operates on a Microsoft Windows-based PC platform.",
+
+  "platforms": [
+    "Windows"
+  ],
+
+  "windowsCompatibility": {
+    "supported": true,
+    "evidence": "Microsoft Windows-based PC platform",
+    "confidence": 1.0
+  },
+
+  "semanticClassification": {
+    "domain": "Human Machine Systems",
+    "category": "Modeling and Simulation",
+    "agentUsable": true,
+    "agiMeshCompatible": true
+  },
+
+  "tags": [
+    "NASA",
+    "ARC",
+    "Crew and Life Support"
+  ],
+
+  "sti_keywords_passed_thresholds": [
+    "nlp:graphical user interface",
+    "nlp:human-computer interface",
+    "nlp:systems engineering"
+  ]
+}
