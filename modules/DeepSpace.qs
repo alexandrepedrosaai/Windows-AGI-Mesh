@@ -18,7 +18,7 @@ namespace AGIMesh.Modules.DeepSpace {
     );
 
     function DeepSpaceVersion() : String {
-        "0.1.0"
+        return "0.1.0";
     }
 
     function ComputeIntegrityScore(
