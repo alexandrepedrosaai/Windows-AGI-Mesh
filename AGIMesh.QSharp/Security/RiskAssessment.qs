@@ -16,7 +16,7 @@ namespace AGIMesh.Security {
         }
 
         let vulnerabilityPenalty =
-            IntAsDouble(vulnerabilities) * 10.0;
+            Microsoft.Quantum.Convert.IntAsDouble(vulnerabilities) * 10.0;
 
         let confidenceBonus =
             confidence * 100.0;
