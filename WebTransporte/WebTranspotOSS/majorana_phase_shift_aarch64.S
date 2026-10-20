@@ -241,7 +241,8 @@ majorana_purity_neon:
         fmadd s4,s2,s2,s4
         subs w21,w21,#1
         b.ne .L_purity_scalar
-        fadd s0,s0,s4
+        fadd s4,s0,s4
+        ins v0.s[0],v4.s[0]
 .L_purity_reduce:
         faddp v0.4s,v0.4s,v0.4s
         faddp v0.4s,v0.4s,v0.4s
