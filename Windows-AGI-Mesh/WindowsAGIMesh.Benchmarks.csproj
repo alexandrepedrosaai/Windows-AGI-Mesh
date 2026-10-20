@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>WindowsAGIMesh.Benchmarks</RootNamespace>
+    <AssemblyName>WindowsAGIMesh.Benchmarks</AssemblyName>
+    <Description>Performance benchmarks for the Windows AGI Mesh platform — reasoning, serialisation, and throughput.</Description>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WindowsAGIMesh.Contracts\WindowsAGIMesh.Contracts.csproj" />
+    <ProjectReference Include="..\WindowsAGIMesh.Schemas\WindowsAGIMesh.Schemas.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>
