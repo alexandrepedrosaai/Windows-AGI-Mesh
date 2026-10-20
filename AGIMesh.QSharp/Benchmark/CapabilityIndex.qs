@@ -10,6 +10,7 @@ namespace AGIMesh.Benchmark {
             reasoning,
             tools,
             memory,
+            selfCorrection,
             coordination,
             quantum
         ) = scores!;
@@ -18,8 +19,9 @@ namespace AGIMesh.Benchmark {
             reasoning +
             tools +
             memory +
+            selfCorrection +
             coordination +
             quantum
-        ) / 5.0;
+        ) / 6.0;
     }
 }
