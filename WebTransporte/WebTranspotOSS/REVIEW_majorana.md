@@ -54,7 +54,7 @@ max cos err = 1.83e-03   max sin err = 4.45e-04   (both < 0.2%)
 - **Target:** The corrected file uses **Mach-O / Apple Silicon** syntax (`@PAGE`/`@PAGEOFF`, `__TEXT`/`__const`, leading underscores). ELF/Linux-AArch64 porting instructions are in the footer of the `.s` file.
 - **Could not assemble on this VM** (no clang/aarch64 cross-toolchain; apt install timed out). The corrected file was carefully hand-checked; recommend running `clang --target=arm64-apple-macosx -c majorana_phase_shift_fixed.arm64.s` once to confirm zero warnings.
 - **For best accuracy** in production, if phase angles can grow beyond ±π, consider a proper octant range-reduction (reduce to ±π/4) or call `sinf`/`cosf` from a vectorized libm; the current fix is a good balance of speed vs. accuracy.
-- `_compute_phase_angles_neon` signature: `(float* omega, float t, float* phi, int dim)` — note `t` arrives in **s1** (float arg), not x1.
+- `compute_phase_angles_neon` signature: `(const float* omega, float t, float* phi, int dim)` — under AAPCS64, `omega` arrives in **x0**, `t` in **s0**, `phi` in **x1**, and `dim` in **w2**.
 
 ---
 
