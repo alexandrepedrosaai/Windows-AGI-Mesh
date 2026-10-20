@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>WindowsAGIMesh.Contracts</RootNamespace>
+    <AssemblyName>WindowsAGIMesh.Contracts</AssemblyName>
+    <Description>Core contracts, records and interfaces for the Windows AGI Mesh platform.</Description>
+    <PackageTags>agi;mesh;contracts;windows;ai</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+
+</Project>
