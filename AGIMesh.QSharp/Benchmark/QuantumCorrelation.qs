@@ -8,6 +8,10 @@ namespace AGIMesh.Benchmark {
         shots : Int
     ) : Double {
 
+        if shots <= 0 {
+            fail "shots must be greater than zero.";
+        }
+
         mutable matches = 0;
 
         for _ in 1..shots {
