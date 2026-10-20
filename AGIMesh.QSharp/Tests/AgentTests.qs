@@ -1,6 +1,7 @@
 namespace AGIMesh.Tests {
 
     open AGIMesh.Agents;
+    open Microsoft.Quantum.Diagnostics;
 
     @Test("QuantumSimulator")
     operation AgentReadinessTest() : Unit {
