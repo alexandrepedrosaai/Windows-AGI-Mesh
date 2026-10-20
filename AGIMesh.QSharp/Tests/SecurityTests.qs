@@ -1,6 +1,7 @@
 namespace AGIMesh.Tests {
 
     open AGIMesh.Security;
+    open Microsoft.Quantum.Diagnostics;
 
     @Test("QuantumSimulator")
     operation RiskAssessmentTest() : Unit {
