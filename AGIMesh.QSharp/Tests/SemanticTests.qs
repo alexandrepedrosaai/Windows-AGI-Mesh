@@ -2,7 +2,7 @@ namespace AGIMesh.Tests {
 
     open AGIMesh.Validation;
 
-    @Test("QuantumSimulator")
+    @Microsoft.Quantum.Diagnostics.Test("QuantumSimulator")
     operation SemanticValidationTest() : Unit {
 
         let valid =
