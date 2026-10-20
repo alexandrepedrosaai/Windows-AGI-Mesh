@@ -327,7 +327,7 @@ namespace SiameseTwinAI.WebTransportLearning.ContinualLearning {
 
             if cycle % 5 == 0 {
                 let (c, tl, el, gn, aa) = step!;
-                Message($"Step {c:D2} | Loss: {tl + el} | " +
+                Message($"Step {c} | Loss: {tl + el} | " +
                         $"Grad: {gn} | Anchor: {aa}");
             }
 
