@@ -1,0 +1,595 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Represents an autonomous agent registered in the AGI Mesh.
+/// Agents are the primary actors that execute tasks, collaborate, and report results.
+/// </summary>
+public sealed record MeshAgent
+(
+    /// <summary>Unique identifier for this agent instance.</summary>
+    [Required]
+    [StringLength(128, MinimumLength = 1)]
+    string AgentId,
+
+    /// <summary>
+    /// Functional role of the agent, e.g. "Planner", "Executor", "Reviewer", "Orchestrator".
+    /// </summary>
+    [Required]
+    [StringLength(64, MinimumLength = 1)]
+    string Role,
+
+    /// <summary>
+    /// Skill tokens this agent is capable of performing,
+    /// e.g. "summarization", "code-generation", "image-captioning".
+    /// </summary>
+    string[] Skills,
+
+    /// <summary>
+    /// Trust level in the range [0.0, 1.0].
+    /// 0.0 = untrusted / sandboxed; 1.0 = fully trusted / privileged.
+    /// </summary>
+    [Range(0.0, 1.0)]
+    double TrustLevel
+)
+{
+    /// <summary>
+    /// Returns true when the agent is considered trusted (TrustLevel >= 0.8).
+    /// </summary>
+    public bool IsTrusted => TrustLevel >= 0.8;
+
+    /// <summary>
+    /// Returns true when the agent has the specified skill token.
+    /// </summary>
+    public bool HasSkill(string skill) =>
+        Skills.Contains(skill, StringComparer.OrdinalIgnoreCase);
+}
+using System.ComponentModel.DataAnnotations;
+
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Records a human or automated attestation event for an agent action or policy decision.
+/// Attestations form the immutable audit trail required by governance policies.
+/// </summary>
+public sealed record MeshAttestation
+(
+    /// <summary>Unique identifier for this attestation record.</summary>
+    [Required]
+    [StringLength(128, MinimumLength = 1)]
+    string AttestationId,
+
+    /// <summary>
+    /// Identity of the reviewer — a human user principal name or an automated service account.
+    /// </summary>
+    [Required]
+    [StringLength(256, MinimumLength = 1)]
+    string Reviewer,
+
+    /// <summary>UTC timestamp when the attestation was recorded.</summary>
+    DateTime Timestamp,
+
+    /// <summary>
+    /// Identifier of the agent action or policy decision being attested.
+    /// </summary>
+    string SubjectId = "",
+
+    /// <summary>
+    /// Outcome of the attestation: "Approved", "Rejected", or "Escalated".
+    /// </summary>
+    string Outcome = "Approved",
+
+    /// <summary>
+    /// Optional free-text notes provided by the reviewer.
+    /// </summary>
+    string? Notes = null
+)
+{
+    /// <summary>Returns true when the attestation outcome is "Approved".</summary>
+    public bool IsApproved =>
+        string.Equals(Outcome, "Approved", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Returns true when the attestation outcome is "Rejected".</summary>
+    public bool IsRejected =>
+        string.Equals(Outcome, "Rejected", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Returns a human-readable summary of the attestation event.
+    /// </summary>
+    public string Summary =>
+        $"[{AttestationId}] {Outcome} by {Reviewer} at {Timestamp:u}";
+}
+using System.ComponentModel.DataAnnotations;
+
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Captures the result of a performance benchmark run against a mesh node or agent.
+/// Benchmarks measure reasoning throughput, latency, and hardware utilisation.
+/// </summary>
+public sealed record MeshBenchmark
+(
+    /// <summary>Unique identifier for this benchmark run.</summary>
+    [Required]
+    [StringLength(128, MinimumLength = 1)]
+    string BenchmarkId,
+
+    /// <summary>
+    /// Normalised performance score in the range [0.0, 100.0].
+    /// Higher is better.
+    /// </summary>
+    [Range(0.0, 100.0)]
+    double Score,
+
+    /// <summary>
+    /// End-to-end latency measured in milliseconds for the benchmark workload.
+    /// </summary>
+    [Range(0.0, double.MaxValue)]
+    double LatencyMs,
+
+    /// <summary>
+    /// Identifier of the node or agent that produced this result.
+    /// </summary>
+    string TargetId = "",
+
+    /// <summary>
+    /// UTC timestamp when the benchmark was executed.
+    /// </summary>
+    DateTime? ExecutedAt = null
+)
+{
+    /// <summary>
+    /// Returns true when the benchmark score meets the minimum passing threshold (>= 60.0).
+    /// </summary>
+    public bool Passed => Score >= 60.0;
+
+    /// <summary>
+    /// Returns a human-readable summary of the benchmark result.
+    /// </summary>
+    public string Summary =>
+        $"[{BenchmarkId}] Score={Score:F2} | Latency={LatencyMs:F2}ms | Passed={Passed}";
+}
+using System.ComponentModel.DataAnnotations;
+
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Represents a message exchanged between agents on the AGI Mesh message bus.
+/// Messages carry typed payloads and routing envelopes for multi-agent communication.
+/// </summary>
+public sealed record MeshMessage
+(
+    /// <summary>Unique identifier for this message.</summary>
+    [Required]
+    [StringLength(128, MinimumLength = 1)]
+    string MessageId,
+
+    /// <summary>AgentId of the sender.</summary>
+    [Required]
+    string SenderId,
+
+    /// <summary>AgentId of the intended recipient. Null for broadcast messages.</summary>
+    string? RecipientId,
+
+    /// <summary>
+    /// Message type token used for routing and deserialization,
+    /// e.g. "task.assigned", "result.ready", "heartbeat".
+    /// </summary>
+    [Required]
+    string MessageType,
+
+    /// <summary>
+    /// JSON-serialised payload body. Schema is determined by <see cref="MessageType"/>.
+    /// </summary>
+    string Payload = "{}",
+
+    /// <summary>UTC timestamp when the message was created.</summary>
+    DateTime? SentAt = null,
+
+    /// <summary>
+    /// Correlation identifier linking this message to a parent task or conversation thread.
+    /// </summary>
+    string? CorrelationId = null
+)
+{
+    /// <summary>Returns true when the message is a broadcast (no specific recipient).</summary>
+    public bool IsBroadcast => RecipientId is null;
+
+    /// <summary>Returns true when the message carries a heartbeat signal.</summary>
+    public bool IsHeartbeat =>
+        string.Equals(MessageType, "heartbeat", StringComparison.OrdinalIgnoreCase);
+}
+using System.ComponentModel.DataAnnotations;
+
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Represents a physical or virtual node participating in the AGI Mesh network.
+/// A node exposes hardware capabilities (CPU, GPU, NPU) and a set of functional capabilities.
+/// </summary>
+public sealed record MeshNode
+(
+    /// <summary>Unique identifier for this node.</summary>
+    [Required]
+    [StringLength(128, MinimumLength = 1)]
+    string NodeId,
+
+    /// <summary>
+    /// Logical type of the node, e.g. "EdgeDevice", "CloudWorker", "OrchestratorHub".
+    /// </summary>
+    [Required]
+    [StringLength(64, MinimumLength = 1)]
+    string NodeType,
+
+    /// <summary>
+    /// List of capability tokens this node advertises, e.g. "vision", "nlp", "code-exec".
+    /// </summary>
+    string[] Capabilities,
+
+    /// <summary>Whether the node exposes CPU compute for inference workloads.</summary>
+    bool SupportsCpu,
+
+    /// <summary>Whether the node exposes a discrete or integrated GPU.</summary>
+    bool SupportsGpu,
+
+    /// <summary>Whether the node exposes a Neural Processing Unit (NPU / AI accelerator).</summary>
+    bool SupportsNpu
+)
+{
+    /// <summary>
+    /// Returns a human-readable summary of the node's hardware profile.
+    /// </summary>
+    public string HardwareProfile =>
+        $"CPU={SupportsCpu} | GPU={SupportsGpu} | NPU={SupportsNpu}";
+
+    /// <summary>
+    /// Returns true when the node supports at least one accelerated compute path.
+    /// </summary>
+    public bool IsAccelerated => SupportsGpu || SupportsNpu;
+}
+using System.ComponentModel.DataAnnotations;
+
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Defines a governance policy applied to agent actions within the AGI Mesh.
+/// Policies control risk thresholds, human-in-the-loop requirements, and audit trails.
+/// </summary>
+public sealed record MeshPolicy
+(
+    /// <summary>Unique identifier for this policy.</summary>
+    [Required]
+    [StringLength(128, MinimumLength = 1)]
+    string PolicyId,
+
+    /// <summary>
+    /// Risk classification for actions governed by this policy.
+    /// Accepted values: "Low", "Medium", "High", "Critical".
+    /// </summary>
+    [Required]
+    string RiskLevel,
+
+    /// <summary>
+    /// When true, a human reviewer must approve actions before execution.
+    /// </summary>
+    bool HumanReview,
+
+    /// <summary>
+    /// Maximum number of autonomous retries allowed before escalation.
+    /// </summary>
+    [Range(0, 10)]
+    int MaxRetries = 3,
+
+    /// <summary>
+    /// Whether all actions governed by this policy must be written to an audit log.
+    /// </summary>
+    bool AuditRequired = true
+)
+{
+    /// <summary>
+    /// Returns true when the policy is classified as high-risk or critical.
+    /// </summary>
+    public bool IsHighRisk =>
+        RiskLevel is "High" or "Critical";
+
+    /// <summary>
+    /// Returns true when the policy requires both human review and audit logging.
+    /// </summary>
+    public bool RequiresFullGovernance =>
+        HumanReview && AuditRequired;
+}
+using System.ComponentModel.DataAnnotations;
+
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Encapsulates the outcome of a task executed by an agent in the AGI Mesh.
+/// Results carry the output payload, execution metrics, and error details when applicable.
+/// </summary>
+public sealed record MeshResult
+(
+    /// <summary>Unique identifier for this result record.</summary>
+    [Required]
+    [StringLength(128, MinimumLength = 1)]
+    string ResultId,
+
+    /// <summary>Identifier of the task that produced this result.</summary>
+    [Required]
+    string TaskId,
+
+    /// <summary>Identifier of the agent that executed the task.</summary>
+    [Required]
+    string AgentId,
+
+    /// <summary>
+    /// Outcome status: "Success", "Failure", "PartialSuccess", "Timeout".
+    /// </summary>
+    [Required]
+    string Status,
+
+    /// <summary>
+    /// JSON-serialised output produced by the agent. Empty string when the task failed.
+    /// </summary>
+    string Output = "{}",
+
+    /// <summary>
+    /// Human-readable error message when Status is "Failure" or "Timeout".
+    /// </summary>
+    string? ErrorMessage = null,
+
+    /// <summary>Wall-clock execution time in milliseconds.</summary>
+    [Range(0.0, double.MaxValue)]
+    double ExecutionMs = 0.0,
+
+    /// <summary>UTC timestamp when the result was produced.</summary>
+    DateTime? CompletedAt = null
+)
+{
+    /// <summary>Returns true when the task completed without errors.</summary>
+    public bool IsSuccess =>
+        string.Equals(Status, "Success", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Returns true when the task failed or timed out.</summary>
+    public bool IsFailure =>
+        Status is "Failure" or "Timeout";
+
+    /// <summary>Returns a concise summary line for logging.</summary>
+    public string Summary =>
+        $"[{ResultId}] Task={TaskId} Agent={AgentId} Status={Status} ExecMs={ExecutionMs:F1}";
+}
+using System.ComponentModel.DataAnnotations;
+
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Represents a unit of work dispatched to one or more agents in the AGI Mesh.
+/// Tasks carry input payloads, routing metadata, and execution constraints.
+/// </summary>
+public sealed record MeshTask
+(
+    /// <summary>Unique identifier for this task.</summary>
+    [Required]
+    [StringLength(128, MinimumLength = 1)]
+    string TaskId,
+
+    /// <summary>
+    /// Human-readable description of what the task should accomplish.
+    /// </summary>
+    [Required]
+    [StringLength(2048, MinimumLength = 1)]
+    string Description,
+
+    /// <summary>
+    /// Priority level: "Low", "Normal", "High", "Critical".
+    /// </summary>
+    string Priority = "Normal",
+
+    /// <summary>
+    /// Identifier of the agent assigned to execute this task.
+    /// Null means the orchestrator will assign dynamically.
+    /// </summary>
+    string? AssignedAgentId = null,
+
+    /// <summary>UTC timestamp when the task was created.</summary>
+    DateTime? CreatedAt = null,
+
+    /// <summary>
+    /// Optional deadline by which the task must complete.
+    /// </summary>
+    DateTime? Deadline = null,
+
+    /// <summary>
+    /// Current lifecycle status: "Pending", "Running", "Completed", "Failed", "Cancelled".
+    /// </summary>
+    string Status = "Pending",
+
+    /// <summary>
+    /// Arbitrary key-value metadata attached to the task (e.g. tenant, correlation IDs).
+    /// </summary>
+    Dictionary<string, string>? Metadata = null
+)
+{
+    /// <summary>Returns true when the task has not yet started.</summary>
+    public bool IsPending =>
+        string.Equals(Status, "Pending", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Returns true when the task finished successfully.</summary>
+    public bool IsCompleted =>
+        string.Equals(Status, "Completed", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Returns true when the task is overdue relative to its deadline.</summary>
+    public bool IsOverdue =>
+        Deadline.HasValue && DateTime.UtcNow > Deadline.Value && !IsCompleted;
+}
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>WindowsAGIMesh.Contracts</RootNamespace>
+    <AssemblyName>WindowsAGIMesh.Contracts</AssemblyName>
+    <Description>Core contracts, records and interfaces for the Windows AGI Mesh platform.</Description>
+    <PackageTags>agi;mesh;contracts;windows;ai</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+
+</Project>
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Defines the contract for the AGI Mesh orchestrator.
+/// The orchestrator is responsible for dispatching tasks to agents,
+/// collecting results, and enforcing governance policies.
+/// </summary>
+public interface IMeshOrchestrator
+{
+    /// <summary>
+    /// Submits a task to the mesh for execution.
+    /// The orchestrator selects the most suitable agent based on skills and trust level.
+    /// </summary>
+    /// <param name="task">The task to dispatch.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The result produced by the executing agent.</returns>
+    Task<MeshResult> DispatchAsync(
+        MeshTask task,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves the current status of a previously submitted task.
+    /// </summary>
+    /// <param name="taskId">The unique identifier of the task.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task<MeshTask?> GetTaskStatusAsync(
+        string taskId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Cancels a running or pending task.
+    /// </summary>
+    /// <param name="taskId">The unique identifier of the task to cancel.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task CancelTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns all results produced for a given task, including partial results
+    /// from multi-agent collaborative executions.
+    /// </summary>
+    Task<IReadOnlyList<MeshResult>> GetResultsAsync(
+        string taskId,
+        CancellationToken cancellationToken = default);
+}
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Defines the contract for the policy engine that evaluates governance rules
+/// before and after agent actions are executed in the AGI Mesh.
+/// </summary>
+public interface IMeshPolicyEngine
+{
+    /// <summary>
+    /// Evaluates whether a task is permitted to execute under the applicable policy.
+    /// </summary>
+    /// <param name="task">The task requesting execution.</param>
+    /// <param name="agent">The agent that will execute the task.</param>
+    /// <param name="policy">The governance policy to evaluate against.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>
+    /// True when the task is permitted; false when it must be blocked or escalated.
+    /// </returns>
+    Task<bool> EvaluateAsync(
+        MeshTask task,
+        MeshAgent agent,
+        MeshPolicy policy,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Records an attestation for a completed or reviewed action.
+    /// </summary>
+    /// <param name="attestation">The attestation record to persist.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task AttestAsync(
+        MeshAttestation attestation,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves all attestation records associated with a given subject (task or policy decision).
+    /// </summary>
+    /// <param name="subjectId">The subject identifier to query.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task<IReadOnlyList<MeshAttestation>> GetAttestationsAsync(
+        string subjectId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns the active policy that governs a given agent role.
+    /// Returns null when no specific policy is configured for that role.
+    /// </summary>
+    Task<MeshPolicy?> GetPolicyForRoleAsync(
+        string agentRole,
+        CancellationToken cancellationToken = default);
+}
+namespace WindowsAGIMesh.Contracts;
+
+/// <summary>
+/// Defines the contract for a registry that tracks nodes and agents
+/// participating in the AGI Mesh at runtime.
+/// </summary>
+public interface IMeshRegistry
+{
+    /// <summary>
+    /// Registers a new node in the mesh.
+    /// </summary>
+    /// <param name="node">The node to register.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task RegisterNodeAsync(
+        MeshNode node,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Removes a node from the mesh registry.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the node to remove.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task UnregisterNodeAsync(
+        string nodeId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns all currently registered nodes.
+    /// </summary>
+    Task<IReadOnlyList<MeshNode>> GetNodesAsync(
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers a new agent in the mesh.
+    /// </summary>
+    Task RegisterAgentAsync(
+        MeshAgent agent,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Removes an agent from the mesh registry.
+    /// </summary>
+    Task UnregisterAgentAsync(
+        string agentId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns all currently registered agents.
+    /// </summary>
+    Task<IReadOnlyList<MeshAgent>> GetAgentsAsync(
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Finds agents that possess all of the specified skill tokens.
+    /// </summary>
+    Task<IReadOnlyList<MeshAgent>> FindAgentsBySkillsAsync(
+        IEnumerable<string> requiredSkills,
+        CancellationToken cancellationToken = default);
+}
