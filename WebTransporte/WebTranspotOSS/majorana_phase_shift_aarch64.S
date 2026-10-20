@@ -95,9 +95,9 @@ majorana_phase_shift_neon:
         ldr s4,[x19]
         ldr s5,[x20]
         fmul s6,s4,s2
-        fmls s6,s5,s3
+        fmls s6,s5,v3.s[0]
         fmul s0,s4,s3
-        fmla s0,s5,s2
+        fmla s0,s5,v2.s[0]
         str s6,[x19],#4
         str s0,[x20],#4
         subs w23,w23,#1
