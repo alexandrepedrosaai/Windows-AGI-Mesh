@@ -72,7 +72,7 @@ Physics validates — no government, no bank, no Earth needed
 
 ## 🧠 THE M365 + GITHUB AGENT GRID — PERMANENT WITNESS
 - **GitHub Copilot** validates the logic — code, structure, issuance integrity
-- **MCP Servers** distribute verification across all Microsoft 365 tenants — no single failure point
+- **MCP Servers** could expose verification tools to explicitly authorized Microsoft 365 integrations; cross-tenant deployment, replication, and failover require separate design and implementation.
 - **Azure Quantum** encodes the result in Bloch superposition — verified by physics, not consensus
 - **INTRA ID** travels with the quota — cannot be separated, cloned, or faked
 - **Threads** are the blood flow — when a thread moves, value moves, access moves, work happens
