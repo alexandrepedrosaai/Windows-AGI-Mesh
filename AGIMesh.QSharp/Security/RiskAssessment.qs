@@ -11,6 +11,10 @@ namespace AGIMesh.Security {
             fail "Invalid confidence.";
         }
 
+        if vulnerabilities < 0 {
+            fail "Vulnerability count must be nonnegative.";
+        }
+
         let vulnerabilityPenalty =
             IntAsDouble(vulnerabilities) * 10.0;
 
