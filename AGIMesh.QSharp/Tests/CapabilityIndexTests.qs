@@ -3,7 +3,7 @@ namespace AGIMesh.Tests {
     open AGIMesh.Core;
     open AGIMesh.Benchmark;
 
-    @Test("QuantumSimulator")
+    @Microsoft.Quantum.Diagnostics.Test("QuantumSimulator")
     operation CapabilityIndexTest() : Unit {
 
         let scores =
