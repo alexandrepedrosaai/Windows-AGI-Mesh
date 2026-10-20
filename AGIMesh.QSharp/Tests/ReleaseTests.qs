@@ -2,7 +2,7 @@ namespace AGIMesh.Tests {
 
     open AGIMesh.Security;
 
-    @Test("QuantumSimulator")
+    @Microsoft.Quantum.Diagnostics.Test("QuantumSimulator")
     operation ReleaseValidationTest() : Unit {
 
         if not IsReleaseReady(
