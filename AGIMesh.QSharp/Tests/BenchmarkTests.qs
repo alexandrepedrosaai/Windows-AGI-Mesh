@@ -2,7 +2,7 @@ namespace AGIMesh.Tests {
 
     open AGIMesh.Benchmark;
 
-    @Test("QuantumSimulator")
+    @Microsoft.Quantum.Diagnostics.Test("QuantumSimulator")
     operation BenchmarkTest()
     : Unit {
 
