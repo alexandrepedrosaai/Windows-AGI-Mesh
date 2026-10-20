@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>WindowsAGIMesh.Cli</RootNamespace>
+    <AssemblyName>agimesh</AssemblyName>
+    <Description>Command-line interface for the Windows AGI Mesh platform.</Description>
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WindowsAGIMesh.Benchmarks\WindowsAGIMesh.Benchmarks.csproj" />
+    <ProjectReference Include="..\WindowsAGIMesh.Contracts\WindowsAGIMesh.Contracts.csproj" />
+    <ProjectReference Include="..\WindowsAGIMesh.SchemaGenerator\WindowsAGIMesh.SchemaGenerator.csproj" />
+    <ProjectReference Include="..\WindowsAGIMesh.Schemas\WindowsAGIMesh.Schemas.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>
