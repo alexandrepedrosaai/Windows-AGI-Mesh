@@ -1,0 +1,235 @@
+name: Windows AGI Mesh CI
+
+on:
+  push:
+    branches: [ "main", "develop", "release/**" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: "9.0.x"
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_XMLDOC_MODE: skip
+
+jobs:
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # Build & Test
+  # ───────────────────────────────────────────────────────────────────────────
+  build-and-test:
+    name: Build & Test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore dependencies
+        run: dotnet restore Windows-AGI-Mesh.sln
+        working-directory: Windows-AGI-Mesh
+
+      - name: Build (Release)
+        run: dotnet build Windows-AGI-Mesh.sln -c Release --no-restore
+        working-directory: Windows-AGI-Mesh
+
+      - name: Run tests
+        run: >
+          dotnet test Windows-AGI-Mesh.sln
+          -c Release
+          --no-build
+          --logger "trx;LogFileName=test-results.trx"
+          --collect:"XPlat Code Coverage"
+          --results-directory TestResults
+        working-directory: Windows-AGI-Mesh
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: Windows-AGI-Mesh/TestResults/**
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # Schema Generation
+  # ───────────────────────────────────────────────────────────────────────────
+  generate-schemas:
+    name: Generate JSON Schemas
+    runs-on: windows-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore Windows-AGI-Mesh.sln
+        working-directory: Windows-AGI-Mesh
+
+      - name: Build
+        run: dotnet build Windows-AGI-Mesh.sln -c Release --no-restore
+        working-directory: Windows-AGI-Mesh
+
+      - name: Run Schema Generator
+        run: >
+          dotnet run
+          --project src/WindowsAGIMesh.SchemaGenerator/WindowsAGIMesh.SchemaGenerator.csproj
+          -c Release
+          --no-build
+          -- generated-schemas
+        working-directory: Windows-AGI-Mesh
+
+      - name: Upload generated schemas
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-schemas
+          path: Windows-AGI-Mesh/generated-schemas/**
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # Benchmarks
+  # ───────────────────────────────────────────────────────────────────────────
+  benchmarks:
+    name: Run Benchmarks
+    runs-on: windows-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore Windows-AGI-Mesh.sln
+        working-directory: Windows-AGI-Mesh
+
+      - name: Build
+        run: dotnet build Windows-AGI-Mesh.sln -c Release --no-restore
+        working-directory: Windows-AGI-Mesh
+
+      - name: Run Benchmarks (reasoning, 100000 iterations)
+        run: >
+          dotnet run
+          --project src/WindowsAGIMesh.Benchmarks/WindowsAGIMesh.Benchmarks.csproj
+          -c Release
+          --no-build
+          -- reasoning 100000
+        working-directory: Windows-AGI-Mesh
+
+      - name: Run Benchmarks (serialization, 50000 iterations)
+        run: >
+          dotnet run
+          --project src/WindowsAGIMesh.Benchmarks/WindowsAGIMesh.Benchmarks.csproj
+          -c Release
+          --no-build
+          -- serialization 50000
+        working-directory: Windows-AGI-Mesh
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # CLI Smoke Test
+  # ───────────────────────────────────────────────────────────────────────────
+  cli-smoke:
+    name: CLI Smoke Test
+    runs-on: windows-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore Windows-AGI-Mesh.sln
+        working-directory: Windows-AGI-Mesh
+
+      - name: Build
+        run: dotnet build Windows-AGI-Mesh.sln -c Release --no-restore
+        working-directory: Windows-AGI-Mesh
+
+      - name: agimesh help
+        run: >
+          dotnet run
+          --project src/WindowsAGIMesh.Cli/WindowsAGIMesh.Cli.csproj
+          -c Release
+          --no-build
+          -- help
+        working-directory: Windows-AGI-Mesh
+
+      - name: agimesh version
+        run: >
+          dotnet run
+          --project src/WindowsAGIMesh.Cli/WindowsAGIMesh.Cli.csproj
+          -c Release
+          --no-build
+          -- version
+        working-directory: Windows-AGI-Mesh
+
+      - name: agimesh schema
+        run: >
+          dotnet run
+          --project src/WindowsAGIMesh.Cli/WindowsAGIMesh.Cli.csproj
+          -c Release
+          --no-build
+          -- schema ./cli-schemas
+        working-directory: Windows-AGI-Mesh
+
+      - name: agimesh benchmark reasoning 10000
+        run: >
+          dotnet run
+          --project src/WindowsAGIMesh.Cli/WindowsAGIMesh.Cli.csproj
+          -c Release
+          --no-build
+          -- benchmark reasoning 10000
+        working-directory: Windows-AGI-Mesh
