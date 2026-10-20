@@ -4,7 +4,7 @@ namespace AGIMesh.Validation {
         value : String
     ) : Bool {
 
-        return Length(value) > 0;
+        return value != "";
     }
 
     operation ValidateRequiredFields(
