@@ -1,6 +1,7 @@
 namespace AGIMesh.Tests {
 
     open AGIMesh.Governance;
+    open Microsoft.Quantum.Diagnostics;
 
     @Test("QuantumSimulator")
     operation ReviewWorkflowTest() : Unit {
