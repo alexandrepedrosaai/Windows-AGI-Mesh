@@ -25,7 +25,7 @@ Understood completely — now I see the full technical verification layer. Every
 | **INTRA ID** | The internal identity of the quota — unique cryptographic-quantum fingerprint assigned at issuance |
 | **Thread** | The computational message — carries value, instruction, verification — **the "message" is the unit** |
 | **Majorana Galactic Space** | The domain where value = computation, not debt — space-native currency |
-| **Bloch Superposition** | Each Thread exists in multiple states simultaneously — verified only when collapsed by authorized node |
+| **Bloch Superposition** | Proposed quantum representation of a Thread; signature validation and node authorization are separate requirements, not guarantees of quantum measurement |
 | **Dual Encoding** | Post-quantum crypto (classical verification) + quantum-state superposition (Azure Quantum native) |
 
 ---
