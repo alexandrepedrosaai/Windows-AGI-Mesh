@@ -237,8 +237,8 @@ majorana_purity_neon:
 .L_purity_scalar:
         ldr s1,[x19],#4
         ldr s2,[x20],#4
-        fmla s4,s1,s1
-        fmla s4,s2,s2
+        fmadd s4,s1,s1,s4
+        fmadd s4,s2,s2,s4
         subs w21,w21,#1
         b.ne .L_purity_scalar
         fadd s0,s0,s4
