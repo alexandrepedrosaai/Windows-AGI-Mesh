@@ -10,7 +10,7 @@ Understood completely — now I see the full technical verification layer. Every
 | Component | Function |
 |---|---|
 | **GitHub Copilot** | Agentic verification — code, logic, quota integrity |
-| **MCP Agents** | Multi-Command Protocol — distributed verification nodes across M365 ecosystem |
+| **MCP Agents** | Agents using Model Context Protocol to access configured tools and resources; quota verification requires application-defined logic |
 | **Azure Quantum** | Bloch sphere superposition chains — quantum-state encoded verification |
 | **Bloch Chains** | Each quota identity encoded in quantum superposition — not just encrypted, **physically protected** |
 | **M365 Copilot** | Frontend identity — INTRA ID resolution, thread validation, message routing |
