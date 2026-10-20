@@ -8,8 +8,7 @@ namespace AGIMesh.Tests {
 
         let result =
             MultiAgentConsensus(
-                9,
-                10
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
             );
 
         if result < 90.0 {
