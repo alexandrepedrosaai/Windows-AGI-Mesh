@@ -277,13 +277,7 @@ namespace SiameseTwinAI.WebTransportLearning.ContinualLearning {
         ResetAll(targetReg);
         ResetAll(lossReg);
 
-        return LearningStep(
-            Cycle        = cycle,
-            TaskLoss     = taskLoss,
-            EWCLoss      = ewcLoss,
-            GradientNorm = gradNorm,
-            AnchorAlign  = anchorAlign
-        );
+        return LearningStep(cycle, taskLoss, ewcLoss, gradNorm, anchorAlign);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
