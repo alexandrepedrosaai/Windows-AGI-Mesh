@@ -24,12 +24,14 @@ on:
 permissions:
   contents: read
 
+# This is a local CI namespace only. No registry login or image push is used.
 env:
   IMAGE_PREFIX: alexandrepedrosaai/windows-agi-mesh
+  IMAGE_LIST: ${{ runner.temp }}/agimesh-images.txt
 
 jobs:
   build-source-packages:
-    name: Build Docker source packages
+    name: Build and package Docker source images
     runs-on: ubuntu-latest
 
     steps:
@@ -75,6 +77,9 @@ jobs:
           print(f"Validated {len(packages)} Docker packages")
           PY
 
+          : > "$IMAGE_LIST"
+          mkdir -p docker-artifacts
+
       - name: Build every individual source image
         shell: bash
         run: |
@@ -92,6 +97,9 @@ jobs:
               --tag "$image" \
               --load \
               .
+
+            docker image inspect "$image" >/dev/null
+            printf '%s\n' "$image" >> "$IMAGE_LIST"
           done < <(
             find docker/targets \
               -mindepth 2 \
@@ -107,11 +115,16 @@ jobs:
         run: |
           set -euo pipefail
 
+          image="${IMAGE_PREFIX}:all-ci"
+
           docker buildx build \
             --file docker/Dockerfile.all \
-            --tag "${IMAGE_PREFIX}:all-ci" \
+            --tag "$image" \
             --load \
             .
+
+          docker image inspect "$image" >/dev/null
+          printf '%s\n' "$image" >> "$IMAGE_LIST"
 
       - name: Test aggregate image
         shell: bash
@@ -152,6 +165,36 @@ jobs:
               | sort
           )
 
+      - name: Export Docker images
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -s "$IMAGE_LIST"
+          sort -u "$IMAGE_LIST" -o "$IMAGE_LIST"
+
+          docker save $(cat "$IMAGE_LIST") \
+            | gzip -9 > docker-artifacts/windows-agi-mesh-images.tar.gz
+
+          tar -czf docker-artifacts/windows-agi-mesh-source-files.tar.gz \
+            docker
+
+          test -s docker-artifacts/windows-agi-mesh-images.tar.gz
+          test -s docker-artifacts/windows-agi-mesh-source-files.tar.gz
+
+          echo "Generated Docker image archive:"
+          du -h docker-artifacts/windows-agi-mesh-images.tar.gz
+          echo "Generated source package archive:"
+          du -h docker-artifacts/windows-agi-mesh-source-files.tar.gz
+
+      - name: Upload Docker packages as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-agi-mesh-docker-packages
+          path: docker-artifacts/
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Generate package summary
         if: always()
         shell: bash
@@ -162,19 +205,10 @@ jobs:
             echo "- Repository: ${GITHUB_REPOSITORY}"
             echo "- Ref: ${GITHUB_REF}"
             echo "- Commit: ${GITHUB_SHA}"
+            echo "- Image prefix: ${IMAGE_PREFIX}"
             echo "- Registry publication: disabled"
-            echo "- Secrets and tokens: not used"
+            echo "- Docker image archive: windows-agi-mesh-images.tar.gz"
+            echo "- Source archive: windows-agi-mesh-source-files.tar.gz"
             echo
-            echo "### Individual Dockerfiles"
-            find docker/targets \
-              -mindepth 2 \
-              -maxdepth 2 \
-              -type f \
-              -name Dockerfile \
-              -print \
-              | sort \
-              | sed 's/^/- `/; s/$/`/'
-            echo
-            echo "### Aggregate Dockerfile"
-            echo "- docker/Dockerfile.all"
+            echo "Download the artifact named windows-agi-mesh-docker-packages from this workflow run."
           } >> "$GITHUB_STEP_SUMMARY"
