@@ -83,9 +83,12 @@ jobs:
         run: |
           set -euo pipefail
 
+          component_index=0
+          short_sha="${GITHUB_SHA:0:12}"
+
           while IFS= read -r dockerfile; do
-            package_name="$(basename "$(dirname "$dockerfile")")"
-            image="${BASE_IMAGE}:complete-${package_name}-${GITHUB_SHA}"
+            component_index=$((component_index + 1))
+            image="${BASE_IMAGE}:component-${component_index}-${short_sha}"
 
             echo "Building complete component: ${image}"
 
