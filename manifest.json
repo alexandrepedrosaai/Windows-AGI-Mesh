@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    {
+      "source": "WebTransporte/Microsoft Chrome. (internals)Edge AI/MicrosoftPoqer.qs",
+      "dockerfile": "docker/targets/webtransporte-microsoft-chrome-internals-edge-ai-microsoftpoqer-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "WebTransporte/Microsoft Chrome. (internals)Edge AI/Safasensor.summarid.asm.asm",
+      "dockerfile": "docker/targets/webtransporte-microsoft-chrome-internals-edge-ai-safasensor-summarid-asm-asm/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "WebTransporte/Microsoft Chrome. (internals)Edge AI/binary_storage_engine.py",
+      "dockerfile": "docker/targets/webtransporte-microsoft-chrome-internals-edge-ai-binary-storage-engine-py/Dockerfile",
+      "type": "python"
+    },
+    {
+      "source": "WebTransporte/Microsoft Chrome. (internals)Edge AI/covolution_2.qs",
+      "dockerfile": "docker/targets/webtransporte-microsoft-chrome-internals-edge-ai-covolution-2-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "WebTransporte/Microsoft Chrome. (internals)Edge AI/webtransport_machine_conclusion.qs",
+      "dockerfile": "docker/targets/webtransporte-microsoft-chrome-internals-edge-ai-webtransport-machine-conclusion-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "modules/DeepSpace.qs",
+      "dockerfile": "docker/targets/modules-deepspace-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "modules/EdgeAIApp.qs",
+      "dockerfile": "docker/targets/modules-edgeaiapp-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "modules/MagneticMajorana.qs",
+      "dockerfile": "docker/targets/modules-magneticmajorana-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "modules/Nemotron.qs",
+      "dockerfile": "docker/targets/modules-nemotron-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "modules/XboxQuantumXR.qs",
+      "dockerfile": "docker/targets/modules-xboxquantumxr-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/BonsaiAgents/BonsaiPolicyTrainer.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-bonsaiagents-bonsaipolicytrainer-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/BonsaiAgents/CopilotActionTransport.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-bonsaiagents-copilotactiontransport-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/BrainwaveFPGA.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-brainwavefpga-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/FEGEFAGAGPU.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-fegefagagpu-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/HollowCoreFiber.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-hollowcorefiber-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/Model/MojaranaCoupling.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-model-mojaranacoupling-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/agents/copilotagentbridge.py",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-agents-copilotagentbridge-py/Dockerfile",
+      "type": "python"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/src/QuantumHardware/MajoranaSimulator.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-src-quantumhardware-majoranasimulator-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/src/QuantumHardware/src/QuantumHardware/TopologicalQubit.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-src-quantumhardware-src-quantumhardware-topologica/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/src/WindowsAGIMesh/DistributedInference.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-src-windowsagimesh-distributedinference-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/src/WindowsAGIMesh/MeshOrchestrator.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-src-windowsagimesh-meshorchestrator-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/src/src/WindowsAGIMesh/SovereignEdgeRuntime.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-src-src-windowsagimesh-sovereignedgeruntime-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/tests/MeshTests.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-tests-meshtests-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/tests/PhotonicsTests.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-tests-photonicstests-qs/Dockerfile",
+      "type": "source"
+    },
+    {
+      "source": "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/tests/QuantumTests.qs",
+      "dockerfile": "docker/targets/windows-agi-mesh-quantum-src-photonicacceleration-tests-quantumtests-qs/Dockerfile",
+      "type": "source"
+    }
+  ]
+}
