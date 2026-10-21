@@ -1,5 +1,8 @@
 name: Windows AGI Mesh CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main", "develop", "release/**" ]
