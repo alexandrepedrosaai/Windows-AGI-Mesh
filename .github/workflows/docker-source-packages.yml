@@ -23,15 +23,17 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
-# This is a local CI namespace only. No registry login or image push is used.
 env:
-  IMAGE_PREFIX: alexandrepedrosaai/windows-agi-mesh
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/alexandrepedrosaai/windows-agi-mesh
   IMAGE_LIST: /tmp/agimesh-images.txt
+  PUBLISH_IMAGES: ${{ github.event_name != 'pull_request' }}
 
 jobs:
   build-source-packages:
-    name: Build and package Docker source images
+    name: Build, test and publish Docker source images
     runs-on: ubuntu-latest
 
     steps:
@@ -40,6 +42,14 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        if: env.PUBLISH_IMAGES == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate Docker package manifest
         shell: bash
@@ -69,7 +79,7 @@ jobs:
               dockerfile = Path(package["dockerfile"])
 
               if not source.is_file():
-                  raise SystemExit(f"Missing source file: {source}")
+                  raise SystemExit(f"Missing Docker source file: {source}")
 
               if not dockerfile.is_file():
                   raise SystemExit(f"Missing Dockerfile: {dockerfile}")
@@ -88,7 +98,7 @@ jobs:
           while IFS= read -r dockerfile; do
             package_dir="$(dirname "$dockerfile")"
             package_name="$(basename "$package_dir")"
-            image="${IMAGE_PREFIX}:${package_name}-ci"
+            image="${IMAGE_PREFIX}:${package_name}"
 
             echo "Building individual image: ${image}"
 
@@ -115,7 +125,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          image="${IMAGE_PREFIX}:all-ci"
+          image="${IMAGE_PREFIX}:all"
 
           docker buildx build \
             --file docker/Dockerfile.all \
@@ -133,7 +143,7 @@ jobs:
 
           docker run --rm \
             --entrypoint /bin/sh \
-            "${IMAGE_PREFIX}:all-ci" \
+            "${IMAGE_PREFIX}:all" \
             -c '
               test -d /opt/agi-mesh/repository/WebTransporte &&
               test -d /opt/agi-mesh/repository/modules &&
@@ -151,7 +161,7 @@ jobs:
             package_name="$(basename "$package_dir")"
 
             if [[ "$package_name" == *"-py" ]]; then
-              image="${IMAGE_PREFIX}:${package_name}-ci"
+              image="${IMAGE_PREFIX}:${package_name}"
               echo "Testing Python package: ${image}"
               docker run --rm "$image"
             fi
@@ -165,7 +175,21 @@ jobs:
               | sort
           )
 
-      - name: Export Docker images
+      - name: Publish Docker images to GHCR
+        if: env.PUBLISH_IMAGES == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -s "$IMAGE_LIST"
+          sort -u "$IMAGE_LIST" -o "$IMAGE_LIST"
+
+          while IFS= read -r image; do
+            echo "Publishing ${image}"
+            docker push "$image"
+          done < "$IMAGE_LIST"
+
+      - name: Export Docker images as workflow artifacts
         shell: bash
         run: |
           set -euo pipefail
@@ -181,11 +205,6 @@ jobs:
 
           test -s docker-artifacts/windows-agi-mesh-images.tar.gz
           test -s docker-artifacts/windows-agi-mesh-source-files.tar.gz
-
-          echo "Generated Docker image archive:"
-          du -h docker-artifacts/windows-agi-mesh-images.tar.gz
-          echo "Generated source package archive:"
-          du -h docker-artifacts/windows-agi-mesh-source-files.tar.gz
 
       - name: Upload Docker packages as workflow artifacts
         uses: actions/upload-artifact@v4
@@ -206,9 +225,9 @@ jobs:
             echo "- Ref: ${GITHUB_REF}"
             echo "- Commit: ${GITHUB_SHA}"
             echo "- Image prefix: ${IMAGE_PREFIX}"
-            echo "- Registry publication: disabled"
-            echo "- Docker image archive: windows-agi-mesh-images.tar.gz"
-            echo "- Source archive: windows-agi-mesh-source-files.tar.gz"
+            echo "- GHCR publication: ${PUBLISH_IMAGES}"
+            echo "- Package tags: individual source tags plus all"
             echo
-            echo "Download the artifact named windows-agi-mesh-docker-packages from this workflow run."
+            echo "Published images are available at:"
+            echo "https://github.com/${GITHUB_REPOSITORY}/pkgs/container/windows-agi-mesh"
           } >> "$GITHUB_STEP_SUMMARY"
