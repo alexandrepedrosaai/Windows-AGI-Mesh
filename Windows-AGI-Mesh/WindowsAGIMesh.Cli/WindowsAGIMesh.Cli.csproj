@@ -10,10 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WindowsAGIMesh.Benchmarks\WindowsAGIMesh.Benchmarks.csproj" />
-    <ProjectReference Include="..\WindowsAGIMesh.Contracts\WindowsAGIMesh.Contracts.csproj" />
-    <ProjectReference Include="..\WindowsAGIMesh.SchemaGenerator\WindowsAGIMesh.SchemaGenerator.csproj" />
-    <ProjectReference Include="..\WindowsAGIMesh.Schemas\WindowsAGIMesh.Schemas.csproj" />
+    <ProjectReference Include="..\WindowsAGIMesh.Benchmarks.csproj" />
+    <ProjectReference Include="..\src\WindowsAGIMesh.Contracts\WindowsAGIMesh.Contracts.csproj" />
+    <ProjectReference Include="..\src\WindowsAGIMesh.SchemaGenerators\WindowsAGIMesh.SchemaGenerator.csproj" />
+    <ProjectReference Include="..\src\WindowsAGIMesh.Schemas\WindowsAGIMesh.Schemas.csproj" />
   </ItemGroup>
 
   <ItemGroup>

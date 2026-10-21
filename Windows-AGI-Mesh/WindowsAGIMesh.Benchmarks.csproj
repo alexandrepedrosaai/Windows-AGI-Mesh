@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WindowsAGIMesh.Contracts\WindowsAGIMesh.Contracts.csproj" />
-    <ProjectReference Include="..\WindowsAGIMesh.Schemas\WindowsAGIMesh.Schemas.csproj" />
+    <ProjectReference Include="src\WindowsAGIMesh.Contracts\WindowsAGIMesh.Contracts.csproj" />
+    <ProjectReference Include="src\WindowsAGIMesh.Schemas\WindowsAGIMesh.Schemas.csproj" />
   </ItemGroup>
 
   <ItemGroup>

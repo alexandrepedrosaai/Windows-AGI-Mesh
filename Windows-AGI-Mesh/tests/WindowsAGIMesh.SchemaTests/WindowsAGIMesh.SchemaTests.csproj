@@ -19,7 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\WindowsAGIMesh.Schemas\WindowsAGIMesh.Schemas.csproj" />
     <ProjectReference Include="..\..\src\WindowsAGIMesh.Contracts\WindowsAGIMesh.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\WindowsAGIMesh.Benchmarks\WindowsAGIMesh.Benchmarks.csproj" />
+    <ProjectReference Include="..\..\WindowsAGIMesh.Benchmarks.csproj" />
   </ItemGroup>
 
   <ItemGroup>
