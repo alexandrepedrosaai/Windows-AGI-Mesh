@@ -27,7 +27,7 @@ permissions:
 # This is a local CI namespace only. No registry login or image push is used.
 env:
   IMAGE_PREFIX: alexandrepedrosaai/windows-agi-mesh
-  IMAGE_LIST: ${{ runner.temp }}/agimesh-images.txt
+  IMAGE_LIST: /tmp/agimesh-images.txt
 
 jobs:
   build-source-packages:
