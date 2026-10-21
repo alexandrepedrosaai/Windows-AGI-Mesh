@@ -1,0 +1,19 @@
+# syntax=docker/dockerfile:1.7
+FROM python:3.12-slim
+ENV AGIMESH_SOURCE=/opt/agi-mesh/repository \
+    AGIMESH_SOURCE_TYPE=repository \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+LABEL org.opencontainers.image.title="Windows AGI Mesh - all source packages" \
+      org.opencontainers.image.source="https://github.com/alexandrepedrosaai/Windows-AGI-Mesh" \
+      org.opencontainers.image.description="Aggregated Docker package for WebTransporte, modules and PhotonicAcceleration"
+WORKDIR /opt/agi-mesh/repository
+COPY WebTransporte/ WebTransporte/
+COPY modules/ modules/
+COPY Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/ Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/
+COPY docker/entrypoint-all.sh /usr/local/bin/agimesh-entrypoint
+RUN chmod 0555 /usr/local/bin/agimesh-entrypoint && \
+    find WebTransporte modules Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration -type f -size +0c -print >/tmp/agimesh-manifest && \
+    test $(wc -l </tmp/agimesh-manifest) -gt 0
+USER 65532:65532
+ENTRYPOINT ["/usr/local/bin/agimesh-entrypoint"]

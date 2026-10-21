@@ -48,6 +48,7 @@ jobs:
           test -f docker/Dockerfile.all
           test -f docker/entrypoint.sh
           test -f docker/entrypoint-all.sh
+          test -d docker/targets
 
           python3 - <<'PY'
           import json
