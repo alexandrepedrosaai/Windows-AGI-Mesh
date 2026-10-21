@@ -8,32 +8,32 @@ namespace WindowsAGIMesh.Contracts;
 /// </summary>
 public sealed record MeshPolicy
 (
-    /// <summary>Unique identifier for this policy.</summary>
+    // <summary>Unique identifier for this policy.</summary>
     [Required]
     [StringLength(128, MinimumLength = 1)]
     string PolicyId,
 
-    /// <summary>
-    /// Risk classification for actions governed by this policy.
-    /// Accepted values: "Low", "Medium", "High", "Critical".
-    /// </summary>
+    // <summary>
+    // Risk classification for actions governed by this policy.
+    // Accepted values: "Low", "Medium", "High", "Critical".
+    // </summary>
     [Required]
     string RiskLevel,
 
-    /// <summary>
-    /// When true, a human reviewer must approve actions before execution.
-    /// </summary>
+    // <summary>
+    // When true, a human reviewer must approve actions before execution.
+    // </summary>
     bool HumanReview,
 
-    /// <summary>
-    /// Maximum number of autonomous retries allowed before escalation.
-    /// </summary>
+    // <summary>
+    // Maximum number of autonomous retries allowed before escalation.
+    // </summary>
     [Range(0, 10)]
     int MaxRetries = 3,
 
-    /// <summary>
-    /// Whether all actions governed by this policy must be written to an audit log.
-    /// </summary>
+    // <summary>
+    // Whether all actions governed by this policy must be written to an audit log.
+    // </summary>
     bool AuditRequired = true
 )
 {

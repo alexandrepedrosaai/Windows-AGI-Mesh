@@ -7,6 +7,8 @@
 //   iterations : positive integer                  (default: 1000000)
 // ─────────────────────────────────────────────────────────────────────────────
 
+using WindowsAGIMesh.Benchmarks;
+
 string suite      = args.Length > 0 ? args[0].ToLowerInvariant() : "all";
 int    iterations = args.Length > 1 && int.TryParse(args[1], out int n) ? n : 1_000_000;
 

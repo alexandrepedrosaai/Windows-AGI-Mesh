@@ -8,28 +8,28 @@ namespace WindowsAGIMesh.Contracts;
 /// </summary>
 public sealed record MeshAgent
 (
-    /// <summary>Unique identifier for this agent instance.</summary>
+    // <summary>Unique identifier for this agent instance.</summary>
     [Required]
     [StringLength(128, MinimumLength = 1)]
     string AgentId,
 
-    /// <summary>
-    /// Functional role of the agent, e.g. "Planner", "Executor", "Reviewer", "Orchestrator".
-    /// </summary>
+    // <summary>
+    // Functional role of the agent, e.g. "Planner", "Executor", "Reviewer", "Orchestrator".
+    // </summary>
     [Required]
     [StringLength(64, MinimumLength = 1)]
     string Role,
 
-    /// <summary>
-    /// Skill tokens this agent is capable of performing,
-    /// e.g. "summarization", "code-generation", "image-captioning".
-    /// </summary>
+    // <summary>
+    // Skill tokens this agent is capable of performing,
+    // e.g. "summarization", "code-generation", "image-captioning".
+    // </summary>
     string[] Skills,
 
-    /// <summary>
-    /// Trust level in the range [0.0, 1.0].
-    /// 0.0 = untrusted / sandboxed; 1.0 = fully trusted / privileged.
-    /// </summary>
+    // <summary>
+    // Trust level in the range [0.0, 1.0].
+    // 0.0 = untrusted / sandboxed; 1.0 = fully trusted / privileged.
+    // </summary>
     [Range(0.0, 1.0)]
     double TrustLevel
 )

@@ -8,45 +8,45 @@ namespace WindowsAGIMesh.Contracts;
 /// </summary>
 public sealed record MeshTask
 (
-    /// <summary>Unique identifier for this task.</summary>
+    // <summary>Unique identifier for this task.</summary>
     [Required]
     [StringLength(128, MinimumLength = 1)]
     string TaskId,
 
-    /// <summary>
-    /// Human-readable description of what the task should accomplish.
-    /// </summary>
+    // <summary>
+    // Human-readable description of what the task should accomplish.
+    // </summary>
     [Required]
     [StringLength(2048, MinimumLength = 1)]
     string Description,
 
-    /// <summary>
-    /// Priority level: "Low", "Normal", "High", "Critical".
-    /// </summary>
+    // <summary>
+    // Priority level: "Low", "Normal", "High", "Critical".
+    // </summary>
     string Priority = "Normal",
 
-    /// <summary>
-    /// Identifier of the agent assigned to execute this task.
-    /// Null means the orchestrator will assign dynamically.
-    /// </summary>
+    // <summary>
+    // Identifier of the agent assigned to execute this task.
+    // Null means the orchestrator will assign dynamically.
+    // </summary>
     string? AssignedAgentId = null,
 
-    /// <summary>UTC timestamp when the task was created.</summary>
+    // <summary>UTC timestamp when the task was created.</summary>
     DateTime? CreatedAt = null,
 
-    /// <summary>
-    /// Optional deadline by which the task must complete.
-    /// </summary>
+    // <summary>
+    // Optional deadline by which the task must complete.
+    // </summary>
     DateTime? Deadline = null,
 
-    /// <summary>
-    /// Current lifecycle status: "Pending", "Running", "Completed", "Failed", "Cancelled".
-    /// </summary>
+    // <summary>
+    // Current lifecycle status: "Pending", "Running", "Completed", "Failed", "Cancelled".
+    // </summary>
     string Status = "Pending",
 
-    /// <summary>
-    /// Arbitrary key-value metadata attached to the task (e.g. tenant, correlation IDs).
-    /// </summary>
+    // <summary>
+    // Arbitrary key-value metadata attached to the task (e.g. tenant, correlation IDs).
+    // </summary>
     Dictionary<string, string>? Metadata = null
 )
 {

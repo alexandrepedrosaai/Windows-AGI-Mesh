@@ -8,30 +8,30 @@ namespace WindowsAGIMesh.Contracts;
 /// </summary>
 public sealed record MeshNode
 (
-    /// <summary>Unique identifier for this node.</summary>
+    // <summary>Unique identifier for this node.</summary>
     [Required]
     [StringLength(128, MinimumLength = 1)]
     string NodeId,
 
-    /// <summary>
-    /// Logical type of the node, e.g. "EdgeDevice", "CloudWorker", "OrchestratorHub".
-    /// </summary>
+    // <summary>
+    // Logical type of the node, e.g. "EdgeDevice", "CloudWorker", "OrchestratorHub".
+    // </summary>
     [Required]
     [StringLength(64, MinimumLength = 1)]
     string NodeType,
 
-    /// <summary>
-    /// List of capability tokens this node advertises, e.g. "vision", "nlp", "code-exec".
-    /// </summary>
+    // <summary>
+    // List of capability tokens this node advertises, e.g. "vision", "nlp", "code-exec".
+    // </summary>
     string[] Capabilities,
 
-    /// <summary>Whether the node exposes CPU compute for inference workloads.</summary>
+    // <summary>Whether the node exposes CPU compute for inference workloads.</summary>
     bool SupportsCpu,
 
-    /// <summary>Whether the node exposes a discrete or integrated GPU.</summary>
+    // <summary>Whether the node exposes a discrete or integrated GPU.</summary>
     bool SupportsGpu,
 
-    /// <summary>Whether the node exposes a Neural Processing Unit (NPU / AI accelerator).</summary>
+    // <summary>Whether the node exposes a Neural Processing Unit (NPU / AI accelerator).</summary>
     bool SupportsNpu
 )
 {

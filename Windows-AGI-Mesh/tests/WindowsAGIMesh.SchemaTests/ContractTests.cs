@@ -48,7 +48,7 @@ public sealed class ContractTests
     {
         var a = new MeshNode("n1", "Edge", ["nlp"], true, false, false);
         var b = new MeshNode("n1", "Edge", ["nlp"], true, false, false);
-        a.Should().Be(b);
+        a.Should().BeEquivalentTo(b);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

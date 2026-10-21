@@ -7,7 +7,12 @@
     <AssemblyName>WindowsAGIMesh.Benchmarks</AssemblyName>
     <Description>Performance benchmarks for the Windows AGI Mesh platform — reasoning, serialisation, and throughput.</Description>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src/WindowsAGIMesh.Benchmarks/**/*.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="src\WindowsAGIMesh.Contracts\WindowsAGIMesh.Contracts.csproj" />

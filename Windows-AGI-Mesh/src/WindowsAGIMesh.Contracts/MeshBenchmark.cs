@@ -8,32 +8,32 @@ namespace WindowsAGIMesh.Contracts;
 /// </summary>
 public sealed record MeshBenchmark
 (
-    /// <summary>Unique identifier for this benchmark run.</summary>
+    // <summary>Unique identifier for this benchmark run.</summary>
     [Required]
     [StringLength(128, MinimumLength = 1)]
     string BenchmarkId,
 
-    /// <summary>
-    /// Normalised performance score in the range [0.0, 100.0].
-    /// Higher is better.
-    /// </summary>
+    // <summary>
+    // Normalised performance score in the range [0.0, 100.0].
+    // Higher is better.
+    // </summary>
     [Range(0.0, 100.0)]
     double Score,
 
-    /// <summary>
-    /// End-to-end latency measured in milliseconds for the benchmark workload.
-    /// </summary>
+    // <summary>
+    // End-to-end latency measured in milliseconds for the benchmark workload.
+    // </summary>
     [Range(0.0, double.MaxValue)]
     double LatencyMs,
 
-    /// <summary>
-    /// Identifier of the node or agent that produced this result.
-    /// </summary>
+    // <summary>
+    // Identifier of the node or agent that produced this result.
+    // </summary>
     string TargetId = "",
 
-    /// <summary>
-    /// UTC timestamp when the benchmark was executed.
-    /// </summary>
+    // <summary>
+    // UTC timestamp when the benchmark was executed.
+    // </summary>
     DateTime? ExecutedAt = null
 )
 {

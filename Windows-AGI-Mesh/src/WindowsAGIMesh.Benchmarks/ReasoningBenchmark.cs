@@ -1,3 +1,5 @@
+using WindowsAGIMesh.Contracts;
+
 namespace WindowsAGIMesh.Benchmarks;
 
 /// <summary>

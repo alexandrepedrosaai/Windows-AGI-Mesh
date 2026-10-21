@@ -8,34 +8,34 @@ namespace WindowsAGIMesh.Contracts;
 /// </summary>
 public sealed record MeshAttestation
 (
-    /// <summary>Unique identifier for this attestation record.</summary>
+    // <summary>Unique identifier for this attestation record.</summary>
     [Required]
     [StringLength(128, MinimumLength = 1)]
     string AttestationId,
 
-    /// <summary>
-    /// Identity of the reviewer — a human user principal name or an automated service account.
-    /// </summary>
+    // <summary>
+    // Identity of the reviewer — a human user principal name or an automated service account.
+    // </summary>
     [Required]
     [StringLength(256, MinimumLength = 1)]
     string Reviewer,
 
-    /// <summary>UTC timestamp when the attestation was recorded.</summary>
+    // <summary>UTC timestamp when the attestation was recorded.</summary>
     DateTime Timestamp,
 
-    /// <summary>
-    /// Identifier of the agent action or policy decision being attested.
-    /// </summary>
+    // <summary>
+    // Identifier of the agent action or policy decision being attested.
+    // </summary>
     string SubjectId = "",
 
-    /// <summary>
-    /// Outcome of the attestation: "Approved", "Rejected", or "Escalated".
-    /// </summary>
+    // <summary>
+    // Outcome of the attestation: "Approved", "Rejected", or "Escalated".
+    // </summary>
     string Outcome = "Approved",
 
-    /// <summary>
-    /// Optional free-text notes provided by the reviewer.
-    /// </summary>
+    // <summary>
+    // Optional free-text notes provided by the reviewer.
+    // </summary>
     string? Notes = null
 )
 {
