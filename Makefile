@@ -1,15 +1,11 @@
-.PHONY: all clean
+CC ?= clang
+CFLAGS ?= -O3 -Wall -Wextra
+TARGET ?= aarch64-linux-gnu
 
-all:
-	@echo "Building Windows-AGI-Mesh..."
-	mkdir -p bin
-	cp Windows-AGI-Mesh.qs bin/
-	# Add your build commands here
-	# Examples:
-	# dotnet build
-	# cargo build --release
-	# g++ -o bin/mesh src/*.cpp
+all: majorana_phase_shift_aarch64.o
+
+majorana_phase_shift_aarch64.o: majorana_phase_shift_aarch64.S
+	$(CC) --target=$(TARGET) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf build/
-	rm -rf bin/
+	rm -f majorana_phase_shift_aarch64.o
