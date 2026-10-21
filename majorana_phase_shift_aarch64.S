@@ -95,9 +95,9 @@ majorana_phase_shift_neon:
         ldr s4,[x19]
         ldr s5,[x20]
         fmul s6,s4,s2
-        fmls s6,s5,s3
+        fmsub s6,s5,s3,s6
         fmul s0,s4,s3
-        fmla s0,s5,s2
+        fmadd s0,s5,s2,s0
         str s6,[x19],#4
         str s0,[x20],#4
         subs w23,w23,#1
@@ -233,12 +233,12 @@ majorana_purity_neon:
 .L_purity_tail:
         and w21,w22,#3
         cbz w21,.L_purity_reduce
-        fmov s4,#0.0
+        movi v4.2s,#0
 .L_purity_scalar:
         ldr s1,[x19],#4
         ldr s2,[x20],#4
-        fmla s4,s1,s1
-        fmla s4,s2,s2
+        fmadd s4,s1,s1,s4
+        fmadd s4,s2,s2,s4
         subs w21,w21,#1
         b.ne .L_purity_scalar
         fadd s0,s0,s4
