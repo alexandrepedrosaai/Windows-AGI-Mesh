@@ -1,0 +1,12 @@
+# syntax=docker/dockerfile:1.7
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+ARG PACKAGE_VERSION
+ARG SOURCE_COMMIT
+
+LABEL org.opencontainers.image.title="Windows AGI Mesh_${PACKAGE_VERSION}" \
+      org.opencontainers.image.source="https://github.com/alexandrepedrosaai/Windows-AGI-Mesh" \
+      org.opencontainers.image.description="Immutable Windows AGI Mesh package generated from a complete main-branch commit" \
+      org.opencontainers.image.version="${PACKAGE_VERSION}" \
+      org.opencontainers.image.revision="${SOURCE_COMMIT}"

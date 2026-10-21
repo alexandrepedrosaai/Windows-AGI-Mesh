@@ -1,0 +1,235 @@
+name: Windows AGI Mesh Immutable Commit Packages
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: alexandrepedrosaai
+  BASE_IMAGE: ghcr.io/alexandrepedrosaai/windows-agi-mesh
+  IMAGE_LIST: /tmp/agimesh-complete-images.txt
+
+jobs:
+  install-complete-build-and-publish:
+    name: Install complete workflow, test and publish immutable package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout complete repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate complete Docker package inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f docker/manifest.json
+          test -f docker/Dockerfile.all
+          test -f docker/Dockerfile.versioned
+          test -f docker/entrypoint.sh
+          test -f docker/entrypoint-all.sh
+          test -d docker/targets
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(
+              Path("docker/manifest.json").read_text(encoding="utf-8")
+          )
+          packages = manifest.get("packages", [])
+
+          if len(packages) != 25:
+              raise SystemExit(
+                  f"Expected 25 Docker packages, found {len(packages)}"
+              )
+
+          for package in packages:
+              source = Path(package["source"])
+              dockerfile = Path(package["dockerfile"])
+
+              if not source.is_file():
+                  raise SystemExit(f"Missing source file: {source}")
+
+              if not dockerfile.is_file():
+                  raise SystemExit(f"Missing Dockerfile: {dockerfile}")
+
+          print("Complete Docker package inventory validated")
+          PY
+
+          : > "$IMAGE_LIST"
+          mkdir -p docker-artifacts
+
+      - name: Build every component of the complete Windows AGI Mesh
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          while IFS= read -r dockerfile; do
+            package_name="$(basename "$(dirname "$dockerfile")")"
+            image="${BASE_IMAGE}:complete-${package_name}-${GITHUB_SHA}"
+
+            echo "Building complete component: ${image}"
+
+            docker buildx build \
+              --file "$dockerfile" \
+              --tag "$image" \
+              --load \
+              .
+
+            docker image inspect "$image" >/dev/null
+            printf '%s\n' "$image" >> "$IMAGE_LIST"
+          done < <(
+            find docker/targets \
+              -mindepth 2 \
+              -maxdepth 2 \
+              -type f \
+              -name Dockerfile \
+              -print \
+              | sort
+          )
+
+      - name: Build the complete Windows AGI Mesh container
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          image="${BASE_IMAGE}:complete-${GITHUB_SHA}"
+
+          docker buildx build \
+            --file docker/Dockerfile.all \
+            --tag "$image" \
+            --load \
+            .
+
+          docker image inspect "$image" >/dev/null
+          printf '%s\n' "$image" >> "$IMAGE_LIST"
+
+      - name: Test the complete Windows AGI Mesh container
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          image="${BASE_IMAGE}:complete-${GITHUB_SHA}"
+
+          docker run --rm \
+            --entrypoint /bin/sh \
+            "$image" \
+            -c '
+              test -d /opt/agi-mesh/repository/WebTransporte &&
+              test -d /opt/agi-mesh/repository/modules &&
+              test -d /opt/agi-mesh/repository/Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration &&
+              echo "Complete Windows AGI Mesh validation passed"
+            '
+
+      - name: Calculate the next immutable package number
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # This workflow starts at run number 1; +1 makes the first package
+          # Windows-AGI-Mesh_2, followed by _3, _4 and so on.
+          version=$((GITHUB_RUN_NUMBER + 1))
+          short_sha="${GITHUB_SHA:0:12}"
+          package="windows-agi-mesh_${version}"
+          image="${REGISTRY}/${OWNER}/${package}:commit-${short_sha}"
+
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "package=${package}" >> "$GITHUB_OUTPUT"
+          echo "image=${image}" >> "$GITHUB_OUTPUT"
+
+          echo "Next immutable package: ${package}"
+          echo "Image: ${image}"
+
+      - name: Create immutable versioned Docker image
+        shell: bash
+        env:
+          PACKAGE_VERSION: ${{ steps.version.outputs.version }}
+          VERSIONED_IMAGE: ${{ steps.version.outputs.image }}
+        run: |
+          set -euo pipefail
+
+          base_image="${BASE_IMAGE}:complete-${GITHUB_SHA}"
+
+          docker buildx build \
+            --file docker/Dockerfile.versioned \
+            --build-arg "BASE_IMAGE=${base_image}" \
+            --build-arg "PACKAGE_VERSION=${PACKAGE_VERSION}" \
+            --build-arg "SOURCE_COMMIT=${GITHUB_SHA}" \
+            --tag "$VERSIONED_IMAGE" \
+            --load \
+            .
+
+          docker image inspect "$VERSIONED_IMAGE" >/dev/null
+
+      - name: Publish immutable Docker package to GHCR
+        shell: bash
+        env:
+          VERSIONED_IMAGE: ${{ steps.version.outputs.image }}
+        run: |
+          set -euo pipefail
+
+          echo "Publishing immutable package: ${VERSIONED_IMAGE}"
+          docker push "$VERSIONED_IMAGE"
+
+      - name: Export immutable package artifact
+        shell: bash
+        env:
+          VERSIONED_IMAGE: ${{ steps.version.outputs.image }}
+          PACKAGE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          docker save "$VERSIONED_IMAGE" \
+            | gzip -9 > "docker-artifacts/Windows-AGI-Mesh_${PACKAGE_VERSION}.tar.gz"
+
+          tar -czf \
+            "docker-artifacts/Windows-AGI-Mesh_${PACKAGE_VERSION}-source.tar.gz" \
+            docker
+
+          test -s "docker-artifacts/Windows-AGI-Mesh_${PACKAGE_VERSION}.tar.gz"
+          test -s "docker-artifacts/Windows-AGI-Mesh_${PACKAGE_VERSION}-source.tar.gz"
+
+      - name: Upload immutable package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-AGI-Mesh-${{ steps.version.outputs.version }}
+          path: docker-artifacts/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish summary
+        if: always()
+        env:
+          PACKAGE_VERSION: ${{ steps.version.outputs.version }}
+          VERSIONED_IMAGE: ${{ steps.version.outputs.image }}
+        shell: bash
+        run: |
+          {
+            echo "## Windows AGI Mesh Immutable Package"
+            echo
+            echo "- Package: Windows-AGI-Mesh_${PACKAGE_VERSION}"
+            echo "- Image: ${VERSIONED_IMAGE}"
+            echo "- Source commit: ${GITHUB_SHA}"
+            echo "- Package URL: https://github.com/${GITHUB_REPOSITORY}/pkgs/container/windows-agi-mesh_${PACKAGE_VERSION}"
+            echo "- Artifact: Windows-AGI-Mesh-${PACKAGE_VERSION}"
+          } >> "$GITHUB_STEP_SUMMARY"
