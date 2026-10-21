@@ -163,7 +163,7 @@ jobs:
           echo "Next immutable package: ${package}"
           echo "Image: ${image}"
 
-      - name: Create immutable versioned Docker image
+      - name: Create immutable versioned Docker image from complete local image
         shell: bash
         env:
           PACKAGE_VERSION: ${{ steps.version.outputs.version }}
@@ -173,14 +173,11 @@ jobs:
 
           base_image="${BASE_IMAGE}:complete-${GITHUB_SHA}"
 
-          docker buildx build \
-            --file docker/Dockerfile.versioned \
-            --build-arg "BASE_IMAGE=${base_image}" \
-            --build-arg "PACKAGE_VERSION=${PACKAGE_VERSION}" \
-            --build-arg "SOURCE_COMMIT=${GITHUB_SHA}" \
-            --tag "$VERSIONED_IMAGE" \
-            --load \
-            .
+          # The complete image is already loaded in this runner. Tag it locally
+          # instead of using FROM, which would require pulling an unpublished
+          # image from GHCR.
+          docker image inspect "$base_image" >/dev/null
+          docker tag "$base_image" "$VERSIONED_IMAGE"
 
           docker image inspect "$VERSIONED_IMAGE" >/dev/null
 
