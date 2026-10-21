@@ -1,0 +1,179 @@
+name: Windows AGI Mesh Docker Source Packages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "WebTransporte/**"
+      - "modules/**"
+      - "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/**"
+      - "docker/**"
+      - ".github/workflows/docker-source-packages.yml"
+
+  pull_request:
+    paths:
+      - "WebTransporte/**"
+      - "modules/**"
+      - "Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration/**"
+      - "docker/**"
+      - ".github/workflows/docker-source-packages.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_PREFIX: alexandrepedrosaai/windows-agi-mesh
+
+jobs:
+  build-source-packages:
+    name: Build Docker source packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate Docker package manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f docker/manifest.json
+          test -f docker/Dockerfile.all
+          test -f docker/entrypoint.sh
+          test -f docker/entrypoint-all.sh
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(
+              Path("docker/manifest.json").read_text(encoding="utf-8")
+          )
+          packages = manifest.get("packages", [])
+
+          if not packages:
+              raise SystemExit("No Docker packages found in manifest")
+
+          for package in packages:
+              source = Path(package["source"])
+              dockerfile = Path(package["dockerfile"])
+
+              if not source.is_file():
+                  raise SystemExit(f"Missing source file: {source}")
+
+              if not dockerfile.is_file():
+                  raise SystemExit(f"Missing Dockerfile: {dockerfile}")
+
+          print(f"Validated {len(packages)} Docker packages")
+          PY
+
+      - name: Build every individual source image
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          while IFS= read -r dockerfile; do
+            package_dir="$(dirname "$dockerfile")"
+            package_name="$(basename "$package_dir")"
+            image="${IMAGE_PREFIX}:${package_name}-ci"
+
+            echo "Building individual image: ${image}"
+
+            docker buildx build \
+              --file "$dockerfile" \
+              --tag "$image" \
+              --load \
+              .
+          done < <(
+            find docker/targets \
+              -mindepth 2 \
+              -maxdepth 2 \
+              -type f \
+              -name Dockerfile \
+              -print \
+              | sort
+          )
+
+      - name: Build aggregate Docker image
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          docker buildx build \
+            --file docker/Dockerfile.all \
+            --tag "${IMAGE_PREFIX}:all-ci" \
+            --load \
+            .
+
+      - name: Test aggregate image
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          docker run --rm \
+            --entrypoint /bin/sh \
+            "${IMAGE_PREFIX}:all-ci" \
+            -c '
+              test -d /opt/agi-mesh/repository/WebTransporte &&
+              test -d /opt/agi-mesh/repository/modules &&
+              test -d /opt/agi-mesh/repository/Windows-AGI-Mesh-Quantum/src/PhotonicAcceleration &&
+              echo "Aggregate image validation passed"
+            '
+
+      - name: Test Python source packages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          while IFS= read -r dockerfile; do
+            package_dir="$(dirname "$dockerfile")"
+            package_name="$(basename "$package_dir")"
+
+            if [[ "$package_name" == *"-py" ]]; then
+              image="${IMAGE_PREFIX}:${package_name}-ci"
+              echo "Testing Python package: ${image}"
+              docker run --rm "$image"
+            fi
+          done < <(
+            find docker/targets \
+              -mindepth 2 \
+              -maxdepth 2 \
+              -type f \
+              -name Dockerfile \
+              -print \
+              | sort
+          )
+
+      - name: Generate package summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Windows AGI Mesh Docker Packages"
+            echo
+            echo "- Repository: ${GITHUB_REPOSITORY}"
+            echo "- Ref: ${GITHUB_REF}"
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Registry publication: disabled"
+            echo "- Secrets and tokens: not used"
+            echo
+            echo "### Individual Dockerfiles"
+            find docker/targets \
+              -mindepth 2 \
+              -maxdepth 2 \
+              -type f \
+              -name Dockerfile \
+              -print \
+              | sort \
+              | sed 's/^/- `/; s/$/`/'
+            echo
+            echo "### Aggregate Dockerfile"
+            echo "- docker/Dockerfile.all"
+          } >> "$GITHUB_STEP_SUMMARY"
