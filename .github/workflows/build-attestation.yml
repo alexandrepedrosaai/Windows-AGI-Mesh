@@ -17,8 +17,7 @@ permissions: {}
 concurrency:
   group: docker-release-${{ github.event.release.tag_name || inputs.release_tag }}
   cancel-in-progress: false
-
-env:
+  env:
   REGISTRY: ghcr.io
   LOCAL_IMAGE: windows-agi-mesh:ci
   IMAGE_ARCHIVE: windows-agi-mesh-docker-image.tar
