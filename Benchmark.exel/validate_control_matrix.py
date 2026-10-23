@@ -102,8 +102,7 @@ def main():
         if enabled and enabled not in ("yes", "true", "no", "false", ""):
             warnings.append(f"row {rnum} ({intra}): Enabled '{enabled}' not yes/no/true/false")
 
-        tenants.append({c: get(c) for c in REQUIRED if c in col} |
-                       {c: get(c) for c in OPTIONAL if c in col and get(c)})
+        tenants.append({c: get(c) for c in col if c not in OPTIONAL or get(c)})
 
     if args.json:
         print(json.dumps({"valid": not errors, "errors": errors,
