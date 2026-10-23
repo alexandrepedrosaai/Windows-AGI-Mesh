@@ -777,9 +777,11 @@ jobs:
     steps:
       - name: 'install prereqs'
         timeout-minutes: 2
-        uses: $/.github/actions/pkg-install
-        with:
-          apt: gcc-mingw-w64-x86-64-win32 ${{ matrix.install_packages }}
+        env:
+          MATRIX_INSTALL_PACKAGES: '${{ matrix.install_packages }}'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends gcc-mingw-w64-x86-64-win32 ${MATRIX_INSTALL_PACKAGES}
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
