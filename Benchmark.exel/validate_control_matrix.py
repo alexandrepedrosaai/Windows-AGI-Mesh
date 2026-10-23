@@ -70,10 +70,11 @@ def main():
         if not intra:
             errors.append(f"row {rnum}: empty IntraID")
             continue
-        if intra in seen_intra:
-            errors.append(f"row {rnum}: duplicate IntraID '{intra}' (also row {seen_intra[intra]})")
+        intra_key = intra.lower()
+        if intra_key in seen_intra:
+            errors.append(f"row {rnum}: duplicate IntraID '{intra}' (also row {seen_intra[intra_key]})")
         else:
-            seen_intra[intra] = rnum
+            seen_intra[intra_key] = rnum
 
         tid = get("TenantId")
         if tid and not GUID_RE.match(tid):
