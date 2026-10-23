@@ -33,7 +33,11 @@ def append_audit(matrix, intra_id, agent, action, obj, result, note):
         sys.exit(1)
     cell = ws.cell(row=target_row, column=col["AuditLog"] + 1)
     existing = str(cell.value).strip() if cell.value else ""
-    cell.value = (existing + "\n" + entry) if existing else entry
+    updated = (existing + "\n" + entry) if existing else entry
+    if len(updated) > 32767:
+        print("ERRO: AuditLog excede o limite de 32767 caracteres por celula; entrada nao gravada.", file=sys.stderr)
+        sys.exit(1)
+    cell.value = updated
     cell.alignment = openpyxl.styles.Alignment(wrap_text=True, vertical="top")
     wb.save(matrix)
     print(f"AUDIT OK (IntraID={intra_id}): {entry}")
