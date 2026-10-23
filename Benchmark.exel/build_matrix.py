@@ -10,7 +10,7 @@ HEADERS = ["IntraID","TenantId","PrimaryDomain","DisplayName","McpServerMode",
            "McpEndpoint","RuntimeVersion","Owner","Environment","Region",
            "Enabled","Scopes","Notes","AuditLog"]
 
-OUT = "/home/user/.super_doubao/super-doubao-runtime/workspace/_M365TenantintraID_MCPControl.xlsx"
+OUT = "_M365TenantintraID_MCPControl.xlsx"
 
 wb = openpyxl.Workbook()
 ws = wb.active
