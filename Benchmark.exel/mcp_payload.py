@@ -6,13 +6,13 @@ Operacoes suportadas: users_list, users_get, users_create, groups_list, groups_c
   users_assignLicense, ca_policies_list, signins_list, active_users_report, guests_inventory
 Uso: python3 mcp_payload.py <query> <operacao> [--filter ...] [--top N] [--json]
 """
-import argparse, json, sys
+import argparse, json, secrets, sys
 from resolve_tenant import load_tenants, resolve
 
 OPS = {
     "users_list": ("users_list", lambda a: {"$filter": a.filter or "", "$top": a.top or 100, "$select": "id,userPrincipalName,displayName,accountEnabled,assignedLicenses"}),
     "users_get":  ("users_get",  lambda a: {"userId": a.user or "REPLACE-WITH-UPN-OU-ID"}),
-    "users_create": ("users_create", lambda a: {"displayName": a.name or "Novo Usuario", "userPrincipalName": a.upn or "novo@SEU-DOMINIO.onmicrosoft.com", "passwordProfile": {"forceChangePasswordNextSignIn": True, "password": "Gerar-Aleatoria-#123"}, "accountEnabled": True}),
+    "users_create": ("users_create", lambda a: {"displayName": a.name or "Novo Usuario", "userPrincipalName": a.upn or "novo@SEU-DOMINIO.onmicrosoft.com", "passwordProfile": {"forceChangePasswordNextSignIn": True, "password": secrets.token_urlsafe(24) + "aA1!"}, "accountEnabled": True}),
     "groups_list": ("groups_list", lambda a: {"$filter": a.filter or "", "$top": a.top or 100}),
     "groups_create": ("groups_create", lambda a: {"displayName": a.name or "Novo Grupo", "mailEnabled": False, "securityEnabled": True, "groupTypes": []}),
     "users_assignLicense": ("users_assignLicense", lambda a: {"userId": a.user or "REPLACE-WITH-UPN", "addLicenses": [{"skuId": "RESOLVER-VIA-subscribedSkus_list"}], "removeLicenses": []}),
