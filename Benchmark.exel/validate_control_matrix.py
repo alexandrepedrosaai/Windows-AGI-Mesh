@@ -66,9 +66,11 @@ def main():
             i = col.get(name)
             return norm(row[i]) if i is not None and i < len(row) else ""
 
+        for name in REQUIRED:
+            if not get(name):
+                errors.append(f"row {rnum}: empty {name}")
         intra = get("IntraID")
         if not intra:
-            errors.append(f"row {rnum}: empty IntraID")
             continue
         intra_key = intra.lower()
         if intra_key in seen_intra:
