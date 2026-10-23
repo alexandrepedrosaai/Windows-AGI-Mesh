@@ -34,6 +34,8 @@ def load_tenants(path, include_disabled=False):
 
 def resolve(query, tenants):
     q = query.strip()
+    if not q:
+        return [], "none"
     ql = q.lower()
     is_guid = bool(GUID_RE.match(q))
     # 1. IntraID exato
