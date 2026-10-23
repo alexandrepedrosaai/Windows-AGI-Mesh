@@ -74,5 +74,6 @@ for r, row in enumerate(instrucoes, start=1):
 ws2.column_dimensions["A"].width = 100
 ws2.cell(row=1, column=1).font = Font(bold=True, size=14)
 
-wb.save(OUT)
+with open(OUT, "xb") as output:
+    wb.save(output)
 print(f"Matriz criada: {OUT}")
