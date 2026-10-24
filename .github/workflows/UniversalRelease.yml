@@ -83,9 +83,9 @@ jobs:
         with:
           dotnet-version: "9.0.x"
 
-      - run: dotnet restore
+      - run: dotnet restore Windows-AGI-Mesh/Windows-AGI-Mesh.sln
 
-      - run: dotnet build -c Release
+      - run: dotnet build Windows-AGI-Mesh/Windows-AGI-Mesh.sln -c Release --no-restore
 
       # Q#
 
