@@ -90,10 +90,7 @@ jobs:
       # Q#
 
       - run: |
-          dotnet publish \
-            WebGPU/Majorana-Starship/MajoranaStarship.qsproj \
-            -c Release \
-            -o publish
+          dotnet publish WebGPU/Majorana-Starship/MajoranaStarship.qsproj -c Release -o publish
 
       # ZIPS
 
