@@ -1,0 +1,28 @@
+[package]
+name        = "zenith-ai-core"
+version     = "0.1.0"
+edition     = "2021"
+description = "Surface Zenith AI Core — inference orchestration, Copilot integration, model management"
+
+[dependencies]
+zenith-abi      = { path = "../zenith-abi" }
+zenith-ipc      = { path = "../zenith-ipc" }
+zenith-scheduler = { path = "../zenith-scheduler" }
+tokio           = { workspace = true }
+serde           = { workspace = true }
+serde_json      = { workspace = true }
+uuid            = { workspace = true }
+tracing         = { workspace = true }
+parking_lot     = { workspace = true }
+dashmap         = { workspace = true }
+async-trait     = { workspace = true }
+thiserror       = { workspace = true }
+bytes           = { workspace = true }
+rand            = { workspace = true }
+sha2            = { workspace = true }
+futures         = { workspace = true }
+rayon           = { workspace = true }
+
+[dev-dependencies]
+tokio       = { workspace = true }
+criterion   = { workspace = true }
