@@ -131,9 +131,7 @@ impl CapabilityToken {
 
     /// Verify the token signature
     pub fn verify(&self, secret: &[u8]) -> bool {
-        if self.revoked {
-            return false;
-        }
+if self.revoked || self.is_expired() {
         let payload = self.canonical_payload();
         let mut hasher = Sha256::new();
         hasher.update(secret);
