@@ -2,7 +2,7 @@
   "name": "windows-agi-mesh",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
