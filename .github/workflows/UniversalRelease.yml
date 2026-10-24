@@ -135,7 +135,7 @@ jobs:
         run: |
           docker build \
             -t edge-ai:${{ github.ref_name }} \
-            -f docker/Dockerfile .
+            -f docker/Dockerfile.all .
 
   deploy:
 
