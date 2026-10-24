@@ -342,8 +342,11 @@ impl SessionRegistry {
             .collect()
     }
 
-    /// Remove a terminated session
+/// Remove a terminated session
     pub fn remove(&mut self, id: &ZSessionId) -> Option<Session> {
+        if self.sessions.get(id)?.state != SessionState::Terminated {
+            return None;
+        }
         self.sessions.remove(id)
     }
 
