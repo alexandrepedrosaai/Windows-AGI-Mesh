@@ -1,4 +1,4 @@
-name: Test, secure, build, attest, and deploy Docker release
+name: Test, secure
 
 on:
   release:
@@ -704,5 +704,5 @@ concurrency:
     # Configure this environment with Required reviewers in:
     # Repository Settings > Environments > production
     environment:
-   name: production      
-  url: https://github.com/alexandrepedrosaai/Windows-AGI-Mesh
+      name: production
+      url: https://github.com/alexandrepedrosaai/Windows-AGI-Mesh
