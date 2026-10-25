@@ -262,13 +262,13 @@ impl IsolationEnforcer {
             for region in regions.iter_mut() {
                 if region.umo_id.as_ref() == Some(umo_id) {
                     match access {
-                        AccessLevel::Read | AccessLevel::ReadWrite => {
+                        AccessLevel::Read => {
                             region.grant_read(requester);
                         }
+                        AccessLevel::Write | AccessLevel::ReadWrite => {
+                            region.grant_write(requester);
+                        }
                         _ => {}
-                    }
-                    if matches!(access, AccessLevel::ReadWrite) {
-                        region.grant_write(requester);
                     }
                     return true;
                 }
