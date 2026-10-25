@@ -172,7 +172,7 @@ pub struct VCpu {
 impl VCpu {
     /// Create a new vCPU
     pub fn new(index: u32, domain: Domain) -> Self {
-        let realtime = matches!(domain, Domain::RealTime);
+        let realtime = domain == Domain::RealTime;
         Self {
             index,
             domain,
