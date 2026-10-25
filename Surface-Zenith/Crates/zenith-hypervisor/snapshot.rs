@@ -122,7 +122,7 @@ impl ContainerSnapshot {
         }
         for page in pages {
             hasher.update(page.page_id.to_le_bytes());
-            hasher.update(&page.data[..page.data.len().min(64)]);
+            hasher.update(&page.data);
         }
         hasher.finalize().to_vec()
     }
