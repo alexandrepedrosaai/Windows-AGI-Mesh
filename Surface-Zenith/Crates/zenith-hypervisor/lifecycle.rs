@@ -150,7 +150,7 @@ impl LifecycleManager {
             let from = self.current_form_factor
                 .as_ref()
                 .map(|f| f.recommended_domain())
-                .unwrap_or(Domain::Android);
+                .unwrap_or_else(|| transition.from.recommended_domain());
             let to = transition.new_primary_domain();
             Some((from, to))
         } else {
