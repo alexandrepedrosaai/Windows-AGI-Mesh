@@ -132,7 +132,7 @@ impl ContainerConfig {
         };
         Self {
             label: domain.name().to_string(),
-            domain,
+            domain: domain.clone(),
             vcpu_count,
             memory_limit,
             cpu_quota: 1_000_000_000,
