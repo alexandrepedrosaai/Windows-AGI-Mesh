@@ -141,7 +141,7 @@ impl ContainerConfig {
             checkpointing: true,
             is_primary: true,
             env: HashMap::new(),
-            quota: ResourceQuota::default(),
+            quota: ResourceQuota::for_domain(&domain),
             kernel_args: Vec::new(),
             rootfs_path: None,
             network: NetworkConfig::default(),
