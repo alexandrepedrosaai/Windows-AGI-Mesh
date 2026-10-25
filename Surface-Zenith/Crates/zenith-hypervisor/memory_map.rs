@@ -81,7 +81,7 @@ impl DomainMemoryMap {
         ));
         // User space (EL0)
         map.add_area(VirtualMemoryArea::new(
-            0x0000_0000_0040_0000, 0x0000_0001_0000_0000,
+            0x0000_0000_0040_0000, 0x0000_0000_FFC0_0000,
             MemoryPermissions::rx(), "user-text",
         ));
         map.add_area(VirtualMemoryArea::new(
