@@ -408,7 +408,7 @@ impl DomainContainer {
     pub fn can_accept_task(&self) -> bool {
         self.state.can_accept_tasks()
             && self.stats.memory_used < self.config.memory_limit
-            && self.stats.active_tasks < 1000
+&& self.stats.active_tasks < self.config.quota.max_tasks
     }
 
     /// Domain type of this container
