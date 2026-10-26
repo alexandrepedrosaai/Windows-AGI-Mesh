@@ -182,9 +182,10 @@ impl PageTableWalker {
     pub fn unmap(&mut self, va: u64) -> bool {
         let d = VaDecomposition::from_va(va);
         if let Some(l3) = self.l3_tables.get_mut(&(d.l0_idx, d.l1_idx, d.l2_idx)) {
-            if l3.get(d.l3_idx).is_valid() {
+            let pte = l3.get(d.l3_idx);
+            if pte.is_valid() {
                 l3.clear(d.l3_idx);
-                self.mapped_pages = self.mapped_pages.saturating_sub(1);
+                if pte.is_dirty() { self.dirty_pages = self.dirty_pages.saturating_sub(1); }
                 return true;
             }
         }
