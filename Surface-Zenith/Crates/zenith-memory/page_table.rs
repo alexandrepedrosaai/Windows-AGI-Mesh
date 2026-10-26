@@ -185,6 +185,7 @@ impl PageTableWalker {
             let pte = l3.get(d.l3_idx);
             if pte.is_valid() {
                 l3.clear(d.l3_idx);
+                self.mapped_pages = self.mapped_pages.saturating_sub(1);
                 if pte.is_dirty() { self.dirty_pages = self.dirty_pages.saturating_sub(1); }
                 return true;
             }
