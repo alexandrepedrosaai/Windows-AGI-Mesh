@@ -351,7 +351,7 @@ quantum_routine_05:
     ; Loop AVX-512 (8 doubles por iteração)
 .quantum_routine_05_avx512_loop:
     cmp     r15, rbx
-    jg      .quantum_routine_05_done
+    jg      .quantum_routine_05_scalar
     vmovapd zmm0, [r12 + r15*8]
     vmovapd zmm1, [r12 + r15*8 + 64]
     ; Operação quântica: rotação de fase
