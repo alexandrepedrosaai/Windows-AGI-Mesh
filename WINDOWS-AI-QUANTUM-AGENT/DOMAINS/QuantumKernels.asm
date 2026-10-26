@@ -416,8 +416,10 @@ quantum_routine_06:
     jnz     .quantum_routine_06_scalar
     ; Loop AVX-512 (8 doubles por iteração)
 .quantum_routine_06_avx512_loop:
-    cmp     r15, r14
-    jge     .quantum_routine_06_done
+    mov     rax, r14
+    sub     rax, r15
+    cmp     rax, 16
+    jl      .quantum_routine_06_scalar
     vmovapd zmm0, [r12 + r15*8]
     vmovapd zmm1, [r12 + r15*8 + 64]
     ; Operação quântica: rotação de fase
