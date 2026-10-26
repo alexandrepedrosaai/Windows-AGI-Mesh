@@ -1,4 +1,6 @@
-WINDOWS-AI-QUANTUM-AGENT
+## WINDOWS-AI-QUANTUM-AGENT
+<img width="4032" height="1742" alt="image" src="https://github.com/user-attachments/assets/9b6e1827-eed6-44d6-9cd7-994c67d41ffd" />
+
 pipeline/
 │
 ├── 01_hardware/              ← STAGE 1: Initialize QPU + Photonics
@@ -50,3 +52,5 @@ pipeline/
 │
 └── 10_pipeline_runner/       ← STAGE 10: Orchestrator
     └── pipeline.py                     Runs stages 1→9 sequentially
+    https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/blob/main/WINDOWS-AI-QUANTUM-AGENT/Mermaid-Copilot-binaries.png
+    
