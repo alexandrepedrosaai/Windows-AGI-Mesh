@@ -129,13 +129,16 @@ quantum_routine_02:
     mov     r13, rsi        ; ptr_output
     mov     r14, rdx        ; n_elements
     xor     r15, r15        ; contador
+    mov     rbx, r14
+    sub     rbx, 16         ; último índice seguro para 2 loads de 64B
+    jb      .quantum_routine_02_scalar
     ; Verificar alinhamento AVX-512
     test    r12, 63
     jnz     .quantum_routine_02_scalar
     ; Loop AVX-512 (8 doubles por iteração)
 .quantum_routine_02_avx512_loop:
-    cmp     r15, r14
-    jge     .quantum_routine_02_done
+    cmp     r15, rbx
+    jg      .quantum_routine_02_scalar
     vmovapd zmm0, [r12 + r15*8]
     vmovapd zmm1, [r12 + r15*8 + 64]
     ; Operação quântica: rotação de fase
