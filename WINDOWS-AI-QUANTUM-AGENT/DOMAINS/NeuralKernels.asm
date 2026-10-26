@@ -79,7 +79,7 @@ quantum_routine_01:
     vmulpd  zmm11, zmm10, zmm9
     vbroadcastsd zmm12, [rel const_01]
     vfmadd213pd zmm11, zmm12, zmm9
-    vmovapd [r13 + r15*8], zmm11
+    vmovupd [r13 + r15*8], zmm11
     add     r15, 8
     jmp     .quantum_routine_01_avx512_loop
 .quantum_routine_01_scalar:
