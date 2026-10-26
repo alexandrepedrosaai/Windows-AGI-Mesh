@@ -272,10 +272,14 @@ quantum_routine_04:
     ; Verificar alinhamento AVX-512
     test    r12, 63
     jnz     .quantum_routine_04_scalar
+    ; Guardar limite vetorial seguro: n_elements - 16
+    mov     r11, r14
+    sub     r11, 16
+    js      .quantum_routine_04_scalar
     ; Loop AVX-512 (8 doubles por iteração)
 .quantum_routine_04_avx512_loop:
-    cmp     r15, r14
-    jge     .quantum_routine_04_done
+    cmp     r15, r11
+    jg      .quantum_routine_04_scalar
     vmovapd zmm0, [r12 + r15*8]
     vmovapd zmm1, [r12 + r15*8 + 64]
     ; Operação quântica: rotação de fase
@@ -297,7 +301,7 @@ quantum_routine_04:
     add     r15, 8
     jmp     .quantum_routine_04_avx512_loop
 .quantum_routine_04_scalar:
-    ; Fallback escalar
+    ; Fallback escalar / tail
     cmp     r15, r14
     jge     .quantum_routine_04_done
     vmovsd  xmm0, [r12 + r15*8]
