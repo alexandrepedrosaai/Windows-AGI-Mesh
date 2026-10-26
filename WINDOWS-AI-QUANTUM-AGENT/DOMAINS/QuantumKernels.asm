@@ -271,10 +271,15 @@ quantum_routine_04:
     ; Verificar alinhamento AVX-512
     test    r12, 63
     jnz     .quantum_routine_04_scalar
+    ; Limite seguro do loop AVX-512: precisa ler 16 doubles (2x64B) por iteração
+    cmp     r14, 16
+    jb      .quantum_routine_04_scalar
+    mov     r11, r14
+    sub     r11, 16
     ; Loop AVX-512 (8 doubles por iteração)
 .quantum_routine_04_avx512_loop:
-    cmp     r15, r14
-    jge     .quantum_routine_04_done
+    cmp     r15, r11
+    jg      .quantum_routine_04_scalar
     vmovapd zmm0, [r12 + r15*8]
     vmovapd zmm1, [r12 + r15*8 + 64]
     ; Operação quântica: rotação de fase
