@@ -200,6 +200,7 @@ impl UmoManager {
     pub fn tag_umo(&mut self, id: &ZObjectId, tag: impl Into<String>) -> bool {
         let tag = tag.into();
         if let Some(record) = self.records.get_mut(id) {
+            if record.tags.iter().any(|existing| existing == &tag) { return true; }
             record.tag(tag.clone());
             self.tag_index.entry(tag).or_default().push(*id);
             true
