@@ -63,7 +63,7 @@ jobs:
         run: dotnet --info
 
       - name: Restore dependencies
-        run: dotnet restore "$env:SOLUTION"
+        run: dotnet restore "$env:SOLUTION" --runtime "${{ matrix.rid }}"
         shell: pwsh
 
       - name: Build Release
