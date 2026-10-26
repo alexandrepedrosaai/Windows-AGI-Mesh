@@ -7,7 +7,7 @@ name: 'Windows'
 'on':
   push:
     branches:
-      - master
+      - main
       - 'curl-*'
       - '*/ci'
     paths-ignore:
