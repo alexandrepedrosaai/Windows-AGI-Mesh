@@ -85,7 +85,7 @@ impl PageCache {
     }
 
     /// Insert a page into the cache
-if self.entries.contains_key(&pfn) { return false; }
+pub fn insert(&mut self, pfn: u64, domain: Option<Domain>) -> bool {
         if self.used + crate::PAGE_SIZE as u64 > self.capacity {
             if !self.evict_one() {
                 return false;
