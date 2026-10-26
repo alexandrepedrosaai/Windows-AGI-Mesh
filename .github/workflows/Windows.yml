@@ -1,10 +1,10 @@
-name: Windows AGI Mesh CI
+name: Windows AGI Mesh
 
 on:
   push:
-    branches: [main, develop, "release/**"]
+    branches: [main]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -16,14 +16,31 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   NUGET_XMLDOC_MODE: skip
   SOLUTION: Windows-AGI-Mesh/Windows-AGI-Mesh.sln
+  CLI_PROJECT: Windows-AGI-Mesh/WindowsAGIMesh.Cli/WindowsAGIMesh.Cli.csproj
 
 jobs:
-  build-test:
-    name: Restore, build and test
-    runs-on: windows-latest
+  build-test-publish:
+    name: ${{ matrix.rid }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: linux-x64
+            runner: ubuntu-24.04
+          - rid: linux-arm64
+            runner: ubuntu-24.04-arm
+          - rid: win-x64
+            runner: windows-latest
+          - rid: win-arm64
+            runner: windows-latest
+          - rid: osx-x64
+            runner: macos-13
+          - rid: osx-arm64
+            runner: macos-14
+    runs-on: ${{ matrix.runner }}
 
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -37,8 +54,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json') }}
+          key: nuget-${{ runner.os }}-${{ matrix.rid }}-${{ hashFiles('**/*.csproj', 'global.json') }}
           restore-keys: |
+            nuget-${{ runner.os }}-${{ matrix.rid }}-
             nuget-${{ runner.os }}-
 
       - name: Show toolchain
@@ -46,9 +64,11 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore "$env:SOLUTION"
+        shell: pwsh
 
       - name: Build Release
         run: dotnet build "$env:SOLUTION" --configuration Release --no-restore --nologo
+        shell: pwsh
 
       - name: Run tests
         run: >
@@ -56,19 +76,119 @@ jobs:
           --configuration Release
           --no-build
           --no-restore
-          --logger "trx;LogFileName=test-results.trx"
-          --results-directory Windows-AGI-Mesh/TestResults
+          --logger "trx;LogFileName=test-results-${{ matrix.rid }}.trx"
+          --results-directory "Windows-AGI-Mesh/TestResults/${{ matrix.rid }}"
+        shell: pwsh
 
-      - name: CLI smoke test
-        working-directory: Windows-AGI-Mesh
+      - name: Publish CLI binary
+        run: >
+          dotnet publish "$env:CLI_PROJECT"
+          --configuration Release
+          --runtime "${{ matrix.rid }}"
+          --self-contained true
+          --no-restore
+          --nologo
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:DebugType=None
+          --output "publish/${{ matrix.rid }}"
+        shell: pwsh
+
+      - name: Package Windows binary
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          dotnet run --project WindowsAGIMesh.Cli/WindowsAGIMesh.Cli.csproj --configuration Release --no-build --no-restore -- help
-          dotnet run --project WindowsAGIMesh.Cli/WindowsAGIMesh.Cli.csproj --configuration Release --no-build --no-restore -- version
+          $archive = "Windows-AGI-Mesh-${{ matrix.rid }}-${{ github.sha }}.zip"
+          Compress-Archive -Path "publish/${{ matrix.rid }}/*" -DestinationPath $archive -Force
+
+      - name: Package Unix binary
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="Windows-AGI-Mesh-${{ matrix.rid }}-${GITHUB_SHA}.tar.gz"
+          tar -C "publish/${{ matrix.rid }}" -czf "$archive" .
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-AGI-Mesh-${{ matrix.rid }}
+          path: |
+            Windows-AGI-Mesh-${{ matrix.rid }}-${{ github.sha }}.zip
+            Windows-AGI-Mesh-${{ matrix.rid }}-${{ github.sha }}.tar.gz
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: windows-agi-mesh-test-results
-          path: Windows-AGI-Mesh/TestResults/**
+          name: test-results-${{ matrix.rid }}
+          path: Windows-AGI-Mesh/TestResults/${{ matrix.rid }}/**
           if-no-files-found: warn
+          retention-days: 14
+
+  release:
+    name: Release Windows AGI Mesh
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build-test-publish
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all binaries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: Windows-AGI-Mesh-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Add source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          git archive --format=tar.gz --prefix="Windows-AGI-Mesh-${GITHUB_SHA}/" \
+            --output="release-assets/Windows-AGI-Mesh-source-${GITHUB_SHA}.tar.gz" "$GITHUB_SHA"
+          test -n "$(find release-assets -maxdepth 1 -type f -print -quit)"
+
+      - name: Create commit tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          short_sha="${GITHUB_SHA:0:12}"
+          tag="windows-agi-mesh-${short_sha}"
+          title="Windows AGI Mesh ${short_sha}"
+          notes_file="release-notes.md"
+          {
+            echo "# ${title}"
+            echo
+            echo "Automated release for commit ${GITHUB_SHA}."
+            echo
+            echo "## Included binaries"
+            find release-assets -maxdepth 1 -type f -printf '%f\n' | sort | sed 's/^/- /'
+          } > "$notes_file"
+          gh release create "$tag" release-assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$title" \
+            --notes-file "$notes_file"
+
+      - name: Release summary
+        shell: bash
+        run: |
+          short_sha="${GITHUB_SHA:0:12}"
+          {
+            echo "## Windows AGI Mesh release created"
+            echo
+            echo "- Tag: windows-agi-mesh-${short_sha}"
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Release: https://github.com/${GITHUB_REPOSITORY}/releases/tag/windows-agi-mesh-${short_sha}"
+          } >> "$GITHUB_STEP_SUMMARY"
