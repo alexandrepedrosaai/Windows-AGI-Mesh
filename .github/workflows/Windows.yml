@@ -805,15 +805,15 @@ jobs:
           - { build: 'cmake'    , compiler: 'gcc' }
           - { build: 'cmake'    , compiler: 'clang-tidy', install_packages: 'clang-22 clang-tidy-22', CFLAGS: '-Wunused-macros' }
     steps:
-      - name: 'install prereqs'
-        timeout-minutes: 2
-        uses: $/.github/actions/pkg-install
-        with:
-          apt: gcc-mingw-w64-x86-64-win32 ${{ matrix.install_packages }}
-
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: 'install prereqs'
+        timeout-minutes: 2
+        uses: ./.github/actions/pkg-install
+        with:
+          apt: gcc-mingw-w64-x86-64-win32 ${{ matrix.install_packages }}
 
       - name: 'autoreconf'
         if: ${{ matrix.build == 'autotools' }}

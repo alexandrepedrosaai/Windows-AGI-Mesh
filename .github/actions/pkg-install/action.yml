@@ -1,0 +1,24 @@
+name: Package Install
+description: Install APT packages on Ubuntu runners
+
+inputs:
+  apt:
+    description: Space-separated list of APT packages to install
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Install APT packages
+      shell: bash
+      env:
+        APT_PACKAGES: ${{ inputs.apt }}
+      run: |
+        set -euo pipefail
+        if [ -n "${APT_PACKAGES}" ]; then
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${APT_PACKAGES}
+        else
+          echo "No APT packages requested."
+        fi
