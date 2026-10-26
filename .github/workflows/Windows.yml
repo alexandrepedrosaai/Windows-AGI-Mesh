@@ -7,7 +7,7 @@ name: 'Windows'
 'on':
   push:
     branches:
-      - master
+      - main
       - 'curl-*'
       - '*/ci'
     paths-ignore:
@@ -18,7 +18,7 @@ name: 'Windows'
       - 'projects/**'
   pull_request:
     branches:
-      - master
+      - main
       - 'curl-*'
     paths-ignore:
       - '**/*.md'
