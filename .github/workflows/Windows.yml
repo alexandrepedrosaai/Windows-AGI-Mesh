@@ -33,8 +33,6 @@ jobs:
             runner: windows-latest
           - rid: win-arm64
             runner: windows-latest
-          - rid: osx-x64
-            runner: macos-13
           - rid: osx-arm64
             runner: macos-14
     runs-on: ${{ matrix.runner }}
