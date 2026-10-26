@@ -65,8 +65,9 @@ impl CowMapping {
 
     /// Add a domain as a sharer
     pub fn add_sharer(&mut self, domain: &Domain, va: u64) {
-        self.sharers.insert(domain.name().to_string(), va);
-        self.ref_count += 1;
+if self.sharers.insert(domain.name().to_string(), va).is_none() {
+    self.ref_count += 1;
+}
     }
 
     /// Remove a domain from sharers
