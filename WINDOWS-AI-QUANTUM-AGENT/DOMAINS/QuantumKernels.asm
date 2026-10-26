@@ -127,9 +127,9 @@ quantum_routine_02:
     mov     r13, rsi        ; ptr_output
     mov     r14, rdx        ; n_elements
     xor     r15, r15        ; contador
-    ; Limite seguro para AVX-512: precisa de 8 doubles válidos para store
+    ; Limite seguro para AVX-512: cada iteração lê 16 doubles (2x zmm load)
     mov     rbx, r14
-    sub     rbx, 8
+    sub     rbx, 16
     js      .quantum_routine_02_scalar
     ; Verificar alinhamento AVX-512
     test    r12, 63
