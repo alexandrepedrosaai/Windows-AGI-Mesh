@@ -5,25 +5,14 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'Go.Windows.go/**'
-      - '.schemas/**'
-      - '.pre-commit-config.yaml'
 
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'Go.Windows.go/**'
+    paths-ignore:
       - 'ACC_STATE.json'
-      - '.schemas/**'
-      - '.github/workflows/**'
-      - '.pre-commit-config.yaml'
 
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: acc-${{ github.workflow }}-${{ github.ref }}
@@ -34,10 +23,6 @@ jobs:
   validate:
 
     name: ACC Validation
-
-    if: |
-      github.actor != 'github-actions[bot]' &&
-      !startsWith(github.ref_name, 'acc-state-')
 
     runs-on: ubuntu-latest
 
@@ -276,57 +261,24 @@ jobs:
             exit 1
           fi
 
-  generate-acc-pr:
-
-    name: Generate ACC State PR
-
-    needs:
-      - validate
-
-    if: |
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      github.actor != 'github-actions[bot]'
-
+  generate-acc-state:
+    name: Generate and push ACC State to main
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
-      pull-requests: write
-
     runs-on: ubuntu-latest
-
     steps:
-
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
-
-      - name: Check Existing ACC PR
-        uses: actions/github-script@v8
-        id: checkpr
         with:
-          script: |
-            const prs = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: "open"
-            });
-
-            const exists = prs.data.some(
-              p => p.title === "ACC State Update"
-            );
-
-            core.setOutput("exists", exists);
-
-      - name: Stop If PR Exists
-        if: steps.checkpr.outputs.exists == 'true'
-        run: |
-          echo "ACC PR already exists"
-          exit 0
+          ref: main
+          fetch-depth: 0
 
       - name: Generate ACC_STATE
         run: |
-
+          set -euo pipefail
           TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
           cat > ACC_STATE.json << EOF
           {
             "schema_version":"1.0",
@@ -355,39 +307,22 @@ jobs:
           }
           EOF
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Install Validation Tools
-        run: npm install -g ajv-cli
-
-      - name: Validate Generated ACC_STATE
+      - name: Validate generated ACC_STATE
         run: |
-          ajv validate \
-            -s .schemas/acc-state.schema.json \
-            -d ACC_STATE.json
+          npm install -g ajv-cli
+          ajv validate -s .schemas/acc-state.schema.json -d ACC_STATE.json
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          branch: acc-state-update
-          delete-branch: true
-          commit-message: "ACC State Update"
-          title: "ACC State Update"
-          body: |
-            ACC Constitutional State Update
-
-            ✅ Constitutional Gate PASS
-            ✅ Governance PASS
-            ✅ Auditability PASS
-            ✅ Consensus PASS
-            ✅ Human Sovereignty PRESERVED
-            ✅ Topology DISTRIBUTED
-
-            CODEOWNER approval required before merge.
-
-          labels: |
-            acc-state
-            governance
+      - name: Commit and push ACC_STATE directly to main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ACC_STATE.json
+          if git diff --cached --quiet; then
+            echo 'ACC_STATE.json is unchanged; nothing to push.'
+            exit 0
+          fi
+          git commit -m "ACC State Update [skip ci]"
+          git push origin HEAD:main
