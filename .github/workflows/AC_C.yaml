@@ -52,7 +52,7 @@ jobs:
       - name: Install Validation Tools
         run: |
           pip install pre-commit
-          npm install -g ajv-cli
+          npm install -g ajv-cli@5 ajv@8 ajv-formats@3
 
       - name: Run PreCommit
         run: |
@@ -95,7 +95,7 @@ jobs:
       - name: Validate ACC_STATE Schema
         if: hashFiles('ACC_STATE.json') != ''
         run: |
-          ajv validate \
+          ajv validate --spec=draft2020 -c ajv-formats \
             -s .schemas/acc-state.schema.json \
             -d ACC_STATE.json
 
@@ -136,7 +136,7 @@ jobs:
           }
           EOF
 
-          if ajv validate \
+          if ajv validate --spec=draft2020 -c ajv-formats \
             -s .schemas/acc-state.schema.json \
             -d bad.json
           then
@@ -175,7 +175,7 @@ jobs:
           }
           EOF
 
-          if ajv validate \
+          if ajv validate --spec=draft2020 -c ajv-formats \
             -s .schemas/acc-state.schema.json \
             -d bad.json
           then
@@ -214,7 +214,7 @@ jobs:
           }
           EOF
 
-          if ajv validate \
+          if ajv validate --spec=draft2020 -c ajv-formats \
             -s .schemas/acc-state.schema.json \
             -d bad.json
           then
@@ -253,7 +253,7 @@ jobs:
           }
           EOF
 
-          if ajv validate \
+          if ajv validate --spec=draft2020 -c ajv-formats \
             -s .schemas/acc-state.schema.json \
             -d bad.json
           then
@@ -309,8 +309,9 @@ jobs:
 
       - name: Validate generated ACC_STATE
         run: |
-          npm install -g ajv-cli
-          ajv validate -s .schemas/acc-state.schema.json -d ACC_STATE.json
+          npm install -g ajv-cli@5 ajv@8 ajv-formats@3
+          ajv validate --spec=draft2020 -c ajv-formats \
+            -s .schemas/acc-state.schema.json -d ACC_STATE.json
 
       - name: Commit and push ACC_STATE directly to main
         env:
