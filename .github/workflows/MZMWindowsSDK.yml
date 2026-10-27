@@ -33,7 +33,9 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: |
+            8.0.x
+            ${{ env.DOTNET_VERSION }}
 
       - name: Materialize the 500-artifact English architecture scaffold
         shell: bash
@@ -137,6 +139,8 @@ jobs:
 
       - name: Compile QMesh and build all CSharp/QSharp SDK projects
         id: build_sdk
+        env:
+          NUGET_CONFIG: ${{ runner.temp }}/NuGet.Config
         shell: bash
         run: |
           set -euo pipefail

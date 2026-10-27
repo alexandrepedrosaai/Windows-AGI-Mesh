@@ -25,7 +25,23 @@ for project in "${projects[@]}"; do
   destination="$output_root/$slug"
   mkdir -p "$destination"
   echo "BUILD $project" | tee -a "$output_root/build-report.txt"
-  if dotnet publish "$project" --configuration Release --output "$destination" --nologo >> "$output_root/build-report.txt" 2>&1; then
+  dotnet_args=(publish "$project" --configuration Release --output "$destination" --nologo --no-restore)
+  if [[ -n "${NUGET_CONFIG:-}" ]]; then
+    if ! dotnet restore "$project" --configfile "$NUGET_CONFIG" >> "$output_root/build-report.txt" 2>&1; then
+      failures=$((failures + 1))
+      echo "FAILED $project (restore)" | tee -a "$output_root/build-report.txt"
+      printf '%s\n' "$project" >> "$output_root/build-failures.txt"
+      continue
+    fi
+  else
+    if ! dotnet restore "$project" >> "$output_root/build-report.txt" 2>&1; then
+      failures=$((failures + 1))
+      echo "FAILED $project (restore)" | tee -a "$output_root/build-report.txt"
+      printf '%s\n' "$project" >> "$output_root/build-failures.txt"
+      continue
+    fi
+  fi
+  if dotnet "${dotnet_args[@]}" >> "$output_root/build-report.txt" 2>&1; then
     successes=$((successes + 1))
     echo "OK $project" | tee -a "$output_root/build-report.txt"
   else

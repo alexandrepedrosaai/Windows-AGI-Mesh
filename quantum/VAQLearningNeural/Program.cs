@@ -1,18 +1,22 @@
-using Mzm.VAQLearningNeural;
-
-var agent = new VariationalQuantumQLearner(stateCount: 4, actionCount: 2, seed: 7);
-for (var episode = 0; episode < 32; episode++)
-{
-    var state = episode % 4;
-    var action = agent.SelectAction(state);
-    var nextState = (state + action + 1) % 4;
-    var reward = nextState == 0 ? 1.0 : -0.05;
-    agent.Update(state, action, reward, nextState);
-}
-
-Console.WriteLine($"VA Q-learning neural polymorphism score: {agent.Score():F4}");
-
 namespace Mzm.VAQLearningNeural;
+
+public static class Program
+{
+    public static void Main()
+    {
+        var agent = new VariationalQuantumQLearner(stateCount: 4, actionCount: 2, seed: 7);
+        for (var episode = 0; episode < 32; episode++)
+        {
+            var state = episode % 4;
+            var action = agent.SelectAction(state);
+            var nextState = (state + action + 1) % 4;
+            var reward = nextState == 0 ? 1.0 : -0.05;
+            agent.Update(state, action, reward, nextState);
+        }
+
+        Console.WriteLine($"VA Q-learning neural polymorphism score: {agent.Score():F4}");
+    }
+}
 
 public interface IQuantumState
 {
