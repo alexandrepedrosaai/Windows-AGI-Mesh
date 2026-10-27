@@ -9,8 +9,8 @@ type Decision struct {
 
 	Evidence []string
 
-	AffectsLife bool
-	AffectsRights bool
+	AffectsLife         bool
+	AffectsRights       bool
 	AffectsCivilization bool
 
 	PowerConcentration float64
@@ -20,11 +20,11 @@ type Decision struct {
 
 type Vote struct {
 	NodeID string
-	Yes bool
+	Yes    bool
 }
 
 type AGINode struct {
-	ID string
+	ID        string
 	Influence float64
 }
 
@@ -46,7 +46,7 @@ func ConsensusReached(
 		}
 	}
 
-	return float64(yes) /
+	return float64(yes)/
 		float64(len(votes)) >= threshold
 }
 
@@ -61,11 +61,11 @@ func (n AGINode) Fragment() []AGINode {
 
 	return []AGINode{
 		{
-			ID: n.ID + "-A",
+			ID:        n.ID + "-A",
 			Influence: n.Influence / 2,
 		},
 		{
-			ID: n.ID + "-B",
+			ID:        n.ID + "-B",
 			Influence: n.Influence / 2,
 		},
 	}

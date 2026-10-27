@@ -14,13 +14,12 @@ const (
 
 type AuditRecord struct {
 	AuditorID string
-	Approved bool
-	Reason string
-	Time time.Time
+	Approved  bool
+	Reason    string
+	Time      time.Time
 }
 
 type Metrics struct {
-
 	Life float64
 
 	Liberty float64
@@ -69,7 +68,7 @@ func ValidateAuditTrail(
 
 func (m Metrics) GovernanceScore() float64 {
 
-return m.Life +
+	return m.Life +
 		m.Liberty +
 		m.Dignity +
 		m.Knowledge +
@@ -82,10 +81,10 @@ return m.Life +
 func (m Metrics) HumanContinuityIndex() float64 {
 
 	return m.Life*0.25 +
-				m.Liberty*0.15 +
-			m.Dignity*0.15 +
-			m.Knowledge*0.10 +
-			m.Diversity*0.10 +
-			m.Oversight*0.15 +
-			m.Auditability*0.10
+		m.Liberty*0.15 +
+		m.Dignity*0.15 +
+		m.Knowledge*0.10 +
+		m.Diversity*0.10 +
+		m.Oversight*0.15 +
+		m.Auditability*0.10
 }

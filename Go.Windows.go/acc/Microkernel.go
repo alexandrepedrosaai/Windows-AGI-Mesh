@@ -33,7 +33,7 @@ var (
 )
 
 type Constitution struct {
-	Version   string
+	Version    string
 	Principles []Principle
 }
 
