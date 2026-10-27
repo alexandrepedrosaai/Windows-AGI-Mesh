@@ -47,6 +47,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          cat > "$RUNNER_TEMP/NuGet.Config" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+            </packageSources>
+          </configuration>
+          EOF
+          test -s "$RUNNER_TEMP/NuGet.Config"
           dotnet nuget add source "$NUGET_FEED" \
             --name github \
             --username "$GITHUB_ACTOR" \
