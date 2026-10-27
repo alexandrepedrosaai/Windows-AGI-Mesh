@@ -1,0 +1,231 @@
+name: MajoranaZenithSDK Zenith 60 Modules
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  DOTNET_VERSION: 9.0.x
+  PACKAGE_VERSION: 0.2.0-ci.${{ github.run_number }}
+  NUGET_FEED: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+
+concurrency:
+  group: zenith60-nuget-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish-zenith60:
+    name: Publish SDK and 60 Zenith modules
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Generate manifest and package projects
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 packaging/generate_zenith60_projects.py
+          test -s packaging/zenith60-packages.json
+          test "$(find packaging/zenith60-generated -maxdepth 1 -name '*.csproj' | wc -l)" = "61"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('packaging/zenith60-packages.json').read_text())
+          assert data['totalPublishedPackages'] == 61
+          assert len(data['packages']) == 61
+          assert data['packages'][0]['id'] == 'MajoranaZenithSDK'
+          a = [p for p in data['packages'] if p['group'] == 'A']
+          b = [p for p in data['packages'] if p['group'] == 'B']
+          c = [p for p in data['packages'] if p['group'] == 'C']
+          assert len(a) == len(b) == len(c) == 20
+          assert all(len(p['dependsOn']) == 1 for p in a)
+          assert all(len(p['dependsOn']) == 20 for p in b)
+          assert all(not p['dependsOn'] for p in c)
+          print('Validated 1 root + 20 Group A + 20 Group B + 20 Group C')
+          PY
+
+      - name: Create authenticated NuGet.Config
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/NuGet.Config" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+            </packageSources>
+          </configuration>
+          EOF
+          test -s "$RUNNER_TEMP/NuGet.Config"
+          dotnet nuget add source "$NUGET_FEED" \
+            --name github \
+            --username "$GITHUB_ACTOR" \
+            --password "$GH_TOKEN" \
+            --store-password-in-clear-text \
+            --configfile "$RUNNER_TEMP/NuGet.Config"
+          dotnet nuget add source "https://api.nuget.org/v3/index.json" \
+            --name nuget.org \
+            --configfile "$RUNNER_TEMP/NuGet.Config"
+
+      - name: Pack and publish MajoranaZenithSDK root first
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          project="packaging/zenith60-generated/MajoranaZenithSDK.csproj"
+          dotnet restore "$project" --configfile "$RUNNER_TEMP/NuGet.Config" -p:PackageVersion="$PACKAGE_VERSION"
+          dotnet pack "$project" --configuration Release --no-restore --output packages -p:PackageVersion="$PACKAGE_VERSION"
+          test -s "packages/MajoranaZenithSDK.${PACKAGE_VERSION}.nupkg"
+          dotnet nuget push "packages/MajoranaZenithSDK.${PACKAGE_VERSION}.nupkg" \
+            --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
+
+      - name: Pack and publish Group A dependent modules
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for project in packaging/zenith60-generated/*.csproj; do
+            case "$project" in
+              *MajoranaZenithSDK.csproj) continue ;;
+            esac
+            id="$(basename "$project" .csproj)"
+            grep -q 'PackageReference Include="MajoranaZenithSDK"' "$project"
+            if jq -e --arg id "$id" '.packages[] | select(.id == $id and .group == "A")' packaging/zenith60-packages.json >/dev/null; then
+              dotnet restore "$project" --configfile "$RUNNER_TEMP/NuGet.Config" -p:PackageVersion="$PACKAGE_VERSION"
+              dotnet pack "$project" --configuration Release --no-restore --output packages -p:PackageVersion="$PACKAGE_VERSION"
+              dotnet nuget push "packages/${id}.${PACKAGE_VERSION}.nupkg" \
+                --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
+            fi
+          done
+
+      - name: Pack and publish Group B combinatorial modules
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for project in packaging/zenith60-generated/*.csproj; do
+            case "$project" in
+              *MajoranaZenithSDK.csproj) continue ;;
+            esac
+            id="$(basename "$project" .csproj)"
+            if jq -e --arg id "$id" '.packages[] | select(.id == $id and .group == "B")' packaging/zenith60-packages.json >/dev/null; then
+              dependency_count=$(jq -r --arg id "$id" '.packages[] | select(.id == $id) | (.dependsOn | length)' packaging/zenith60-packages.json)
+              test "$dependency_count" = "20"
+              dotnet restore "$project" --configfile "$RUNNER_TEMP/NuGet.Config" -p:PackageVersion="$PACKAGE_VERSION"
+              dotnet pack "$project" --configuration Release --no-restore --output packages -p:PackageVersion="$PACKAGE_VERSION"
+              dotnet nuget push "packages/${id}.${PACKAGE_VERSION}.nupkg" \
+                --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
+            fi
+          done
+
+      - name: Pack and publish Group C self-contained modules
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for project in packaging/zenith60-generated/*.csproj; do
+            case "$project" in
+              *MajoranaZenithSDK.csproj) continue ;;
+            esac
+            id="$(basename "$project" .csproj)"
+            if jq -e --arg id "$id" '.packages[] | select(.id == $id and .group == "C")' packaging/zenith60-packages.json >/dev/null; then
+              test "$(jq -r --arg id "$id" '.packages[] | select(.id == $id) | (.dependsOn | length)' packaging/zenith60-packages.json)" = "0"
+              dotnet restore "$project" --configfile "$RUNNER_TEMP/NuGet.Config" -p:PackageVersion="$PACKAGE_VERSION"
+              dotnet pack "$project" --configuration Release --no-restore --output packages -p:PackageVersion="$PACKAGE_VERSION"
+              dotnet nuget push "packages/${id}.${PACKAGE_VERSION}.nupkg" \
+                --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
+            fi
+          done
+
+      - name: Verify package count and generate SHA256 artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=$(find packages -maxdepth 1 -type f -name '*.nupkg' | wc -l)
+          test "$count" = "61"
+          sha256sum packages/*.nupkg | sort > packages/SHA256SUMS.txt
+          while read -r digest package; do
+            printf '%s  %s\n' "$digest" "$(basename "$package")" > "${package%.nupkg}.sha256"
+          done < <(sha256sum packages/*.nupkg | sort)
+          test "$(find packages -maxdepth 1 -type f -name '*.sha256' | wc -l)" = "61"
+          sha256sum -c packages/SHA256SUMS.txt
+
+      - name: Upload NuGet packages, manifests and SHA256 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MajoranaZenithSDK-zenith60-${{ github.sha }}
+          path: |
+            packages/*.nupkg
+            packages/*.sha256
+            packages/SHA256SUMS.txt
+            packaging/zenith60-packages.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Create or update release with GitHub Actions Bot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          short_sha="${GITHUB_SHA:0:12}"
+          tag="majorana-zenith-sdk-60-${short_sha}"
+          title="MajoranaZenithSDK Zenith 60 Modules ${short_sha}"
+          release_date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "$tag" "$GITHUB_SHA"
+          git push origin "refs/tags/$tag" --force
+          cat > release-notes.md <<EOF
+          # ${title}
+
+          Automated release date: ${release_date}
+          Source commit: ${GITHUB_SHA}
+          Published packages: 61 total (MajoranaZenithSDK + 60 Zenith modules)
+          Package version: ${PACKAGE_VERSION}
+
+          Group A modules depend on MajoranaZenithSDK.
+          Group B modules depend on MajoranaZenithSDK and 19 of the 20 Group A modules in a deterministic round-robin combination.
+          Group C modules are self-contained and have no package dependencies.
+
+          SHA256 integrity manifests are attached. SHA256 is an integrity hash, not encryption.
+          EOF
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" packages/*.nupkg packages/*.sha256 packages/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --title "$title" --notes-file release-notes.md
+          else
+            gh release create "$tag" packages/*.nupkg packages/*.sha256 packages/SHA256SUMS.txt \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$title" --notes-file release-notes.md
+          fi
+
+      - name: Release summary
+        shell: bash
+        run: |
+          short_sha="${GITHUB_SHA:0:12}"
+          {
+            echo "## MajoranaZenithSDK Zenith 60 release complete"
+            echo
+            echo "- Total packages: 61"
+            echo "- Version: ${PACKAGE_VERSION}"
+            echo "- Tag: majorana-zenith-sdk-60-${short_sha}"
+            echo "- Release: https://github.com/${GITHUB_REPOSITORY}/releases/tag/majorana-zenith-sdk-60-${short_sha}"
+          } >> "$GITHUB_STEP_SUMMARY"
