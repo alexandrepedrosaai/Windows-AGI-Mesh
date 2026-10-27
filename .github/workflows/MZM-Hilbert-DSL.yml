@@ -125,6 +125,7 @@ jobs:
             artifacts/nuget/*.nupkg
             artifacts/qmesh/**
             artifacts/binaries/build-report.txt
+            artifacts/binaries/build-failures.txt
           if-no-files-found: error
           retention-days: 30
 

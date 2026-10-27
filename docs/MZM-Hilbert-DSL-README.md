@@ -31,6 +31,8 @@ The workflow `.github/workflows/MZM-Hilbert-DSL.yml` runs on every commit to `ma
 7. Publishes the NuGet tool package to GitHub Packages.
 8. Creates or updates a commit-specific tag and a GitHub Release named **MZM Hilbert DSL** using `github-actions[bot]`.
 
+The repository contains legacy and experimental projects that do not all share one compatible SDK or dependency graph. The repo-wide binary sweep therefore uses best-effort mode: it attempts every project, publishes successful outputs, and records complete diagnostics in `build-report.txt` plus the project list in `build-failures.txt`. The MZM tool build and QMesh compilation remain fatal checks. The local script supports `scripts/build_all_binaries.sh <output> --strict` when a caller explicitly wants any project failure to stop the run.
+
 The `MajoranaZenithSDK` and Zenith 60-module workflows also pack and install the same MZM Hilbert DSL NuGet tool before their package operations, so `qmeshc` is available on every SDK run.
 
 ## Integrity and quantum-language boundary
