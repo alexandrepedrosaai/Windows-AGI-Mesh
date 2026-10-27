@@ -12,9 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  actions: write
-  deployments: write
+  contents: read
 
 concurrency:
   group: acc-${{ github.workflow }}-${{ github.ref }}
