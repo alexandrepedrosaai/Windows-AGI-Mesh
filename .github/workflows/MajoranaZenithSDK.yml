@@ -1,0 +1,187 @@
+name: MajoranaZenithSDK NuGet Catalog
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  DOTNET_VERSION: 9.0.x
+  PACKAGE_VERSION: 0.1.0-ci.${{ github.run_number }}
+  NUGET_FEED: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+
+concurrency:
+  group: majorana-zenith-sdk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package-publish-release:
+    name: Pack, publish and release 50 NuGet packages
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Generate the 50-package manifest and pack projects
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 packaging/generate_nuget_projects.py
+          test "$(python3 -c 'import json; print(len(json.load(open("packaging/packages.json"))["packages"]))')" = "50"
+          test "$(python3 -c 'import json; print(json.load(open("packaging/packages.json"))["packages"][0]["id"])')" = "MajoranaZenithSDK"
+
+      - name: Configure GitHub Packages NuGet source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dotnet nuget add source "$NUGET_FEED" \
+            --name github \
+            --username "$GITHUB_ACTOR" \
+            --password "$GH_TOKEN" \
+            --store-password-in-clear-text \
+            --configfile "$RUNNER_TEMP/NuGet.Config"
+          dotnet nuget add source "https://api.nuget.org/v3/index.json" \
+            --name nuget.org \
+            --configfile "$RUNNER_TEMP/NuGet.Config"
+
+      - name: Restore and pack MajoranaZenithSDK first
+        shell: bash
+        run: |
+          set -euo pipefail
+          main_project="packaging/generated/MajoranaZenithSDK.csproj"
+          dotnet restore "$main_project" --configfile "$RUNNER_TEMP/NuGet.Config"
+          dotnet pack "$main_project" \
+            --configuration Release \
+            --no-restore \
+            --output packages \
+            -p:PackageVersion="$PACKAGE_VERSION"
+          test -s "packages/MajoranaZenithSDK.${PACKAGE_VERSION}.nupkg"
+
+      - name: Publish MajoranaZenithSDK before dependent packages
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dotnet nuget push "packages/MajoranaZenithSDK.${PACKAGE_VERSION}.nupkg" \
+            --source "$NUGET_FEED" \
+            --api-key "$GH_TOKEN" \
+            --skip-duplicate \
+            --no-symbols
+
+      - name: Restore and pack the remaining 49 packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p packages
+          shopt -s nullglob
+          for project in packaging/generated/*.csproj; do
+            [[ "$project" == *"/MajoranaZenithSDK.csproj" ]] && continue
+            dotnet restore "$project" --configfile "$RUNNER_TEMP/NuGet.Config"
+            dotnet pack "$project" \
+              --configuration Release \
+              --no-restore \
+              --output packages \
+              -p:PackageVersion="$PACKAGE_VERSION"
+          done
+          package_count=$(find packages -maxdepth 1 -type f -name '*.nupkg' | wc -l)
+          test "$package_count" = "50"
+
+      - name: Publish all dependent packages to GitHub Packages
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for package in packages/*.nupkg; do
+            dotnet nuget push "$package" \
+              --source "$NUGET_FEED" \
+              --api-key "$GH_TOKEN" \
+              --skip-duplicate \
+              --no-symbols
+          done
+
+      - name: Generate SHA256 integrity manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum packages/*.nupkg | sort > packages/SHA256SUMS.txt
+          while read -r digest package; do
+            printf '%s  %s\n' "$digest" "$(basename "$package")" > "${package%.nupkg}.sha256"
+          done < <(sha256sum packages/*.nupkg | sort)
+          test "$(find packages -maxdepth 1 -type f -name '*.sha256' | wc -l)" = "50"
+          sha256sum -c packages/SHA256SUMS.txt
+
+      - name: Upload NuGet packages and SHA256 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MajoranaZenithSDK-nuget-${{ github.sha }}
+          path: |
+            packages/*.nupkg
+            packages/*.sha256
+            packages/SHA256SUMS.txt
+            packaging/packages.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Build commit tag and update GitHub Actions Bot release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          short_sha="${GITHUB_SHA:0:12}"
+          tag="majorana-zenith-sdk-${short_sha}"
+          title="MajoranaZenithSDK ${short_sha}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "$tag" "$GITHUB_SHA"
+          git push origin "refs/tags/$tag" --force
+          notes="release-notes.md"
+          {
+            echo "# ${title}"
+            echo
+            echo "Automated 50-package NuGet release for commit ${GITHUB_SHA}."
+            echo
+            echo "The primary package MajoranaZenithSDK was published first; packages 2–50 depend on this exact CI version: ${PACKAGE_VERSION}."
+            echo
+            echo "## Integrity"
+            echo "SHA256 manifests are attached for every .nupkg."
+          } > "$notes"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" packages/*.nupkg packages/*.sha256 packages/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --title "$title" --notes-file "$notes"
+          else
+            gh release create "$tag" packages/*.nupkg packages/*.sha256 packages/SHA256SUMS.txt \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "$title" \
+              --notes-file "$notes"
+          fi
+
+      - name: Publish release summary
+        shell: bash
+        run: |
+          short_sha="${GITHUB_SHA:0:12}"
+          {
+            echo "## MajoranaZenithSDK release complete"
+            echo
+            echo "- Packages: 50"
+            echo "- Version: ${PACKAGE_VERSION}"
+            echo "- Tag: majorana-zenith-sdk-${short_sha}"
+            echo "- NuGet feed: ${NUGET_FEED}"
+            echo "- Release: https://github.com/${GITHUB_REPOSITORY}/releases/tag/majorana-zenith-sdk-${short_sha}"
+          } >> "$GITHUB_STEP_SUMMARY"

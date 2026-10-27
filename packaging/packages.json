@@ -1,0 +1,455 @@
+{
+  "schemaVersion": 1,
+  "description": "Deterministic 50-package MajoranaZenithSDK NuGet catalog",
+  "selection": "MajoranaZenithSDK followed by the first 49 sorted .csproj/.qsproj files",
+  "packages": [
+    {
+      "number": 1,
+      "id": "MajoranaZenithSDK",
+      "source": "README.md",
+      "kind": "sdk-root",
+      "dependsOn": []
+    },
+    {
+      "number": 2,
+      "id": "AGIMesh",
+      "source": "AGIMesh/AGIMesh.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 3,
+      "id": "AGIMesh.QSharp",
+      "source": "AGIMesh.QSharp/AGIMesh.QSharp.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 4,
+      "id": "MajoranaQuantumAuditorQubotsStability",
+      "source": "MajoranaQuantumAuditorQubotsStability.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 5,
+      "id": "MajoranaQuantumBlockchain",
+      "source": "MajoranaQuantumBlockchain.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 6,
+      "id": "MajoranaQuantumRegistryExplorer",
+      "source": "MajoranaQuantumRegistryExplorer.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 7,
+      "id": "MajoranaQuantumValidator",
+      "source": "MajoranaQuantumValidator.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 8,
+      "id": "MajoranaStarship",
+      "source": "MajoranaStarship.qsproj",
+      "kind": "qsproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 9,
+      "id": "MajoranaStarshipCategoryTopos",
+      "source": "MajoranaStarshipCategoryTopos.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 10,
+      "id": "MajoranaStarshipCausalityHolography",
+      "source": "MajoranaStarshipCausalityHolography.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 11,
+      "id": "MajoranaStarshipCosmology",
+      "source": "MajoranaStarshipCosmology.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 12,
+      "id": "MajoranaStarshipDiracYangMills",
+      "source": "MajoranaStarshipDiracYangMills.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 13,
+      "id": "MajoranaStarshipEinsteinMaxwell",
+      "source": "MajoranaStarshipEinsteinMaxwell.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 14,
+      "id": "MajoranaStarshipHilbert",
+      "source": "MajoranaStarshipHilbert.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 15,
+      "id": "MajoranaStarshipLoopGravity",
+      "source": "MajoranaStarshipLoopGravity.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 16,
+      "id": "MajoranaStarshipMTheory",
+      "source": "MajoranaStarshipMTheory.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 17,
+      "id": "MajoranaStarshipModalInfo",
+      "source": "MajoranaStarshipModalInfo.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 18,
+      "id": "MajoranaStarshipMultiverseQubits",
+      "source": "MajoranaStarshipMultiverseQubits.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 19,
+      "id": "MajoranaStarshipPDE",
+      "source": "MajoranaStarshipPDE.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 20,
+      "id": "MajoranaStarshipQKD",
+      "source": "MajoranaStarshipQKD.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 21,
+      "id": "MajoranaStarshipQuantumBlackHole",
+      "source": "MajoranaStarshipQuantumBlackHole.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 22,
+      "id": "MajoranaStarshipQuantumBlackHoles",
+      "source": "MajoranaStarshipQuantumBlackHoles.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 23,
+      "id": "MajoranaStarshipQuantumChaosDynamics",
+      "source": "MajoranaStarshipQuantumChaosDynamics.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 24,
+      "id": "MajoranaStarshipQuantumCosmicStrings",
+      "source": "MajoranaStarshipQuantumCosmicStrings.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 25,
+      "id": "MajoranaStarshipQuantumCreation",
+      "source": "MajoranaStarshipQuantumCreation.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 26,
+      "id": "MajoranaStarshipQuantumDestiny",
+      "source": "MajoranaStarshipQuantumDestiny.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 27,
+      "id": "MajoranaStarshipQuantumEntanglementNetworks",
+      "source": "MajoranaStarshipQuantumEntanglementNetworks.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 28,
+      "id": "MajoranaStarshipQuantumEternity",
+      "source": "MajoranaStarshipQuantumEternity.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 29,
+      "id": "MajoranaStarshipQuantumExoplanets",
+      "source": "MajoranaStarshipQuantumExoplanets.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 30,
+      "id": "MajoranaStarshipQuantumFractals",
+      "source": "MajoranaStarshipQuantumFractals.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 31,
+      "id": "MajoranaStarshipQuantumFreedom",
+      "source": "MajoranaStarshipQuantumFreedom.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 32,
+      "id": "MajoranaStarshipQuantumGalaxies",
+      "source": "MajoranaStarshipQuantumGalaxies.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 33,
+      "id": "MajoranaStarshipQuantumGeometry",
+      "source": "MajoranaStarshipQuantumGeometry.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 34,
+      "id": "MajoranaStarshipQuantumGravityWaves",
+      "source": "MajoranaStarshipQuantumGravityWaves.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 35,
+      "id": "MajoranaStarshipQuantumHyperdimensional",
+      "source": "MajoranaStarshipQuantumHyperdimensional.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 36,
+      "id": "MajoranaStarshipQuantumMultiverse",
+      "source": "MajoranaStarshipQuantumMultiverse.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 37,
+      "id": "MajoranaStarshipQuantumNebulae",
+      "source": "MajoranaStarshipQuantumNebulae.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 38,
+      "id": "MajoranaStarshipQuantumNeuralStarship",
+      "source": "MajoranaStarshipQuantumNeuralStarship.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 39,
+      "id": "MajoranaStarshipQuantumSingularity",
+      "source": "MajoranaStarshipQuantumSingularity.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 40,
+      "id": "MajoranaStarshipQuantumSupernovae",
+      "source": "MajoranaStarshipQuantumSupernovae.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 41,
+      "id": "MajoranaStarshipQuantumSymmetryBreaking",
+      "source": "MajoranaStarshipQuantumSymmetryBreaking.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 42,
+      "id": "MajoranaStarshipQuantumTimeCrystal",
+      "source": "MajoranaStarshipQuantumTimeCrystal.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 43,
+      "id": "MajoranaStarshipQuantumTimeTravel",
+      "source": "MajoranaStarshipQuantumTimeTravel.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 44,
+      "id": "MajoranaStarshipQuantumTopology",
+      "source": "MajoranaStarshipQuantumTopology.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 45,
+      "id": "MajoranaStarshipQuantumWormholes",
+      "source": "MajoranaStarshipQuantumWormholes.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 46,
+      "id": "MajoranaStarshipStringTheory",
+      "source": "MajoranaStarshipStringTheory.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 47,
+      "id": "MajoranaStarshipTemporalDistributed",
+      "source": "MajoranaStarshipTemporalDistributed.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 48,
+      "id": "WindowsAGIMesh.Benchmarks",
+      "source": "Windows-AGI-Mesh/WindowsAGIMesh.Benchmarks.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 49,
+      "id": "WindowsAGIMesh.Cli",
+      "source": "Windows-AGI-Mesh/WindowsAGIMesh.Cli/WindowsAGIMesh.Cli.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 50,
+      "id": "WindowsAGIMesh.Contracts",
+      "source": "Windows-AGI-Mesh/src/WindowsAGIMesh.Contracts/WindowsAGIMesh.Contracts.csproj",
+      "kind": "csproj",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    }
+  ]
+}
