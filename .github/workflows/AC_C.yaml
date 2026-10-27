@@ -70,8 +70,14 @@ jobs:
           npm install -g ajv-cli
 
       - name: Run PreCommit
+        if: hashFiles('.pre-commit-config.yaml') != ''
         run: |
-          pre-commit run --all-files
+          pre-commit run --config .pre-commit-config.yaml --all-files
+
+      - name: Report missing PreCommit configuration
+        if: hashFiles('.pre-commit-config.yaml') == ''
+        run: |
+          echo 'No .pre-commit-config.yaml found; skipping pre-commit checks.'
 
       - name: Verify Go Module
         working-directory: Go.Windows.go
