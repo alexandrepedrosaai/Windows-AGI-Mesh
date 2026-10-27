@@ -1,11 +1,10 @@
-name: Windows Quantum MCP Agents
+name: Windows Quantum Agent Model
 
 on:
   push:
     branches: [main]
     paths:
       - 'WINDOWS-AI-QUANTUM-AGENT/**'
-      - 'Go.Windows.go/**'
       - '.github/workflows/WindowsQuantumAgent.yml'
   workflow_dispatch:
 
@@ -15,7 +14,7 @@ permissions:
   deployments: write
 
 concurrency:
-  group: windows-quantum-mcp-agents-${{ github.ref }}
+  group: windows-quantum-agent-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -25,7 +24,7 @@ env:
 
 jobs:
   build-package-release:
-    name: Build and release Windows Quantum MCP Agents
+    name: Build and release Windows Quantum Agent Model
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Windows Quantum Agent sources
@@ -42,11 +41,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Setup Go toolchain
-        uses: actions/setup-go@v5
-        with:
-          go-version: stable
 
       - name: Install Assembly toolchain
         shell: bash
@@ -71,7 +65,7 @@ jobs:
             END { for (e in count) print e, count[e] }
           ' | sort > agent-build/reports/language-inventory.txt
           {
-            echo "Windows Quantum MCP Agents"
+            echo "Windows Quantum Agent Model"
             echo "commit=$GITHUB_SHA"
             echo "source_root=$AGENT_ROOT"
             echo "file_count=$(wc -l < agent-build/reports/all-files.txt)"
@@ -136,26 +130,6 @@ jobs:
           # non-NASM dialect; the failed command is recorded above.
           exit 0
 
-      - name: Build all Go files from Go.Windows.go
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p agent-build/go-source agent-build/go-windows-x64
-          cp -a Go.Windows.go/. agent-build/go-source/
-          cd agent-build/go-source
-          test -f go.mod || go mod init windows-quantum-mcp-agents
-          gofmt -w $(find . -type f -name '*.go' -print)
-          go test ./...
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build ./...
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build \
-            -o ../go-windows-x64/WindowsQuantumMCPAgent.exe ./acc
-          cd ../..
-          test -s agent-build/go-windows-x64/WindowsQuantumMCPAgent.exe
-          find agent-build/go-source -type f -name '*.go' -print0 \
-            | sort -z | tr '\0' '\n' > agent-build/reports/go-files.txt
-          find agent-build/go-windows-x64 -type f -printf '%f\n' \
-            > agent-build/reports/go-binaries.txt
-
       - name: Build Windows Quantum Agent launcher binary
         shell: bash
         run: |
@@ -192,14 +166,12 @@ jobs:
           release_dir=agent-build/release
           tar --exclude='agent-build/release' --exclude='.git' -czf \
             "$release_dir/WINDOWS-AI-QUANTUM-AGENT-source.tar.gz" \
-            "$AGENT_ROOT" Go.Windows.go
+            "$AGENT_ROOT"
           tar -czf "$release_dir/WindowsQuantumAgentModel-build.tar.gz" \
-            agent-build/reports agent-build/assembly agent-build/go-windows-x64 \
-            agent-build/windows-x64
+            agent-build/reports agent-build/assembly agent-build/windows-x64
           tar --exclude='agent-build/release' --exclude='.git' -czf \
             "$release_dir/WindowsQuantumAgentModel-complete-bundle.tar.gz" \
-            "$AGENT_ROOT" Go.Windows.go agent-build/reports agent-build/assembly \
-            agent-build/go-source agent-build/go-windows-x64 agent-build/windows-x64
+            "$AGENT_ROOT" agent-build/reports agent-build/assembly agent-build/windows-x64
           find "$release_dir" -type f ! -name 'SHA256SUMS.txt' -print0 \
             | sort -z | xargs -0 sha256sum > "$release_dir/SHA256SUMS.txt"
           sha256sum -c "$release_dir/SHA256SUMS.txt"
@@ -209,15 +181,12 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Windows-Quantum-MCP-Agents-${{ github.sha }}
+          name: Windows-Quantum-Agent-Model-${{ github.sha }}
           path: |
             WINDOWS-AI-QUANTUM-AGENT/**
-            Go.Windows.go/**
             agent-build/release/**
             agent-build/reports/**
             agent-build/assembly/**
-            agent-build/go-source/**
-            agent-build/go-windows-x64/**
             agent-build/windows-x64/**
           if-no-files-found: warn
           retention-days: 30
@@ -226,20 +195,18 @@ jobs:
         if: success()
         uses: actions/download-artifact@v4
         with:
-          name: Windows-Quantum-MCP-Agents-${{ github.sha }}
-          path: copilot-deploy/Windows-Quantum-MCP-Agents
+          name: Windows-Quantum-Agent-Model-${{ github.sha }}
+          path: copilot-deploy/Windows-Quantum-Agent-Model
 
       - name: Validate downloaded Copilot deployment payload
         if: success()
         shell: bash
         run: |
           set -euo pipefail
-          payload=copilot-deploy/Windows-Quantum-MCP-Agents
+          payload=copilot-deploy/Windows-Quantum-Agent-Model
           test -d "$payload/WINDOWS-AI-QUANTUM-AGENT"
-          test -d "$payload/Go.Windows.go"
           test -s "$payload/agent-build/release/WindowsQuantumAgentModel-complete-bundle.tar.gz"
           test -s "$payload/agent-build/windows-x64/WindowsQuantumAgentModel.dll"
-          test -s "$payload/agent-build/go-windows-x64/WindowsQuantumMCPAgent.exe"
           find "$payload" -type f -print0 | sort -z | tr '\0' '\n' > "$payload/downloaded-files.txt"
           sha256sum "$payload/agent-build/release"/* > "$payload/downloaded-release-assets.sha256"
           {
@@ -248,42 +215,7 @@ jobs:
             echo "deployment_environment=copilot"
           } > "$payload/copilot-deployment-manifest.txt"
 
-      - name: Deploy all downloaded files and Go binaries to MCP Agent
-        if: success()
-        env:
-          GH_TOKEN: ${{ github.token }}
-          BOT_NAME: github-advanced-security[bot]
-          BOT_EMAIL: 62310815+github-advanced-security[bot]@users.noreply.github.com
-        shell: bash
-        run: |
-          set -euo pipefail
-          payload=copilot-deploy/Windows-Quantum-MCP-Agents
-          artifact_name="Windows-Quantum-MCP-Agents-${GITHUB_SHA}"
-          artifact_url="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts" \
-            --jq ".artifacts[] | select(.name == \"$artifact_name\") | .archive_download_url" \
-            | head -n 1)"
-          downloaded_files="$(wc -l < "$payload/downloaded-files.txt")"
-          deployment_id="$(jq -cn \
-            --arg ref "$GITHUB_SHA" \
-            --arg description "Windows Quantum MCP Agents: $downloaded_files deployed files" \
-            --arg artifact "$artifact_name" \
-            --arg artifact_url "$artifact_url" \
-            --argjson downloaded_files "$downloaded_files" \
-            '{ref:$ref, environment:"MCP Agent", description:$description, auto_merge:false, required_contexts:[], payload:{artifact_name:$artifact, artifact_url:$artifact_url, downloaded_files:$downloaded_files, bot:"github-advanced-security[bot]"}}' \
-            | gh api --method POST "repos/$GITHUB_REPOSITORY/deployments" --input - --jq '.id')"
-          gh api --method POST \
-            "repos/$GITHUB_REPOSITORY/deployments/$deployment_id/statuses" \
-            --input - <<JSON
-          {
-            "state": "success",
-            "environment": "MCP Agent",
-            "environment_url": "https://github.com/$GITHUB_REPOSITORY/deployments/MCP%20Agent",
-            "log_url": "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
-            "description": "Deployed $downloaded_files downloaded files and Windows Go binaries using $BOT_NAME ($BOT_EMAIL)."
-          }
-          JSON
-
-      - name: Create or update Windows Quantum MCP Agents release
+      - name: Create or update Windows Quantum Agent Model release
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
@@ -291,25 +223,27 @@ jobs:
         run: |
           set -euo pipefail
           shopt -s nullglob
-          tag="windows-quantum-mcp-agents-${GITHUB_SHA:0:12}"
+          tag="windows-quantum-agent-${GITHUB_SHA:0:12}"
           assets=(agent-build/release/*)
           if (( ${#assets[@]} == 0 )); then
             echo 'No release assets were generated' >&2
             exit 1
           fi
-          git config user.name 'github-advanced-security[bot]'
-          git config user.email '62310815+github-advanced-security[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -f "$tag" "$GITHUB_SHA"
+          git push origin "refs/tags/$tag" --force
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$tag" "${assets[@]}" \
               --repo "$GITHUB_REPOSITORY" --clobber
             gh release edit "$tag" --repo "$GITHUB_REPOSITORY" \
-              --title 'Windows Quantum MCP Agents' \
-              --notes "Automated Windows Quantum MCP Agents bundle for commit $GITHUB_SHA."
+              --title 'Windows Quantum Agent Model' \
+              --notes "Automated Windows Quantum Agent Model bundle for commit $GITHUB_SHA."
           else
             gh release create "$tag" "${assets[@]}" \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title 'Windows Quantum MCP Agents' \
-              --notes "Automated Windows Quantum MCP Agents bundle for commit $GITHUB_SHA."
+              --title 'Windows Quantum Agent Model' \
+              --notes "Automated Windows Quantum Agent Model bundle for commit $GITHUB_SHA."
           fi
 
       - name: Deploy all downloaded files to GitHub copilot environment
@@ -319,13 +253,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="windows-quantum-mcp-agents-${GITHUB_SHA:0:12}"
-          artifact_name="Windows-Quantum-MCP-Agents-${GITHUB_SHA}"
+          tag="windows-quantum-agent-${GITHUB_SHA:0:12}"
+          artifact_name="Windows-Quantum-Agent-Model-${GITHUB_SHA}"
           artifact_url="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts" \
             --jq ".artifacts[] | select(.name == \"$artifact_name\") | .archive_download_url" \
             | head -n 1)"
           release_url="https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag"
-          downloaded_files="$(wc -l < copilot-deploy/Windows-Quantum-MCP-Agents/downloaded-files.txt)"
+          downloaded_files="$(wc -l < copilot-deploy/Windows-Quantum-Agent-Model/downloaded-files.txt)"
 
           deployment_id="$(jq -cn \
             --arg ref "$GITHUB_SHA" \
