@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   actions: write
+  deployments: write
 
 concurrency:
   group: windows-quantum-agent-${{ github.ref }}
@@ -182,12 +183,37 @@ jobs:
         with:
           name: Windows-Quantum-Agent-Model-${{ github.sha }}
           path: |
+            WINDOWS-AI-QUANTUM-AGENT/**
             agent-build/release/**
             agent-build/reports/**
             agent-build/assembly/**
             agent-build/windows-x64/**
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Download all source files and binaries for Copilot deployment
+        if: success()
+        uses: actions/download-artifact@v4
+        with:
+          name: Windows-Quantum-Agent-Model-${{ github.sha }}
+          path: copilot-deploy/Windows-Quantum-Agent-Model
+
+      - name: Validate downloaded Copilot deployment payload
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload=copilot-deploy/Windows-Quantum-Agent-Model
+          test -d "$payload/WINDOWS-AI-QUANTUM-AGENT"
+          test -s "$payload/agent-build/release/WindowsQuantumAgentModel-complete-bundle.tar.gz"
+          test -s "$payload/agent-build/windows-x64/WindowsQuantumAgentModel.dll"
+          find "$payload" -type f -print0 | sort -z | tr '\0' '\n' > "$payload/downloaded-files.txt"
+          sha256sum "$payload/agent-build/release"/* > "$payload/downloaded-release-assets.sha256"
+          {
+            echo "downloaded_files=$(wc -l < "$payload/downloaded-files.txt")"
+            echo "downloaded_payload=$payload"
+            echo "deployment_environment=copilot"
+          } > "$payload/copilot-deployment-manifest.txt"
 
       - name: Create or update Windows Quantum Agent Model release
         if: success()
@@ -219,3 +245,40 @@ jobs:
               --title 'Windows Quantum Agent Model' \
               --notes "Automated Windows Quantum Agent Model bundle for commit $GITHUB_SHA."
           fi
+
+      - name: Deploy all downloaded files to GitHub copilot environment
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="windows-quantum-agent-${GITHUB_SHA:0:12}"
+          artifact_name="Windows-Quantum-Agent-Model-${GITHUB_SHA}"
+          artifact_url="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts" \
+            --jq ".artifacts[] | select(.name == \"$artifact_name\") | .archive_download_url" \
+            | head -n 1)"
+          release_url="https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag"
+          downloaded_files="$(wc -l < copilot-deploy/Windows-Quantum-Agent-Model/downloaded-files.txt)"
+
+          deployment_id="$(jq -cn \
+            --arg ref "$GITHUB_SHA" \
+            --arg description "Windows Quantum Agent Model: $downloaded_files downloaded files" \
+            --arg artifact "$artifact_name" \
+            --arg artifact_url "$artifact_url" \
+            --arg release_url "$release_url" \
+            --argjson downloaded_files "$downloaded_files" \
+            '{ref:$ref, environment:"copilot", description:$description, auto_merge:false, required_contexts:[], payload:{artifact_name:$artifact, artifact_url:$artifact_url, release_url:$release_url, downloaded_files:$downloaded_files}}' \
+            | gh api --method POST "repos/$GITHUB_REPOSITORY/deployments" --input - --jq '.id')"
+
+          gh api --method POST \
+            "repos/$GITHUB_REPOSITORY/deployments/$deployment_id/statuses" \
+            --input - <<JSON
+          {
+            "state": "success",
+            "environment": "copilot",
+            "environment_url": "$release_url",
+            "log_url": "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
+            "description": "Downloaded and deployed $downloaded_files files from the Windows Quantum Agent Model artifact."
+          }
+          JSON
