@@ -219,6 +219,7 @@ jobs:
             artifacts/MZMWindowsSDK/nuget-download-report.txt
             artifacts/MZMWindowsSDK/SHA256SUMS.txt
             artifacts/MZMWindowsSDK/SHA256SUMS-source.txt
+            artifacts/MZMWindowsSDK/*.sha256
             artifacts/MZMWindowsSDK/**/*.sha256
             artifacts/MZMWindowsSDK/nuget/*.nupkg
             artifacts/MZMWindowsSDK/binaries/build-report.txt
@@ -233,9 +234,30 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          shopt -s nullglob globstar
           short_sha="${GITHUB_SHA:0:12}"
           tag="mzmwindows-sdk-${short_sha}"
           release_date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          checksum_assets=(artifacts/MZMWindowsSDK/**/*.sha256)
+          nuget_assets=(artifacts/MZMWindowsSDK/nuget/*.nupkg)
+          if (( ${#checksum_assets[@]} == 0 )); then
+            echo "No checksum assets were generated under artifacts/MZMWindowsSDK" >&2
+            exit 1
+          fi
+          if (( ${#nuget_assets[@]} == 0 )); then
+            echo "No NuGet assets were generated under artifacts/MZMWindowsSDK/nuget" >&2
+            exit 1
+          fi
+          release_assets=(
+            artifacts/MZMWindowsSDK/MZMWindowsSDK-source.tar.gz
+            artifacts/MZMWindowsSDK/MZMWindowsSDK-binaries.tar.gz
+            artifacts/MZMWindowsSDK/nuget-cache.tar.gz
+            artifacts/MZMWindowsSDK/nuget-download-report.txt
+            artifacts/MZMWindowsSDK/SHA256SUMS.txt
+            artifacts/MZMWindowsSDK/SHA256SUMS-source.txt
+            "${checksum_assets[@]}"
+            "${nuget_assets[@]}"
+          )
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag -f "$tag" "$GITHUB_SHA"
@@ -253,27 +275,11 @@ jobs:
           SHA256 provides file integrity verification and is not encryption. Q# and QMesh are language/compiler components; they do not encrypt arbitrary release files. Use a dedicated signing or post-quantum cryptography service if confidentiality or authenticated encryption is required.
           EOF
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$tag" \
-              artifacts/MZMWindowsSDK/MZMWindowsSDK-source.tar.gz \
-              artifacts/MZMWindowsSDK/MZMWindowsSDK-binaries.tar.gz \
-              artifacts/MZMWindowsSDK/nuget-cache.tar.gz \
-              artifacts/MZMWindowsSDK/nuget-download-report.txt \
-              artifacts/MZMWindowsSDK/SHA256SUMS.txt \
-              artifacts/MZMWindowsSDK/SHA256SUMS-source.txt \
-              artifacts/MZMWindowsSDK/**/*.sha256 \
-              artifacts/MZMWindowsSDK/nuget/*.nupkg \
+            gh release upload "$tag" "${release_assets[@]}" \
               --repo "$GITHUB_REPOSITORY" --clobber
             gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --title "MZMWindowsSDK" --notes-file release-notes.md
           else
-            gh release create "$tag" \
-              artifacts/MZMWindowsSDK/MZMWindowsSDK-source.tar.gz \
-              artifacts/MZMWindowsSDK/MZMWindowsSDK-binaries.tar.gz \
-              artifacts/MZMWindowsSDK/nuget-cache.tar.gz \
-              artifacts/MZMWindowsSDK/nuget-download-report.txt \
-              artifacts/MZMWindowsSDK/SHA256SUMS.txt \
-              artifacts/MZMWindowsSDK/SHA256SUMS-source.txt \
-              artifacts/MZMWindowsSDK/**/*.sha256 \
-              artifacts/MZMWindowsSDK/nuget/*.nupkg \
+            gh release create "$tag" "${release_assets[@]}" \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
               --title "MZMWindowsSDK" --notes-file release-notes.md
           fi
