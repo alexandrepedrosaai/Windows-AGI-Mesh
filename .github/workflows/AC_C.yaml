@@ -296,8 +296,7 @@ jobs:
             "mesh":"Windows-AGI-Mesh",
             "timestamp":"${TS}",
             "branch":"main",
-            "commit":"${GITHUB_SHA}",
-            "continuity":true,
+            "continuity":true
             "constitutional_gate":"PASS",
             "governance":"PASS",
             "auditability":"PASS",
