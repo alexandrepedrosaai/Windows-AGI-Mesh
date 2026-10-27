@@ -81,13 +81,11 @@ return m.Life +
 
 func (m Metrics) HumanContinuityIndex() float64 {
 
-	return
-		m.Life*0.25 +
-			m.Liberty*0.15 +
+	return m.Life*0.25 +
+				m.Liberty*0.15 +
 			m.Dignity*0.15 +
 			m.Knowledge*0.10 +
 			m.Diversity*0.10 +
 			m.Oversight*0.15 +
 			m.Auditability*0.10
 }
-
