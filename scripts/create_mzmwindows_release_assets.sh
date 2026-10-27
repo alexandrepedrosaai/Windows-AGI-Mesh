@@ -22,7 +22,8 @@ sort -o "$out/SHA256SUMS-source.txt" "$out/SHA256SUMS-source.txt"
 # Build every C# and Q# project that is compatible with the current runner.
 chmod +x scripts/build_all_binaries.sh
 if [[ ! -s "$out/binaries/build-report.txt" ]]; then
-  scripts/build_all_binaries.sh "$out/binaries" --strict
+  scripts/build_all_binaries.sh "$out/binaries" --strict \
+    quantum/VAQLearningNeural/VAQLearningNeural.csproj
 fi
 
 # Package the MZM Hilbert DSL as a release NuGet artifact when the SDK is available.

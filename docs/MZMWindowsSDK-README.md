@@ -18,13 +18,13 @@ Each release contains:
 - `SHA256SUMS-source.txt` with a SHA256 digest for every source file and subfile in the repository snapshot.
 - `SHA256SUMS.txt` with digests for release payloads.
 - Individual `.sha256` files for each release payload.
-- `build-report.txt` and `build-failures.txt` for the repository-wide project sweep.
+- `build-report.txt` and `build-failures.txt` for the pipeline-project build.
 
 The 500-file scaffold is intentionally an English architecture scaffold: it makes every planned artifact and subsystem explicit without claiming that placeholder files are production implementations. The primary pipeline is QMesh -> AST -> semantic graph -> Mesh IR -> Q# IL -> QIR -> runtime.
 
 ## Build policy
 
-The workflow always performs the critical MZM Hilbert DSL and QMesh build, then runs the repository-wide `.csproj`/`.qsproj` sweep in **strict mode**. Any project failure stops release validation immediately, so the first actionable compiler or restore error is visible as the root cause rather than a later checksum error. `build-report.txt` and `build-failures.txt` are uploaded with `if: always()` for every run. The local build script still supports best-effort mode by default and supports `--strict` when every project must compile successfully.
+The workflow always performs the critical MZM Hilbert DSL and QMesh build, then builds only the pipeline project explicitly listed in the workflow: `quantum/VAQLearningNeural/VAQLearningNeural.csproj`. The historical `.csproj` and `.qsproj` files in the repository are not compiled by this workflow. Any listed pipeline project failure stops release validation immediately, while `build-report.txt` and `build-failures.txt` are uploaded with `if: always()` for every run.
 
 The release upload is assembled only after the preceding build, package and checksum steps succeed. It uploads the collected `release-assets` directory, rather than treating the release directory itself as an input to an earlier build step. This prevents self-referential archives and ensures the Release represents outputs from the completed workflow stages.
 

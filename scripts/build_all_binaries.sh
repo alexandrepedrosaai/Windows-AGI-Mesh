@@ -3,22 +3,22 @@ set -uo pipefail
 
 output_root="${1:-artifacts/binaries}"
 strict=0
-if [[ "${2:-}" == "--strict" ]]; then
-  strict=1
-fi
+shift || true
+projects=()
+while (($#)); do
+  if [[ "$1" == "--strict" ]]; then strict=1; else projects+=("$1"); fi
+  shift
+done
 mkdir -p "$output_root"
 : > "$output_root/build-report.txt"
 : > "$output_root/build-failures.txt"
 failures=0
 successes=0
 
-mapfile -t projects < <(find . -type f \( -name '*.csproj' -o -name '*.qsproj' \) \
-  -not -path './.git/*' \
-  -not -path './packaging/generated/*' \
-  -not -path './packaging/zenith60-generated/*' \
-  -not -path './packaging/MZMWindowsSDK/*' \
-  -not -path './packaging/MZMWindowsSDK.Dependencies/*' \
-  -not -path './tools/MZM.Hilbert.DSL/*' | sort)
+if ((${#projects[@]} == 0)); then
+  mapfile -t projects < <(find . -type f \( -name '*.csproj' -o -name '*.qsproj' \) \
+    -not -path './.git/*' | sort)
+fi
 
 for project in "${projects[@]}"; do
   slug="$(printf '%s' "$project" | sed 's#^./##; s#[/.]#-#g; s#-$##')"

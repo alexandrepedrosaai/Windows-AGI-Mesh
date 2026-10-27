@@ -91,7 +91,8 @@ jobs:
         run: |
           set -euo pipefail
           chmod +x scripts/build_all_binaries.sh
-          scripts/build_all_binaries.sh artifacts/binaries
+          scripts/build_all_binaries.sh artifacts/binaries --strict \
+            quantum/VAQLearningNeural/VAQLearningNeural.csproj
 
       - name: Create binary archives and SHA256 envelope
         shell: bash

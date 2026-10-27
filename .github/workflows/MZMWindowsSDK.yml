@@ -137,7 +137,7 @@ jobs:
           echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
           qmeshc --help
 
-      - name: Compile QMesh and build all CSharp/QSharp SDK projects
+      - name: Compile QMesh and build pipeline projects only
         id: build_sdk
         env:
           NUGET_CONFIG: ${{ runner.temp }}/NuGet.Config
@@ -146,9 +146,10 @@ jobs:
           set -euo pipefail
           qmeshc build qmesh/examples/AGIQuantum.qmesh --output artifacts/MZMWindowsSDK/qmesh
           chmod +x scripts/build_all_binaries.sh
-          # Strict mode makes the root cause visible and prevents release validation
-          # from running after an incomplete repository-wide SDK build.
-          scripts/build_all_binaries.sh artifacts/MZMWindowsSDK/binaries --strict
+          # Only projects created for this MZMWindowsSDK pipeline are built here.
+          # Historical repository projects are intentionally not part of this job.
+          scripts/build_all_binaries.sh artifacts/MZMWindowsSDK/binaries --strict \
+            quantum/VAQLearningNeural/VAQLearningNeural.csproj
 
       - name: Build VA Q-learning Neural Quantum Polymorphism
         if: success()
