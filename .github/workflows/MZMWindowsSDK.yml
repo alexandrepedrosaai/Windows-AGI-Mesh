@@ -135,15 +135,30 @@ jobs:
           echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
           qmeshc --help
 
-      - name: Compile QMesh and build all compatible CSharp/QSharp binaries
+      - name: Compile QMesh and build all CSharp/QSharp SDK projects
+        id: build_sdk
         shell: bash
         run: |
           set -euo pipefail
           qmeshc build qmesh/examples/AGIQuantum.qmesh --output artifacts/MZMWindowsSDK/qmesh
           chmod +x scripts/build_all_binaries.sh
-          scripts/build_all_binaries.sh artifacts/MZMWindowsSDK/binaries
+          # Strict mode makes the root cause visible and prevents release validation
+          # from running after an incomplete repository-wide SDK build.
+          scripts/build_all_binaries.sh artifacts/MZMWindowsSDK/binaries --strict
+
+      - name: Upload build diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mzmwindows-sdk-build-diagnostics-${{ github.sha }}
+          path: |
+            artifacts/MZMWindowsSDK/binaries/build-report.txt
+            artifacts/MZMWindowsSDK/binaries/build-failures.txt
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Create complete source, binary and SHA256 release assets
+        if: success()
         shell: bash
         env:
           MZM_TOOL_VERSION: ${{ env.MZM_TOOL_VERSION }}
@@ -158,6 +173,7 @@ jobs:
           test -s artifacts/MZMWindowsSDK/SHA256SUMS.txt
 
       - name: Build and publish MZMWindowsSDK base NuGet package
+        if: success()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -174,6 +190,7 @@ jobs:
             --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
 
       - name: Build and publish packages dependent on MZMWindowsSDK
+        if: success()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -189,6 +206,7 @@ jobs:
             --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
 
       - name: Refresh SHA256 manifests after all package uploads
+        if: success()
         shell: bash
         run: |
           set -euo pipefail
@@ -201,6 +219,7 @@ jobs:
           sha256sum -c "$out/SHA256SUMS.txt"
 
       - name: Publish MZM Hilbert DSL NuGet package
+        if: success()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -209,6 +228,7 @@ jobs:
             --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
 
       - name: Upload complete MZMWindowsSDK artifact bundle
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: MZMWindowsSDK-${{ github.sha }}
@@ -229,6 +249,7 @@ jobs:
           retention-days: 30
 
       - name: Create or update MZMWindowsSDK release as GitHub Actions Bot
+        if: success()
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash

@@ -21,7 +21,9 @@ sort -o "$out/SHA256SUMS-source.txt" "$out/SHA256SUMS-source.txt"
 
 # Build every C# and Q# project that is compatible with the current runner.
 chmod +x scripts/build_all_binaries.sh
-scripts/build_all_binaries.sh "$out/binaries"
+if [[ ! -s "$out/binaries/build-report.txt" ]]; then
+  scripts/build_all_binaries.sh "$out/binaries" --strict
+fi
 
 # Package the MZM Hilbert DSL as a release NuGet artifact when the SDK is available.
 if command -v dotnet >/dev/null 2>&1; then

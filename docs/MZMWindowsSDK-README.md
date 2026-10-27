@@ -22,7 +22,7 @@ The 500-file scaffold is intentionally an English architecture scaffold: it make
 
 ## Build policy
 
-The workflow always performs the critical MZM Hilbert DSL and QMesh build. It also attempts every `.csproj` and `.qsproj` project in the repository. Legacy or experimental projects that use incompatible SDKs are recorded in the build reports while compatible binaries are still released. The local build script supports `--strict` when every project must compile successfully.
+The workflow always performs the critical MZM Hilbert DSL and QMesh build, then runs the repository-wide `.csproj`/`.qsproj` sweep in **strict mode**. Any project failure stops release validation immediately, so the first actionable compiler or restore error is visible as the root cause rather than a later checksum error. `build-report.txt` and `build-failures.txt` are uploaded with `if: always()` for every run. The local build script still supports best-effort mode by default and supports `--strict` when every project must compile successfully.
 
 ## Integrity versus encryption
 
