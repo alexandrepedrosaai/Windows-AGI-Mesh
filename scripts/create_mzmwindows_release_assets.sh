@@ -9,11 +9,12 @@ mkdir -p "$out/source" "$out/binaries" "$out/nuget"
 
 # Include every repository file known to Git, including generated architecture files.
 git ls-files -co --exclude-standard -z \
-  | tar --null --files-from=- --exclude='./artifacts' --exclude='./.git' -czf "$out/MZMWindowsSDK-source.tar.gz"
+  | tar --null --exclude='artifacts' --exclude='.git' -czf "$out/MZMWindowsSDK-source.tar.gz" --files-from=-
 
 # Record a byte-level SHA256 for every repository source file.
 : > "$out/SHA256SUMS-source.txt"
 while IFS= read -r -d '' file; do
+  [[ "$file" == artifacts/* ]] && continue
   sha256sum "$file" >> "$out/SHA256SUMS-source.txt"
 done < <(git ls-files -co --exclude-standard -z | sort -z)
 sort -o "$out/SHA256SUMS-source.txt" "$out/SHA256SUMS-source.txt"

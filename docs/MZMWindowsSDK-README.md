@@ -10,6 +10,9 @@ Each release contains:
 - The 500-file English Windows-AGI-Mesh v1.0 architecture scaffold under `mzm-windows-sdk/`.
 - `MZMWindowsSDK-binaries.tar.gz` with all compatible C# and Q# outputs produced by the .NET CLI.
 - QMesh compiler outputs and the `MZM.Hilbert.DSL` global tool package.
+- A required pull, restore and cache of `MajoranaZenithSDK` from GitHub Packages.
+- A best-effort download report and cache for all other package IDs listed by the repository manifests.
+- The `MZMWindowsSDK` NuGet package, followed by `MZMWindowsSDK.Dependencies`, which references the exact same CI version of the base package.
 - `SHA256SUMS-source.txt` with a SHA256 digest for every source file and subfile in the repository snapshot.
 - `SHA256SUMS.txt` with digests for release payloads.
 - Individual `.sha256` files for each release payload.
