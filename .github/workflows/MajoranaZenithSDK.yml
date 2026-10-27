@@ -12,6 +12,7 @@ permissions:
 env:
   DOTNET_VERSION: 9.0.x
   PACKAGE_VERSION: 0.1.0-ci.${{ github.run_number }}
+  MZM_TOOL_VERSION: 0.3.0-ci.${{ github.run_number }}
   NUGET_FEED: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
 
 concurrency:
@@ -65,6 +66,26 @@ jobs:
           dotnet nuget add source "https://api.nuget.org/v3/index.json" \
             --name nuget.org \
             --configfile "$RUNNER_TEMP/NuGet.Config"
+
+      - name: Pack and install MZM Hilbert DSL before MajoranaZenithSDK
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mzm-tool"
+          dotnet restore tools/MZM.Hilbert.DSL/MZM.Hilbert.DSL.csproj \
+            --configfile "$RUNNER_TEMP/NuGet.Config" -p:PackageVersion="$MZM_TOOL_VERSION"
+          dotnet pack tools/MZM.Hilbert.DSL/MZM.Hilbert.DSL.csproj \
+            --configuration Release --no-restore --output "$RUNNER_TEMP/mzm-tool" \
+            -p:PackageVersion="$MZM_TOOL_VERSION"
+          dotnet tool install --global MZM.Hilbert.DSL \
+            --version "$MZM_TOOL_VERSION" --add-source "$RUNNER_TEMP/mzm-tool" \
+            --ignore-failed-sources
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+          qmeshc build qmesh/examples/AGIQuantum.qmesh --output "$RUNNER_TEMP/qmesh"
+          dotnet nuget push "$RUNNER_TEMP/mzm-tool/MZM.Hilbert.DSL.${MZM_TOOL_VERSION}.nupkg" \
+            --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
 
       - name: Restore and pack MajoranaZenithSDK first
         shell: bash

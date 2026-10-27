@@ -1,0 +1,171 @@
+name: MZM Hilbert DSL
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  DOTNET_VERSION: 9.0.x
+  TOOL_VERSION: 0.3.0-ci.${{ github.run_number }}
+  NUGET_FEED: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+
+concurrency:
+  group: mzm-hilbert-dsl-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-release:
+    name: Build all CSharp QSharp and QMesh binaries
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Create authenticated NuGet.Config
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/NuGet.Config" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+            </packageSources>
+          </configuration>
+          EOF
+          dotnet nuget add source "$NUGET_FEED" --name github \
+            --username "$GITHUB_ACTOR" --password "$GH_TOKEN" \
+            --store-password-in-clear-text --configfile "$RUNNER_TEMP/NuGet.Config"
+          dotnet nuget add source "https://api.nuget.org/v3/index.json" \
+            --name nuget.org --configfile "$RUNNER_TEMP/NuGet.Config"
+
+      - name: Pack the MZM Hilbert DSL NuGet tool
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/nuget
+          dotnet restore tools/MZM.Hilbert.DSL/MZM.Hilbert.DSL.csproj --configfile "$RUNNER_TEMP/NuGet.Config" -p:PackageVersion="$TOOL_VERSION"
+          dotnet pack tools/MZM.Hilbert.DSL/MZM.Hilbert.DSL.csproj \
+            --configuration Release --no-restore --output artifacts/nuget \
+            -p:PackageVersion="$TOOL_VERSION"
+          test -s "artifacts/nuget/MZM.Hilbert.DSL.${TOOL_VERSION}.nupkg"
+
+      - name: Install qmeshc before the MajoranaZenithSDK build
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet tool install --global MZM.Hilbert.DSL \
+            --version "$TOOL_VERSION" \
+            --add-source "$GITHUB_WORKSPACE/artifacts/nuget" \
+            --ignore-failed-sources
+          export PATH="$HOME/.dotnet/tools:$PATH"
+          qmeshc --help
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+
+      - name: Compile QMesh into QSharp QIR graph YAML and Mesh IR
+        run: |
+          set -euo pipefail
+          qmeshc build qmesh/examples/AGIQuantum.qmesh --output artifacts/qmesh
+          qmeshc run qmesh/examples/AGIQuantum.qmesh --output artifacts/qmesh-run > artifacts/qmesh-run.txt
+          cp qmesh/qsharp/Sha256Envelope.qs artifacts/qmesh/Sha256Envelope.qs
+          test -s artifacts/qmesh/AGIQuantum.qsharp
+          test -s artifacts/qmesh/AGIQuantum.qir
+
+      - name: Build all CSharp and QSharp project binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x scripts/build_all_binaries.sh
+          scripts/build_all_binaries.sh artifacts/binaries
+
+      - name: Create binary archives and SHA256 envelope
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -czf artifacts/MZM-Hilbert-DSL-binaries.tar.gz artifacts/binaries artifacts/qmesh
+          find artifacts -type f ! -name 'SHA256SUMS.txt' ! -name '*.sha256' -print0 \
+            | sort -z \
+            | xargs -0 sha256sum > artifacts/SHA256SUMS.txt
+          while read -r digest file; do
+            printf '%s  %s\n' "$digest" "$(basename "$file")" > "${file}.sha256"
+          done < artifacts/SHA256SUMS.txt
+          sha256sum -c artifacts/SHA256SUMS.txt
+
+      - name: Publish MZM Hilbert DSL NuGet package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dotnet nuget push "artifacts/nuget/MZM.Hilbert.DSL.${TOOL_VERSION}.nupkg" \
+            --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
+
+      - name: Upload binaries and integrity artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MZM-Hilbert-DSL-${{ github.sha }}
+          path: |
+            artifacts/MZM-Hilbert-DSL-binaries.tar.gz
+            artifacts/SHA256SUMS.txt
+            artifacts/**/*.sha256
+            artifacts/nuget/*.nupkg
+            artifacts/qmesh/**
+            artifacts/binaries/build-report.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Create or update MZM Hilbert DSL release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          short_sha="${GITHUB_SHA:0:12}"
+          tag="mzm-hilbert-dsl-${short_sha}"
+          release_date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "$tag" "$GITHUB_SHA"
+          git push origin "refs/tags/$tag" --force
+          cat > release-notes.md <<EOF
+          # MZM Hilbert DSL
+
+          Automated release date: ${release_date}
+          Source commit: ${GITHUB_SHA}
+          Tool package: MZM.Hilbert.DSL ${TOOL_VERSION}
+
+          This release builds CSharp, QSharp and QMesh outputs, including QMesh Q# and QIR backends.
+          Binary integrity is provided by SHA256SUMS.txt and individual SHA256 files.
+          SHA256 is an integrity hash, not quantum encryption. Q# sources are included as a language-level envelope for the hashes; artifact signing or encryption must be performed by a dedicated cryptographic service.
+          EOF
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" artifacts/MZM-Hilbert-DSL-binaries.tar.gz artifacts/SHA256SUMS.txt artifacts/**/*.sha256 artifacts/nuget/*.nupkg --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --title "MZM Hilbert DSL" --notes-file release-notes.md
+          else
+            gh release create "$tag" artifacts/MZM-Hilbert-DSL-binaries.tar.gz artifacts/SHA256SUMS.txt artifacts/**/*.sha256 artifacts/nuget/*.nupkg \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "MZM Hilbert DSL" --notes-file release-notes.md
+          fi
+
+      - name: Write release summary
+        run: |
+          {
+            echo "## MZM Hilbert DSL release"
+            echo
+            echo "- Release name: MZM Hilbert DSL"
+            echo "- Tool package: MZM.Hilbert.DSL ${TOOL_VERSION}"
+            echo "- Tag: mzm-hilbert-dsl-${GITHUB_SHA:0:12}"
+            echo "- Release: https://github.com/${GITHUB_REPOSITORY}/releases/tag/mzm-hilbert-dsl-${GITHUB_SHA:0:12}"
+          } >> "$GITHUB_STEP_SUMMARY"
