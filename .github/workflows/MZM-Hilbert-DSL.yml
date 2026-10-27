@@ -66,6 +66,7 @@ jobs:
 
       - name: Install qmeshc before the MajoranaZenithSDK build
         shell: bash
+        working-directory: ${{ runner.temp }}
         run: |
           set -euo pipefail
           dotnet tool install --global MZM.Hilbert.DSL \

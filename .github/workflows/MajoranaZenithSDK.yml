@@ -79,10 +79,12 @@ jobs:
           dotnet pack tools/MZM.Hilbert.DSL/MZM.Hilbert.DSL.csproj \
             --configuration Release --no-restore --output "$RUNNER_TEMP/mzm-tool" \
             -p:PackageVersion="$MZM_TOOL_VERSION"
+          cd "$RUNNER_TEMP"
           dotnet tool install --global MZM.Hilbert.DSL \
             --version "$MZM_TOOL_VERSION" --add-source "$RUNNER_TEMP/mzm-tool" \
             --ignore-failed-sources
           echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+          cd "$GITHUB_WORKSPACE"
           qmeshc build qmesh/examples/AGIQuantum.qmesh --output "$RUNNER_TEMP/qmesh"
           dotnet nuget push "$RUNNER_TEMP/mzm-tool/MZM.Hilbert.DSL.${MZM_TOOL_VERSION}.nupkg" \
             --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
