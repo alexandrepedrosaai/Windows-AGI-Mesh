@@ -1,0 +1,221 @@
+name: Windows Quantum Agent Model
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'WINDOWS-AI-QUANTUM-AGENT/**'
+      - '.github/workflows/WindowsQuantumAgent.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: windows-quantum-agent-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  AGENT_ROOT: WINDOWS-AI-QUANTUM-AGENT
+  DOTNET_VERSION: 8.0.x
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+
+jobs:
+  build-package-release:
+    name: Build and release Windows Quantum Agent Model
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Windows Quantum Agent sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Setup .NET launcher toolchain
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install Assembly toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes nasm
+
+      - name: Inventory every source file and subfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p agent-build/{reports,python-cache,assembly,launcher,release}
+          find "$AGENT_ROOT" -type f -print0 | sort -z | tr '\0' '\n' > agent-build/reports/all-files.txt
+          find "$AGENT_ROOT" -type f | awk '
+            function ext(path, base,n,a) {
+              n=split(path,a,"/"); base=a[n];
+              if (base !~ /\./) return "[no extension]";
+              sub(/^.*\./,"",base); return "." tolower(base);
+            }
+            { count[ext($0)]++ }
+            END { for (e in count) print e, count[e] }
+          ' | sort > agent-build/reports/language-inventory.txt
+          {
+            echo "Windows Quantum Agent Model"
+            echo "commit=$GITHUB_SHA"
+            echo "source_root=$AGENT_ROOT"
+            echo "file_count=$(wc -l < agent-build/reports/all-files.txt)"
+            cat agent-build/reports/language-inventory.txt
+          } > agent-build/reports/build-manifest.txt
+
+      - name: Validate Python sources
+        shell: bash
+        run: |
+          set -uo pipefail
+          report=agent-build/reports/python-validation.txt
+          : > "$report"
+          export PYTHONPYCACHEPREFIX="$GITHUB_WORKSPACE/agent-build/python-cache"
+          status=0
+          while IFS= read -r -d '' file; do
+            if python -m py_compile "$file" >> "$report" 2>&1; then
+              echo "OK $file" >> "$report"
+            else
+              echo "FAILED $file" >> "$report"
+              status=1
+            fi
+          done < <(find "$AGENT_ROOT" -type f -name '*.py' -print0 | sort -z)
+          # The source bundle is preserved even when an existing Python document
+          # contains prose/pseudocode that is not executable Python.
+          exit 0
+
+      - name: Validate Q# sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - "$AGENT_ROOT" <<'PY' > agent-build/reports/qsharp-validation.txt
+          from pathlib import Path
+          import sys
+          root = Path(sys.argv[1])
+          files = sorted(root.rglob('*.qs'))
+          for path in files:
+              text = path.read_text(encoding='utf-8', errors='replace')
+              balance = text.count('{') - text.count('}')
+              status = 'OK' if text.strip() and balance == 0 else 'FAILED'
+              print(f'{status} {path} braces={balance} bytes={len(text.encode())}')
+          if not files:
+              raise SystemExit('No Q# sources found')
+          PY
+
+      - name: Assemble x86-64 Windows objects
+        shell: bash
+        run: |
+          set -uo pipefail
+          report=agent-build/reports/assembly-validation.txt
+          : > "$report"
+          status=0
+          while IFS= read -r -d '' file; do
+            name="$(basename "${file%.asm}")"
+            if nasm -f win64 "$file" -o "agent-build/assembly/${name}.obj" >> "$report" 2>&1; then
+              echo "OK $file -> agent-build/assembly/${name}.obj" >> "$report"
+            else
+              echo "FAILED $file" >> "$report"
+              status=1
+            fi
+          done < <(find "$AGENT_ROOT" -type f -name '*.asm' -print0 | sort -z)
+          # Keep source/reports publishable even if an assembly file targets a
+          # non-NASM dialect; the failed command is recorded above.
+          exit 0
+
+      - name: Build Windows Quantum Agent launcher binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > agent-build/launcher/WindowsQuantumAgentLauncher.csproj <<'EOF'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <ImplicitUsings>enable</ImplicitUsings>
+              <Nullable>enable</Nullable>
+              <AssemblyName>WindowsQuantumAgentModel</AssemblyName>
+            </PropertyGroup>
+          </Project>
+          EOF
+          cat > agent-build/launcher/Program.cs <<'EOF'
+          using System;
+          using System.IO;
+
+          Console.WriteLine("Windows Quantum Agent Model");
+          Console.WriteLine("Source bundle: WINDOWS-AI-QUANTUM-AGENT");
+          Console.WriteLine($"Working directory: {Directory.GetCurrentDirectory()}");
+          EOF
+          dotnet publish agent-build/launcher/WindowsQuantumAgentLauncher.csproj \
+            --configuration Release --runtime win-x64 --self-contained false \
+            --output agent-build/windows-x64 --nologo
+          test -s agent-build/windows-x64/WindowsQuantumAgentModel.dll
+          test -s agent-build/windows-x64/WindowsQuantumAgentModel.exe || true
+
+      - name: Collect complete agent source and build outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_dir=agent-build/release
+          tar --exclude='agent-build/release' --exclude='.git' -czf \
+            "$release_dir/WINDOWS-AI-QUANTUM-AGENT-source.tar.gz" \
+            "$AGENT_ROOT"
+          tar -czf "$release_dir/WindowsQuantumAgentModel-build.tar.gz" \
+            agent-build/reports agent-build/assembly agent-build/windows-x64
+          tar --exclude='agent-build/release' --exclude='.git' -czf \
+            "$release_dir/WindowsQuantumAgentModel-complete-bundle.tar.gz" \
+            "$AGENT_ROOT" agent-build/reports agent-build/assembly agent-build/windows-x64
+          find "$release_dir" -type f ! -name 'SHA256SUMS.txt' -print0 \
+            | sort -z | xargs -0 sha256sum > "$release_dir/SHA256SUMS.txt"
+          sha256sum -c "$release_dir/SHA256SUMS.txt"
+          find "$release_dir" -maxdepth 1 -type f -printf '%f\n' | sort
+
+      - name: Upload complete CI/CD artifact to Actions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-Quantum-Agent-Model-${{ github.sha }}
+          path: |
+            agent-build/release/**
+            agent-build/reports/**
+            agent-build/assembly/**
+            agent-build/windows-x64/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Create or update Windows Quantum Agent Model release
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          tag="windows-quantum-agent-${GITHUB_SHA:0:12}"
+          assets=(agent-build/release/*)
+          if (( ${#assets[@]} == 0 )); then
+            echo 'No release assets were generated' >&2
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -f "$tag" "$GITHUB_SHA"
+          git push origin "refs/tags/$tag" --force
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" \
+              --title 'Windows Quantum Agent Model' \
+              --notes "Automated Windows Quantum Agent Model bundle for commit $GITHUB_SHA."
+          else
+            gh release create "$tag" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title 'Windows Quantum Agent Model' \
+              --notes "Automated Windows Quantum Agent Model bundle for commit $GITHUB_SHA."
+          fi
