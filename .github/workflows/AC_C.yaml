@@ -388,7 +388,7 @@ jobs:
               (cd Go.Windows.go && GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o ../mcp-deploy/mcp-build/windows-x64/WindowsQuantumMCPAgent.exe ./acc)
             fi
           fi
-          tar -czf mcp-deploy/mcp-build/MCP-Agents-cross-deploy.tar.gz Go.Windows.go mcp-deploy/metadata mcp-deploy/benchmark mcp-deploy/transfer-learning
+          tar -czf mcp-deploy/mcp-build/MCP-Agents-cross-deploy.tar.gz Go.Windows.go mcp-deploy/metadata mcp-deploy/benchmark mcp-deploy/transfer-learning mcp-deploy/mcp-build/windows-x64 mcp-deploy/mcp-build/reports
           sha256sum mcp-deploy/mcp-build/MCP-Agents-cross-deploy.tar.gz > mcp-deploy/mcp-build/SHA256SUMS.txt
       - name: Upload MCP Agents cross-deploy artifact
         uses: actions/upload-artifact@v4
