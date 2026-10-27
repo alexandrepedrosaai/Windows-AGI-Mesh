@@ -1,0 +1,8 @@
+// QMesh v0.2 example artifact 034.
+// Section: QMesh Language.
+mesh Artifact034 {
+    quantum Circuit034 {
+        qubit q0;
+        H q0;
+    }
+}
