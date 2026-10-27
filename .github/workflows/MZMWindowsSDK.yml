@@ -146,6 +146,18 @@ jobs:
           # from running after an incomplete repository-wide SDK build.
           scripts/build_all_binaries.sh artifacts/MZMWindowsSDK/binaries --strict
 
+      - name: Build VA Q-learning Neural Quantum Polymorphism
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/MZMWindowsSDK/binaries/VAQLearningNeural
+          dotnet publish quantum/VAQLearningNeural/VAQLearningNeural.csproj \
+            --configuration Release \
+            --output artifacts/MZMWindowsSDK/binaries/VAQLearningNeural \
+            --nologo
+          test -s artifacts/MZMWindowsSDK/binaries/VAQLearningNeural/VAQLearningNeural.dll
+
       - name: Upload build diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -218,6 +230,41 @@ jobs:
           done < "$out/SHA256SUMS.txt"
           sha256sum -c "$out/SHA256SUMS.txt"
 
+      - name: Collect outputs from all previous steps for the Release
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          release_dir="artifacts/release-assets"
+          rm -rf "$release_dir"
+          mkdir -p "$release_dir"
+
+          # This archive contains the files produced by earlier workflow steps,
+          # not a self-referential release-assets directory.
+          find artifacts -type f ! -path 'artifacts/release-assets/*' -print0 \
+            | tar --null -czf "$release_dir/previous-step-outputs.tar.gz" --files-from=-
+
+          # Keep every project definition used by the repository build sweep.
+          find . -type f \( -name '*.csproj' -o -name '*.qsproj' \) \
+            ! -path './.git/*' ! -path './artifacts/*' -print0 \
+            | tar --null -czf "$release_dir/all-dotnet-project-files.tar.gz" --files-from=-
+
+          nuget_files=(artifacts/MZMWindowsSDK/nuget/*.nupkg)
+          if (( ${#nuget_files[@]} > 0 )); then
+            cp "${nuget_files[@]}" "$release_dir/"
+          fi
+
+          : > "$release_dir/SHA256SUMS.txt"
+          find "$release_dir" -type f ! -name 'SHA256SUMS.txt' ! -name '*.sha256' -print0 \
+            | sort -z | xargs -0 sha256sum > "$release_dir/SHA256SUMS.txt"
+          while IFS= read -r digest file; do
+            printf '%s  %s\n' "$digest" "$(basename "$file")" > "${file}.sha256"
+          done < "$release_dir/SHA256SUMS.txt"
+          sha256sum -c "$release_dir/SHA256SUMS.txt"
+          test -s "$release_dir/previous-step-outputs.tar.gz"
+          test -s "$release_dir/all-dotnet-project-files.tar.gz"
+
       - name: Publish MZM Hilbert DSL NuGet package
         if: success()
         env:
@@ -244,6 +291,7 @@ jobs:
             artifacts/MZMWindowsSDK/nuget/*.nupkg
             artifacts/MZMWindowsSDK/binaries/build-report.txt
             artifacts/MZMWindowsSDK/binaries/build-failures.txt
+            artifacts/release-assets/**
             mzm-windows-sdk/**
           if-no-files-found: error
           retention-days: 30
@@ -259,26 +307,15 @@ jobs:
           short_sha="${GITHUB_SHA:0:12}"
           tag="mzmwindows-sdk-${short_sha}"
           release_date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          checksum_assets=(artifacts/MZMWindowsSDK/**/*.sha256)
-          nuget_assets=(artifacts/MZMWindowsSDK/nuget/*.nupkg)
-          if (( ${#checksum_assets[@]} == 0 )); then
-            echo "No checksum assets were generated under artifacts/MZMWindowsSDK" >&2
+          release_assets=(artifacts/release-assets/*)
+          if (( ${#release_assets[@]} == 0 )); then
+            echo "No outputs from previous workflow steps were collected" >&2
             exit 1
           fi
-          if (( ${#nuget_assets[@]} == 0 )); then
-            echo "No NuGet assets were generated under artifacts/MZMWindowsSDK/nuget" >&2
+          if [[ ! -s artifacts/release-assets/SHA256SUMS.txt ]]; then
+            echo "The previous-step output manifest is missing" >&2
             exit 1
           fi
-          release_assets=(
-            artifacts/MZMWindowsSDK/MZMWindowsSDK-source.tar.gz
-            artifacts/MZMWindowsSDK/MZMWindowsSDK-binaries.tar.gz
-            artifacts/MZMWindowsSDK/nuget-cache.tar.gz
-            artifacts/MZMWindowsSDK/nuget-download-report.txt
-            artifacts/MZMWindowsSDK/SHA256SUMS.txt
-            artifacts/MZMWindowsSDK/SHA256SUMS-source.txt
-            "${checksum_assets[@]}"
-            "${nuget_assets[@]}"
-          )
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag -f "$tag" "$GITHUB_SHA"

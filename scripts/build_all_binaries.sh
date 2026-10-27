@@ -16,6 +16,8 @@ mapfile -t projects < <(find . -type f \( -name '*.csproj' -o -name '*.qsproj' \
   -not -path './.git/*' \
   -not -path './packaging/generated/*' \
   -not -path './packaging/zenith60-generated/*' \
+  -not -path './packaging/MZMWindowsSDK/*' \
+  -not -path './packaging/MZMWindowsSDK.Dependencies/*' \
   -not -path './tools/MZM.Hilbert.DSL/*' | sort)
 
 for project in "${projects[@]}"; do
