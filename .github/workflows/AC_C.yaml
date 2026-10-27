@@ -547,7 +547,7 @@ jobs:
             find WSL/benchmark -type f \( -name '*.png' -o -name '*.svg' -o -name '*.csv' \) -print0 | tar --null -czf release-assets/repository/benchmark-charts-and-data.tar.gz --files-from=- || true
           fi
           find release-assets -type f ! -name 'SHA256SUMS.txt' -print0 | sort -z | xargs -0 sha256sum > release-assets/SHA256SUMS.txt
-      - name: Create immutable tag and release
+      - name: Create tag and release
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
