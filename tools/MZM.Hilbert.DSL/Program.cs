@@ -4,10 +4,15 @@ public static class Program
 {
     public static int Main(string[] args)
     {
-        if (args.Length < 2 || args[0] is "--help" or "-h")
+        if (args.Length == 0 || args[0] is "--help" or "-h")
         {
             Console.WriteLine("qmeshc build|emit-qsharp|emit-qir|graph|run <file.qmesh> [--output <path>]");
-            return args.Length < 2 ? 2 : 0;
+            return 0;
+        }
+        if (args.Length < 2)
+        {
+            Console.Error.WriteLine("Missing QMesh input file.");
+            return 2;
         }
         var command = args[0].ToLowerInvariant();
         var input = args[1];
