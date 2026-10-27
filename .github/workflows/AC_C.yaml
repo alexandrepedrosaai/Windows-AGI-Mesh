@@ -286,7 +286,7 @@ jobs:
           set -euo pipefail
           TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           SHORT_SHA="${GITHUB_SHA:0:12}"
-          TAG="acc-${SHORT_SHA}"
+          TAG="acc-${GITHUB_SHA}"
           ARTIFACT="acc-state-${SHORT_SHA}"
           mkdir -p acc-release/metadata acc-release/benchmark acc-release/inference
           cat > acc-release/metadata/ACC_STATE.json << EOF
