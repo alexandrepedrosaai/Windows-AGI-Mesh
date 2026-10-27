@@ -11,8 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
 
@@ -61,29 +60,10 @@ jobs:
           }
           EOF
 
-      - name: Create Branch
-        run: |
-
-          BRANCH=acc-state-${{ github.run_id }}
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git checkout -b $BRANCH
-
-          git add ACC_STATE.json
-
-          git commit -m "ACC_STATE ${{ github.sha }}"
-
-          git push origin $BRANCH
-
-      - name: Open Pull Request
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-
-          gh pr create \
-            --title "ACC State Update" \
-            --body "Automated constitutional state update." \
-            --base main \
-            --head acc-state-${{ github.run_id }}
+      - name: Upload generated ACC state
+        uses: actions/upload-artifact@v4
+        with:
+          name: ACC_STATE-${{ github.sha }}
+          path: ACC_STATE.json
+          if-no-files-found: error
+          retention-days: 30
