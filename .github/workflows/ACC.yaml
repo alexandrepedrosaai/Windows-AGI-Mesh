@@ -27,13 +27,19 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
+          cache: false
 
       - name: Test
+        working-directory: Go.Windows.go
         run: |
+          test -f go.mod || go mod init windows-agi-mesh/acc
+          go mod tidy
           go test ./... -v
 
       - name: Build
+        working-directory: Go.Windows.go
         run: |
+          test -f go.mod || go mod init windows-agi-mesh/acc
           go build ./...
 
       - name: Generate ACC_STATE
