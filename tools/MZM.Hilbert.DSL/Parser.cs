@@ -4,7 +4,7 @@ namespace Mzm.Hilbert.Dsl;
 
 public static class QMeshParser
 {
-    private static readonly Regex ImportPattern = new(@"\bimport\s+\"([^\"]+)\"\s*;", RegexOptions.Compiled);
+    private static readonly Regex ImportPattern = new(@"\bimport\s+""([^""]+)""\s*;", RegexOptions.Compiled);
     private static readonly Regex MeshPattern = new(@"\bmesh\s+(\w+)\s*\{(?<body>.*)\}\s*$", RegexOptions.Compiled | RegexOptions.Singleline);
     private static readonly Regex QuantumPattern = new(@"\bquantum\s+(\w+)\s*\{(?<body>.*?)\}", RegexOptions.Compiled | RegexOptions.Singleline);
     private static readonly Regex QubitPattern = new(@"\bqubit\s+(\w+)\s*;", RegexOptions.Compiled);
