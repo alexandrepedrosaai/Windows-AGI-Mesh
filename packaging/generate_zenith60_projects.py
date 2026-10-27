@@ -64,6 +64,7 @@ def project_xml(package_id: str, number: int, dependencies: list[str]) -> str:
     <PackageId>{package_id}</PackageId>
     <PackageVersion Condition="'$(PackageVersion)' == ''">0.2.0-local</PackageVersion>
     <PackageTitle>{package_id}</PackageTitle>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Description>Zenith module {number}/60 for the MajoranaZenithSDK catalog.</Description>
     <Authors>alexandrepedrosaai</Authors>
     <RepositoryUrl>https://github.com/alexandrepedrosaai/Windows-AGI-Mesh</RepositoryUrl>
@@ -122,6 +123,7 @@ def main() -> None:
     <PackageId>MajoranaZenithSDK</PackageId>
     <PackageVersion Condition="'$(PackageVersion)' == ''">0.2.0-local</PackageVersion>
     <PackageTitle>MajoranaZenithSDK</PackageTitle>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Description>Root SDK package for the 60-module Zenith catalog.</Description>
     <Authors>alexandrepedrosaai</Authors>
     <RepositoryUrl>https://github.com/alexandrepedrosaai/Windows-AGI-Mesh</RepositoryUrl>

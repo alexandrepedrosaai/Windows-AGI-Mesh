@@ -106,8 +106,8 @@ jobs:
               *MajoranaZenithSDK.csproj) continue ;;
             esac
             id="$(basename "$project" .csproj)"
-            grep -q 'PackageReference Include="MajoranaZenithSDK"' "$project"
             if jq -e --arg id "$id" '.packages[] | select(.id == $id and .group == "A")' packaging/zenith60-packages.json >/dev/null; then
+              grep -q 'PackageReference Include="MajoranaZenithSDK"' "$project"
               dotnet restore "$project" --configfile "$RUNNER_TEMP/NuGet.Config" -p:PackageVersion="$PACKAGE_VERSION"
               dotnet pack "$project" --configuration Release --no-restore --output packages -p:PackageVersion="$PACKAGE_VERSION"
               dotnet nuget push "packages/${id}.${PACKAGE_VERSION}.nupkg" \
