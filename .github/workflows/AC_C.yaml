@@ -554,14 +554,59 @@ jobs:
         run: |
           set -euo pipefail
           tag='${{ needs.generate-acc-state.outputs.tag }}'
-          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $tag already exists; skipping duplicate creation."
-            exit 0
+          upload_root=release-assets/upload
+          rm -rf "$upload_root"
+          mkdir -p "$upload_root"
+
+          # Release uploads use an explicit allowlist. Build/test logs are retained in
+          # workflow artifacts but are not uploaded to GitHub Releases.
+          while IFS= read -r -d '' file; do
+            case "$file" in
+              */go-build.txt|*/go-test.txt|*/build-report.txt|*/go-files.txt|*/downloaded-files.txt|*/mcp-deployment-manifest.txt)
+                echo "Skipping non-release log: $file"
+                continue
+                ;;
+            esac
+            case "$file" in
+              */SHA256SUMS.txt)
+                # Rebuild this manifest below from the exact upload set.
+                ;;
+              *.tar.gz|*.zip|*.exe|*.nupkg|*.json|*.png|*.svg|*.csv|*/benchmark.txt)
+                test -s "$file" || { echo "Empty release asset: $file" >&2; exit 1; }
+                cp -- "$file" "$upload_root/$(basename "$file")"
+                ;;
+            esac
+          done < <(find release-assets -type f ! -path "$upload_root/*" -print0 | sort -z)
+
+          # Generate one deterministic checksum file for exactly the files that will
+          # be uploaded, preventing content-length ambiguity from streamed inputs.
+          find "$upload_root" -maxdepth 1 -type f -print0 | sort -z | xargs -0 -r sha256sum > "$upload_root/SHA256SUMS.txt"
+          test -s "$upload_root/SHA256SUMS.txt"
+          mapfile -t assets < <(find "$upload_root" -maxdepth 1 -type f -print | sort)
+          test "${#assets[@]}" -gt 1
+          for asset in "${assets[@]}"; do
+            test -f "$asset" || { echo "Missing release asset: $asset" >&2; exit 1; }
+            test -s "$asset" || { echo "Empty release asset: $asset" >&2; exit 1; }
+          done
+
+          if ! gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$tag" \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "ACC $tag" \
+              --notes "Automated validated release for commit $GITHUB_SHA. Benchmark value: 1.0. Files, Windows binaries, MCP Agents cross-deploy evidence, Zenith Parameters, inference evidence and benchmark data are attached. External release remains human-approval gated."
           fi
-          mapfile -t assets < <(find release-assets -type f ! -name 'SHA256SUMS.txt' -print | sort)
-          test "${#assets[@]}" -gt 0
-          assets+=(release-assets/SHA256SUMS.txt)
-          gh release create "$tag" "${assets[@]}" \
-            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "ACC $tag" \
-            --notes "Automated validated release for commit $GITHUB_SHA. Benchmark value: 1.0. Files, Windows binaries, MCP Agents cross-deploy evidence, Zenith Parameters, inference evidence and benchmark data are attached. External release remains human-approval gated."
+
+          # Upload one concrete local file at a time. Retry only transient upload
+          # failures; no shell glob or process substitution is passed to gh.
+          for asset in "${assets[@]}"; do
+            uploaded=0
+            for attempt in 1 2 3; do
+              if gh release upload "$tag" "$asset" --repo "$GITHUB_REPOSITORY" --clobber; then
+                uploaded=1
+                break
+              fi
+              echo "Upload attempt $attempt failed for $(basename "$asset"); retrying..." >&2
+              sleep $((attempt * 5))
+            done
+            test "$uploaded" -eq 1 || { echo "Failed to upload release asset: $asset" >&2; exit 1; }
+          done
