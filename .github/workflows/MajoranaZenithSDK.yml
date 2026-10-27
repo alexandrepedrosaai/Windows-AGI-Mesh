@@ -71,7 +71,9 @@ jobs:
         run: |
           set -euo pipefail
           main_project="packaging/generated/MajoranaZenithSDK.csproj"
-          dotnet restore "$main_project" --configfile "$RUNNER_TEMP/NuGet.Config"
+          dotnet restore "$main_project" \
+            --configfile "$RUNNER_TEMP/NuGet.Config" \
+            -p:PackageVersion="$PACKAGE_VERSION"
           dotnet pack "$main_project" \
             --configuration Release \
             --no-restore \
@@ -99,7 +101,9 @@ jobs:
           shopt -s nullglob
           for project in packaging/generated/*.csproj; do
             [[ "$project" == *"/MajoranaZenithSDK.csproj" ]] && continue
-            dotnet restore "$project" --configfile "$RUNNER_TEMP/NuGet.Config"
+            dotnet restore "$project" \
+              --configfile "$RUNNER_TEMP/NuGet.Config" \
+              -p:PackageVersion="$PACKAGE_VERSION"
             dotnet pack "$project" \
               --configuration Release \
               --no-restore \
