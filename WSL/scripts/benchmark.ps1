@@ -328,7 +328,7 @@ function Run-PyTorchBenchmark {
     $outFile = Join-Path $OutputDir "pytorch_results.json"
     $result = Invoke-PythonBenchmark `
         -Script "benchmark/benchmark_pytorch.py" `
-        -Arguments "--device $device --vendor $(if ($GPU -eq 'none') { 'auto' } else { $GPU })" `
+        -Arguments @("--device", $device, "--vendor", $(if ($GPU -eq "none") { "auto" } else { $GPU })) `
         -OutputFile $outFile
 
     if ($result -eq 0) {
