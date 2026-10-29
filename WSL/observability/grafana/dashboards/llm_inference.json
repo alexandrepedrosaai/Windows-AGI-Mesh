@@ -1,0 +1,87 @@
+{
+  "title": "Windows AGI Benchmark Lab \u2014 LLM Inference",
+  "uid": "agi-llm-inference",
+  "version": 1,
+  "schemaVersion": 38,
+  "tags": [
+    "agi",
+    "llm",
+    "inference",
+    "ollama",
+    "microsoft"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Tokens per Second",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "ollama_tokens_per_second",
+          "legendFormat": "Tok/s",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Time to First Token (ms)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "ollama_ttft_ms",
+          "legendFormat": "TTFT ms",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Active Models",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "ollama_models_loaded",
+          "legendFormat": "Models",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Inference Requests/min",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "rate(ollama_requests_total[1m]) * 60",
+          "legendFormat": "Req/min",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

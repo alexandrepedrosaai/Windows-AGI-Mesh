@@ -1,0 +1,366 @@
+{
+  "title": "Windows AGI Benchmark Lab \u2014 GPU Performance",
+  "uid": "agi-gpu-bench",
+  "version": 1,
+  "schemaVersion": 38,
+  "tags": [
+    "agi",
+    "gpu",
+    "benchmark",
+    "microsoft"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "GPU Utilization %",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "%",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "avg(amd_gpu_util_pct{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "AMD \u2014 GPU Utilization %",
+          "refId": "A"
+        },
+        {
+          "expr": "avg(nvidia_gpu_util_pct{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "NVIDIA \u2014 GPU Utilization %",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "VRAM Used (GB)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "GB",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "avg(amd_gpu_vram_used_gb{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "AMD \u2014 VRAM Used (GB)",
+          "refId": "A"
+        },
+        {
+          "expr": "avg(nvidia_gpu_vram_used_gb{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "NVIDIA \u2014 VRAM Used (GB)",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Power Draw (W)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "W",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "avg(amd_gpu_power_watts{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "AMD \u2014 Power Draw (W)",
+          "refId": "A"
+        },
+        {
+          "expr": "avg(nvidia_gpu_power_watts{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "NVIDIA \u2014 Power Draw (W)",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Temperature Edge (\u00b0C)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "\u00b0C",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "avg(amd_gpu_temp_edge_c{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "AMD \u2014 Temperature Edge (\u00b0C)",
+          "refId": "A"
+        },
+        {
+          "expr": "avg(nvidia_gpu_temp_gpu_c{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "NVIDIA \u2014 Temperature Edge (\u00b0C)",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "GFX Clock (MHz)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "MHz",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "avg(amd_gpu_gfx_clock_mhz{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "AMD \u2014 GFX Clock (MHz)",
+          "refId": "A"
+        },
+        {
+          "expr": "avg(nvidia_gpu_gfx_clock_mhz{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "NVIDIA \u2014 GFX Clock (MHz)",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Memory Clock (MHz)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "MHz",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "avg(amd_gpu_mem_clock_mhz{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "AMD \u2014 Memory Clock (MHz)",
+          "refId": "A"
+        },
+        {
+          "expr": "avg(nvidia_gpu_mem_clock_mhz{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "NVIDIA \u2014 Memory Clock (MHz)",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Fan Speed (%)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "%",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "avg(amd_gpu_fan_speed_pct{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "AMD \u2014 Fan Speed (%)",
+          "refId": "A"
+        },
+        {
+          "expr": "avg(nvidia_gpu_fan_speed_pct{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "NVIDIA \u2014 Fan Speed (%)",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "VRAM Total (GB)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "GB",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "avg(amd_gpu_vram_total_gb{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "AMD \u2014 VRAM Total (GB)",
+          "refId": "A"
+        },
+        {
+          "expr": "avg(nvidia_gpu_vram_total_gb{project=\"windows-agi-benchmark\"})",
+          "legendFormat": "NVIDIA \u2014 VRAM Total (GB)",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    }
+  ]
+}
