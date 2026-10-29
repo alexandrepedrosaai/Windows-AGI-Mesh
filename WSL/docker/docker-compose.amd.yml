@@ -146,7 +146,7 @@ services:
       - ../benchmark:/app/benchmark
       - ../benchmark/reports:/app/reports
 
-    command: python /app/benchmark/benchmark_pytorch.py --device cuda --vendor amd
+    command: python /app/benchmark/benchmark_pytorch.py --device cuda --vendor amd --output /app/reports/pytorch_results.json
 
     networks:
       - agi-net
