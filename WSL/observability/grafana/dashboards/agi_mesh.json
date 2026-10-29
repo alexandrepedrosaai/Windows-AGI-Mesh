@@ -1,0 +1,104 @@
+{
+  "title": "Windows AGI Benchmark Lab \u2014 AGI Mesh Runtime",
+  "uid": "agi-mesh-runtime",
+  "version": 1,
+  "schemaVersion": 38,
+  "tags": [
+    "agi",
+    "mesh",
+    "agents",
+    "microsoft"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Agent Throughput (tasks/min)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "rate(agi_orchestrator_completed_tasks[1m]) * 60",
+          "legendFormat": "Tasks/min",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Active Agents",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "agi_orchestrator_active_agents",
+          "legendFormat": "Active",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Pending Tasks",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "agi_orchestrator_pending_tasks",
+          "legendFormat": "Pending",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Vector Search Latency (ms)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "agi_vector_search_latency_ms",
+          "legendFormat": "Latency ms",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Redis Operations/sec",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "rate(redis_commands_total[1m])",
+          "legendFormat": "Ops/s",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}
