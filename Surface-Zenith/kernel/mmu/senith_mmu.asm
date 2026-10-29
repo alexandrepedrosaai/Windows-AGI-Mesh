@@ -453,10 +453,10 @@ zenith_mmu_cow_fault:
 
     ; Copy old page content to new page
     ; x0 = new PA, x1 = old PTE (contains old PA)
-    mov     x2, x0              ; new PA
+    mov     x23, x0             ; preserve new PA across memcpy call
     and     x3, x1, #PAGE_MASK  ; old PA
     mov     x0, x3              ; src
-    mov     x1, x2              ; dst
+    mov     x1, x23             ; dst
     mov     x2, #PAGE_SIZE
     bl      zenith_memcpy_page
 
@@ -465,7 +465,7 @@ zenith_mmu_cow_fault:
     and     x1, x1, #~PAGE_MASK ; keep attribute bits
     bic     x1, x1, #PTE_COW    ; clear CoW flag
     orr     x1, x1, #PTE_DIRTY  ; set dirty
-    orr     x1, x1, x0          ; OR in new PA (x0 = new PA from memcpy)
+    orr     x1, x1, x23         ; OR in preserved new PA
     ; Re-add write permission (clear AP read-only bits)
     bic     x1, x1, #PTE_AP_RO_EL1
     orr     x1, x1, #PTE_AP_RW_EL1
