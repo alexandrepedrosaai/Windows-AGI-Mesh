@@ -556,7 +556,7 @@ function Main {
             "ollama"    { Run-OllamaBenchmark }
             "onnx"      { Run-ONNXBenchmark }
             "pytorch"   { Run-PyTorchBenchmark }
-            "llamacpp"  { Run-LlamaCppBenchmark }
+            "llamacpp"  { Invoke-PythonBenchmark -Script "benchmark/benchmark_llamacpp.py" -OutputFile (Join-Path $OutputDir "llamacpp_results.json") }
             "assembly"  { Run-AssemblyBenchmark }
             "gpu"       { Run-GPUMetrics }
             "system"    { Run-SystemMetrics }
