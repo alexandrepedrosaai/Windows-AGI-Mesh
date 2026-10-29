@@ -343,6 +343,9 @@ namespace SurfaceZenith.Quantum.IntentResolver {
         // Encode the hour with maximum count as the initial state
         mutable maxCount = 0;
         mutable peakHour = 0;
+        if Length(hourlyCounts) != 24 {
+            fail "AnalyzeBehaviorPattern: hourlyCounts must contain exactly 24 values.";
+        }
         for hour in 0 .. 23 {
             if hourlyCounts[hour] > maxCount {
                 set maxCount = hourlyCounts[hour];
