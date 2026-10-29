@@ -81,10 +81,10 @@ namespace SurfaceZenith.Quantum.QKD {
         return M(qubit) == One;
     }
 
-    /// Simulate quantum channel noise (depolarizing channel).
+    /// Simulate quantum channel noise with independent bit-flip and phase-flip errors.
     ///
-    /// Models realistic quantum channel with error rate ε.
-    /// An eavesdropper introduces additional errors (≈25% per intercepted bit).
+    /// Models a noisy channel with error rate ε. No eavesdropper is modeled in this file;
+    /// intercept-resend attacks are not simulated.
     ///
     /// # Input
     /// - errorRate : channel error probability (0.0–1.0)
