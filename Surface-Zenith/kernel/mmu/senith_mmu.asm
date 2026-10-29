@@ -42,7 +42,7 @@
 
 ; Page size and mask
     .equ PAGE_SIZE,             0x1000      ; 4 KB
-    .equ PAGE_MASK,             0xFFFFFFFFFFFFF000
+    .equ PAGE_MASK,             0x0000FFFFFFFFF000
     .equ PAGE_OFFSET_MASK,      0xFFF
 
 ; Level shift amounts
