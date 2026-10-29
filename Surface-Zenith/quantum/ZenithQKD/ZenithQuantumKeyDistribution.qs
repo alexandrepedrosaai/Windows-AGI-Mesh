@@ -115,8 +115,9 @@ namespace SurfaceZenith.Quantum.QKD {
         errorRate : Double
     ) : (Bool[], Double, Bool) {
 
-        // We need ~4× more raw bits to account for basis mismatch and QBER check
-        let rawBits = keyLength * 4;
+        // Sifting keeps ~50% of raw bits, so 8x raw bits leaves ~4x keyLength sifted
+        // bits, comfortably above the 2x keyLength threshold checked in Step 4.
+        let rawBits = keyLength * 8;
 
         use qubits = Qubit[rawBits];
 
