@@ -266,6 +266,9 @@ Adjoint T(target);
         layers : Int,
         shots  : Int
     ) : Double {
+        if Length(qubits) < 2 {
+            fail "EstimateZZExpectation requires at least two qubits.";
+        }
 
         mutable counts = [0, size = 4]; // 00, 01, 10, 11
 
