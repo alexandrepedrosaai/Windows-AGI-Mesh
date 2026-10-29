@@ -1,0 +1,288 @@
+# =============================================================================
+# Windows AGI Benchmark Lab — NVIDIA CUDA GPU Profile
+# Copyright (c) 2026 Microsoft Corporation. All Rights Reserved.
+# =============================================================================
+
+version: "3.9"
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Ollama — NVIDIA CUDA GPU Inference Engine
+  # ---------------------------------------------------------------------------
+  ollama:
+    image: ollama/ollama:latest
+    container_name: agi-ollama-nvidia
+    restart: unless-stopped
+    profiles:
+      - nvidia
+
+    deploy:
+      resources:
+        limits:
+          memory: 64G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+                - compute
+                - utility
+          memory: 8G
+
+    environment:
+      # Ollama configuration
+      - OLLAMA_NUM_PARALLEL=4
+      - OLLAMA_MAX_LOADED_MODELS=2
+      - OLLAMA_FLASH_ATTENTION=1
+      - OLLAMA_GPU_OVERHEAD=0
+      - OLLAMA_KEEP_ALIVE=5m
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_ORIGINS=http://localhost:3000
+
+      # CUDA configuration
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-all}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CUDA_LAUNCH_BLOCKING=0
+      - NCCL_DEBUG=WARN
+
+      # TensorRT optimization
+      - TENSORRT_PRECISION=${TENSORRT_PRECISION:-fp16}
+
+    ports:
+      - "127.0.0.1:11434:11434"
+
+    volumes:
+      - ollama_models_nvidia:/root/.ollama
+      - /tmp/ollama:/tmp/ollama
+
+    networks:
+      - agi-net
+
+    labels:
+      - "com.microsoft.project=windows-agi-benchmark"
+      - "com.microsoft.gpu=nvidia-cuda"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+
+  # ---------------------------------------------------------------------------
+  # NVIDIA GPU Metrics Exporter (nvidia-smi based)
+  # ---------------------------------------------------------------------------
+  nvidia-exporter:
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:latest
+    container_name: agi-nvidia-exporter
+    restart: unless-stopped
+    profiles:
+      - nvidia
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+
+    environment:
+      - DCGM_EXPORTER_LISTEN=:9400
+      - DCGM_EXPORTER_KUBERNETES=false
+
+    ports:
+      - "9400:9400"
+
+    networks:
+      - agi-net
+
+    labels:
+      - "com.microsoft.project=windows-agi-benchmark"
+      - "com.microsoft.component=nvidia-exporter"
+
+  # ---------------------------------------------------------------------------
+  # PyTorch CUDA Benchmark Container
+  # ---------------------------------------------------------------------------
+  pytorch-cuda:
+    image: pytorch/pytorch:2.3.0-cuda12.1-cudnn8-runtime
+    container_name: agi-pytorch-cuda
+    restart: "no"
+    profiles:
+      - benchmark
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+      - TORCH_CUDNN_V8_API_ENABLED=1
+      - CUBLAS_WORKSPACE_CONFIG=:4096:8
+
+    volumes:
+      - ../benchmark:/app/benchmark
+      - ../benchmark/reports:/app/reports
+
+    command: python /app/benchmark/benchmark_pytorch.py --device cuda --vendor nvidia
+
+    networks:
+      - agi-net
+
+    labels:
+      - "com.microsoft.project=windows-agi-benchmark"
+      - "com.microsoft.component=pytorch-cuda"
+
+  # ---------------------------------------------------------------------------
+  # TensorRT Benchmark Container
+  # ---------------------------------------------------------------------------
+  tensorrt:
+    image: nvcr.io/nvidia/tensorrt:24.03-py3
+    container_name: agi-tensorrt
+    restart: "no"
+    profiles:
+      - nvidia
+      - benchmark
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - TRT_LOGGER_SEVERITY=WARNING
+
+    volumes:
+      - ../benchmark:/app/benchmark
+      - ../benchmark/reports:/app/reports
+
+    command: python /app/benchmark/benchmark_tensorrt.py
+
+    networks:
+      - agi-net
+
+    labels:
+      - "com.microsoft.project=windows-agi-benchmark"
+      - "com.microsoft.component=tensorrt"
+
+  # ---------------------------------------------------------------------------
+  # ONNX Runtime CUDA Container
+  # ---------------------------------------------------------------------------
+  onnx-cuda:
+    image: mcr.microsoft.com/azureml/onnxruntime:latest-cuda
+    container_name: agi-onnx-cuda
+    restart: "no"
+    profiles:
+      - nvidia
+      - benchmark
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+
+    environment:
+      - ONNX_PROVIDER=CUDAExecutionProvider
+      - CUDA_VISIBLE_DEVICES=0
+
+    volumes:
+      - ../benchmark:/app/benchmark
+      - ../benchmark/reports:/app/reports
+
+    command: python /app/benchmark/benchmark_onnx.py --provider cuda
+
+    networks:
+      - agi-net
+
+    labels:
+      - "com.microsoft.project=windows-agi-benchmark"
+      - "com.microsoft.component=onnx-cuda"
+
+  # ---------------------------------------------------------------------------
+  # vLLM CUDA Container
+  # ---------------------------------------------------------------------------
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: agi-vllm
+    restart: unless-stopped
+    profiles:
+      - nvidia
+      - vllm
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - VLLM_WORKER_MULTIPROC_METHOD=spawn
+      - HF_TOKEN=${HF_TOKEN:?HF_TOKEN must be set to access the gated model}
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - vllm_models:/root/.cache/huggingface
+
+    command: >
+      --model meta-llama/Meta-Llama-3-8B-Instruct
+      --dtype float16
+      --max-model-len 4096
+      --gpu-memory-utilization 0.90
+      --host 0.0.0.0
+      --port 8000
+
+    networks:
+      - agi-net
+
+    labels:
+      - "com.microsoft.project=windows-agi-benchmark"
+      - "com.microsoft.component=vllm"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 120s
+
+# =============================================================================
+# Networks (extend base)
+# =============================================================================
+networks:
+  agi-net:
+    external: false
+    name: agi-network
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  ollama_models_nvidia:
+    name: agi-ollama-models-nvidia
+  vllm_models:
+    name: agi-vllm-models

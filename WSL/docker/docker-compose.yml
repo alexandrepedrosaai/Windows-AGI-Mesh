@@ -1,0 +1,185 @@
+# =============================================================================
+# Windows AGI Benchmark Lab — Base Docker Compose
+# Copyright (c) 2026 Microsoft Corporation. All Rights Reserved.
+# =============================================================================
+
+version: "3.9"
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "50m"
+    max-file: "5"
+
+x-restart: &default-restart
+  restart: unless-stopped
+
+x-common-labels: &common-labels
+  labels:
+    - "com.microsoft.project=windows-agi-benchmark"
+    - "com.microsoft.version=1.0.0"
+    - "com.microsoft.license=exclusive"
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # OpenWebUI — LLM Chat Interface
+  # ---------------------------------------------------------------------------
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: agi-openwebui
+    <<: [*default-restart, *common-labels]
+    logging: *default-logging
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:?WEBUI_SECRET_KEY must be set}
+      - ENABLE_SIGNUP=false
+      - DEFAULT_MODELS=llama3
+      - ENABLE_RAG_WEB_SEARCH=true
+      - RAG_WEB_SEARCH_ENGINE=duckduckgo
+    volumes:
+      - openwebui_data:/app/backend/data
+    depends_on:
+      - redis
+      - qdrant
+    networks:
+      - agi-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # Redis — Memory / Cache Layer
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: agi-redis
+    <<: [*default-restart, *common-labels]
+    logging: *default-logging
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --maxmemory 2gb
+      --maxmemory-policy allkeys-lru
+      --save 60 1000
+      --loglevel warning
+    volumes:
+      - redis_data:/data
+    networks:
+      - agi-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Qdrant — Vector Database
+  # ---------------------------------------------------------------------------
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: agi-qdrant
+    <<: [*default-restart, *common-labels]
+    logging: *default-logging
+      - "127.0.0.1:6333:6333"
+      - "127.0.0.1:6334:6334"
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+      - QDRANT__LOG_LEVEL=INFO
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - agi-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # AGI Agents Runtime
+  # ---------------------------------------------------------------------------
+  agents:
+    build:
+      context: ..
+      dockerfile: docker/dockerfiles/Dockerfile.agents
+    container_name: agi-agents
+    <<: [*default-restart, *common-labels]
+    logging: *default-logging
+    environment:
+      - OLLAMA_URL=http://ollama:11434
+      - REDIS_URL=redis://redis:6379
+      - QDRANT_URL=http://qdrant:6333
+      - LOG_LEVEL=INFO
+      - AGENT_CONCURRENCY=4
+      - MICROSOFT_TENANT_ID=${MICROSOFT_TENANT_ID:-}
+      - MICROSOFT_CLIENT_ID=${MICROSOFT_CLIENT_ID:-}
+      - MICROSOFT_CLIENT_SECRET=${MICROSOFT_CLIENT_SECRET:-}
+    volumes:
+      - ../benchmark/Agents:/app/agents
+      - agent_data:/app/data
+    depends_on:
+      - redis
+      - qdrant
+    networks:
+      - agi-net
+
+  # ---------------------------------------------------------------------------
+  # Benchmark Runner Service
+  # ---------------------------------------------------------------------------
+  benchmark:
+    build:
+      context: ..
+      dockerfile: docker/dockerfiles/Dockerfile.benchmark
+    container_name: agi-benchmark
+    <<: *common-labels
+    logging: *default-logging
+    environment:
+      - OLLAMA_URL=http://ollama:11434
+      - REDIS_URL=redis://redis:6379
+      - QDRANT_URL=http://qdrant:6333
+      - REPORT_DIR=/app/reports
+      - EXPORT_CSV=true
+      - EXPORT_JSON=true
+      - GENERATE_CHARTS=true
+    volumes:
+      - ../benchmark:/app/benchmark
+      - ../benchmark/reports:/app/reports
+    depends_on:
+      - redis
+      - qdrant
+    networks:
+      - agi-net
+    profiles:
+      - benchmark
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  agi-net:
+    driver: bridge
+    name: agi-network
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  openwebui_data:
+    name: agi-openwebui-data
+  redis_data:
+    name: agi-redis-data
+  qdrant_data:
+    name: agi-qdrant-data
+  agent_data:
+    name: agi-agent-data
