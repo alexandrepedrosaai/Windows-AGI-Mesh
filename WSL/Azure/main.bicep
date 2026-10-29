@@ -224,7 +224,6 @@ output storageAccountId string = storage.outputs.storageAccountId
 output keyVaultName string = keyVaultName
 output keyVaultUri string = keyVault.outputs.keyVaultUri
 output logAnalyticsWorkspaceId string = logAnalytics.outputs.workspaceId
-output appInsightsConnectionString string = appInsights.outputs.connectionString
 output acrLoginServer string = enableACR ? acr.outputs.loginServer : ''
 output mlWorkspaceName string = enableAzureML ? azureML.outputs.workspaceName : ''
 output functionAppName string = functionApp.outputs.functionAppName
