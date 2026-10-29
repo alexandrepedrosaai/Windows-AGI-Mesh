@@ -119,9 +119,9 @@ _start:
     ; Index 0: Device-nGnRnE (strongly ordered, non-cacheable)
     ; Index 1: Normal Non-Cacheable
     ; Index 2: Normal Write-Back Cacheable
-    mov     x0, #MAIR_DEVICE_nGnRnE
-    orr     x0, x0, #(MAIR_NORMAL_NC  << 8)
-    orr     x0, x0, #(MAIR_NORMAL_WB  << 16)
+    movz    x0, #MAIR_DEVICE_nGnRnE
+    movk    x0, #MAIR_NORMAL_NC, lsl #8
+    movk    x0, #MAIR_NORMAL_WB, lsl #16
     msr     MAIR_EL1, x0
 
     ; -------------------------------------------------------------------------
