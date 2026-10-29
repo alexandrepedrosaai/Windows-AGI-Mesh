@@ -409,28 +409,20 @@ namespace SurfaceZenith.Quantum.QKD {
             let rawKey = RunE91Protocol(keyBits * 2);
             let finalKey = PrivacyAmplification(rawKey, keyBits);
 
-            // Do not report a hardcoded perfect channel.
-            // Estimate channel error from raw key statistics and fail closed on high error.
-            // (A full E91 implementation should expose CHSH/Bell-test metrics here.)
-            mutable ones = 0;
-            for bit in rawKey {
-                if bit {
-                    set ones += 1;
+            // Estimate channel disturbance from Alice/Bob disagreement samples.
+            // Use adjacent raw bits as sacrificed comparison pairs:
+            //   (rawKey[0], rawKey[1]), (rawKey[2], rawKey[3]), ...
+            // A full E91 implementation should replace this with CHSH/Bell-test statistics.
+            let rawLen = Length(rawKey);
+            let pairCount = rawLen / 2;
+            mutable mismatches = 0;
+            for pairIdx in 0 .. pairCount - 1 {
+                let i = 2 * pairIdx;
+                if rawKey[i] != rawKey[i + 1] {
+                    set mismatches += 1;
                 }
             }
-            let rawLen = Length(rawKey);
-            let qber =
-    /// Return a non-secret summary of key material suitable for diagnostics.
-    /// Does NOT expose key bits or reversible encodings.
-                    1.0
-        let keyLength = Length(key);
-        mutable onesCount = 0;
-        for bit in key {
-            if bit {
-                set onesCount += 1;
-            if not success {
-            }
-        return $"[key-summary len={keyLength}, ones={onesCount}]";
+            let qber = if pairCount > 0 { IntAsDouble(mismatches) / IntAsDouble(pairCount) } else { 1.0 };
             return (finalKey, qber, Length(finalKey) == keyBits);
         }
     }
