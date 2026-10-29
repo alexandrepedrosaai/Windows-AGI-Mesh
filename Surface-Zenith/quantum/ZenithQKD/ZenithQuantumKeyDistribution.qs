@@ -393,21 +393,17 @@ namespace SurfaceZenith.Quantum.QKD {
             }
             let rawLen = Length(rawKey);
             let qber =
-                if rawLen == 0 {
+    /// Return a non-secret summary of key material suitable for diagnostics.
+    /// Does NOT expose key bits or reversible encodings.
                     1.0
-                } else {
-                    IntAsDouble(MinI(ones, rawLen - ones)) / IntAsDouble(rawLen)
-                };
-
-            let success = qber < 0.11 and Length(finalKey) == keyBits;
-            return (finalKey, qber, success);
-        } else {
-            // Standard channel error rate: 2%
-            let (rawKey, qber, success) = RunBB84Protocol(keyBits * 2, 0.02);
+        let keyLength = Length(key);
+        mutable onesCount = 0;
+        for bit in key {
+            if bit {
+                set onesCount += 1;
             if not success {
-                return ([], qber, false);
             }
-            let finalKey = PrivacyAmplification(rawKey, keyBits);
+        return $"[key-summary len={keyLength}, ones={onesCount}]";
             return (finalKey, qber, Length(finalKey) == keyBits);
         }
     }
