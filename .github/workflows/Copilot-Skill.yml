@@ -1,5 +1,5 @@
 
-   name: Validate, Deploy and Release Copilot Skill
+name: Validate, Deploy and Release Copilot Skill
 
 on:
   push:
