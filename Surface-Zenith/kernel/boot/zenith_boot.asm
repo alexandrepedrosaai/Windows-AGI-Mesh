@@ -398,7 +398,7 @@ zenith_unhandled_exception:
     .balign 8
 
 zenith_el1_stack_top:
-    .quad   (ZENITH_EL1_STACK_BASE + ZENITH_STACK_SIZE)
+.quad   zenith_el1_stack + ZENITH_STACK_SIZE
 
 zenith_el0_stack_top:
     .quad   (ZENITH_EL0_STACK_BASE + ZENITH_STACK_SIZE)
