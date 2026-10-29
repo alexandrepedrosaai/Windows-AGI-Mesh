@@ -285,7 +285,7 @@ function Run-OllamaBenchmark {
     $outFile = Join-Path $OutputDir "ollama_results.json"
     $result = Invoke-PythonBenchmark `
         -Script "benchmark/benchmark_ollama.py" `
-        -Arguments "--models $modelsArg" `
+        -Arguments (@("--models") + $Models) `
         -OutputFile $outFile
 
     if ($result -eq 0) {
