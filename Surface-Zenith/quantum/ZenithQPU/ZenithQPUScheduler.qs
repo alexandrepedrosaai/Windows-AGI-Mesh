@@ -464,6 +464,9 @@ for _ in 1 .. depth {
     /// Entry point: Verify QPU calibration
     @EntryPoint()
     operation RunCalibrationCheck(shots : Int) : Double {
+        if shots <= 0 {
+            fail "shots must be positive.";
+        }
         return VerifyBellState(shots);
     }
 
