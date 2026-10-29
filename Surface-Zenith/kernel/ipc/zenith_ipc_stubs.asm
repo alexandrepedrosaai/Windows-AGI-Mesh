@@ -91,7 +91,7 @@ zib_publish:
     cbz     x5, .Lpublish_invalid_arg
     mov     x7, #(16 * 1024 * 1024)
     cmp     x5, x7
-    b.gt    .Lpublish_invalid_arg
+    b.hi    .Lpublish_invalid_arg
 
     ; Issue syscall
     mov     x8, #SYSCALL_ZIB_PUBLISH
