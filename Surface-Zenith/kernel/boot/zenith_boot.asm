@@ -146,12 +146,14 @@ _start:
     isb
 
     ; -------------------------------------------------------------------------
-    ; Step 8: Enable MMU, D-cache, I-cache
+    ; Step 8: Enable MMU, D-cache, I-cache, and EL1 hardening controls
     ; -------------------------------------------------------------------------
     mrs     x0, SCTLR_EL1
     orr     x0, x0, #SCTLR_EL1_MMU_ENABLE
     orr     x0, x0, #SCTLR_EL1_CACHE_ENABLE
     orr     x0, x0, #SCTLR_EL1_ICACHE_ENABLE
+    orr     x0, x0, #SCTLR_EL1_WXN
+    orr     x0, x0, #SCTLR_EL1_SPAN
     msr     SCTLR_EL1, x0
     isb
     dsb     sy
