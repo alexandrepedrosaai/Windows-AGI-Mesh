@@ -62,60 +62,11 @@ WORKDIR /app
 
 # Install Python dependencies in layers for cache efficiency
 COPY pyproject.toml ./
+COPY requirements.lock ./
 
-# Core dependencies
+# Install dependencies from a pinned, hash-verified lock file
 RUN pip install --upgrade pip setuptools wheel && \
-    pip install \
-        requests \
-        httpx \
-        aiohttp \
-        pydantic \
-        pydantic-settings \
-        typer \
-        rich \
-        loguru \
-        pyyaml \
-        toml \
-        tqdm \
-        click
-
-# Data & visualization
-RUN pip install \
-        pandas \
-        numpy \
-        matplotlib \
-        seaborn \
-        plotly \
-        kaleido
-
-# Monitoring & metrics
-RUN pip install \
-        prometheus-client \
-        psutil \
-        py-cpuinfo
-
-# AI/ML clients
-RUN pip install \
-        openai \
-        anthropic \
-        transformers \
-        accelerate \
-        onnxruntime \
-        langchain \
-        langchain-community
-
-# Vector & cache
-RUN pip install \
-        qdrant-client \
-        redis \
-        celery
-
-# Azure SDK
-RUN pip install \
-        azure-ai-ml \
-        azure-identity \
-        azure-storage-blob \
-        azure-monitor-opentelemetry
+    pip install --require-hashes -r requirements.lock
 
 # =============================================================================
 # Application code
