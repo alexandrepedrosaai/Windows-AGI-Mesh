@@ -545,7 +545,11 @@ static void print_system_info(void) {
         "Unknown"
 #endif
     );
+#ifdef __STDC_VERSION__
     printf("  C Standard:    C%d\n", __STDC_VERSION__ / 100 % 100);
+#else
+    printf("  C Standard:    unknown\n");
+#endif
     printf("  Pointer size:  %zu bytes\n", sizeof(void *));
     printf("  int size:      %zu bytes\n", sizeof(int));
     printf("  long size:     %zu bytes\n", sizeof(long));
