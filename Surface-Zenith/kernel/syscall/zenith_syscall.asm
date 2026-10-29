@@ -139,55 +139,55 @@ zenith_syscall_table_dispatch:
     ; ---- Range dispatch -------------------------------------------------------
     ; POSIX range
     cmp     x20, #SYSCALL_POSIX_MAX
-    b.le    .Ldispatch_posix
+    b.ls    .Ldispatch_posix
 
     ; ZIB range
     cmp     x20, #SYSCALL_ZIB_BASE
-    b.lt    .Ldispatch_unknown
+    b.lo    .Ldispatch_unknown
     cmp     x20, #SYSCALL_ZIB_MAX
-    b.le    .Ldispatch_zib
+    b.ls    .Ldispatch_zib
 
     ; Session range
     cmp     x20, #SYSCALL_SESSION_BASE
-    b.lt    .Ldispatch_unknown
+    b.lo    .Ldispatch_unknown
     cmp     x20, #SYSCALL_SESSION_MAX
-    b.le    .Ldispatch_session
+    b.ls    .Ldispatch_session
 
     ; Memory range
     cmp     x20, #SYSCALL_MEMORY_BASE
-    b.lt    .Ldispatch_unknown
+    b.lo    .Ldispatch_unknown
     cmp     x20, #SYSCALL_MEMORY_MAX
-    b.le    .Ldispatch_memory
+    b.ls    .Ldispatch_memory
 
     ; Device range
     cmp     x20, #SYSCALL_DEVICE_BASE
-    b.lt    .Ldispatch_unknown
+    b.lo    .Ldispatch_unknown
     cmp     x20, #SYSCALL_DEVICE_MAX
-    b.le    .Ldispatch_device
+    b.ls    .Ldispatch_device
 
     ; AI range
     cmp     x20, #SYSCALL_AI_BASE
-    b.lt    .Ldispatch_unknown
+    b.lo    .Ldispatch_unknown
     cmp     x20, #SYSCALL_AI_MAX
-    b.le    .Ldispatch_ai
+    b.ls    .Ldispatch_ai
 
     ; Quantum range
     cmp     x20, #SYSCALL_QUANTUM_BASE
-    b.lt    .Ldispatch_unknown
+    b.lo    .Ldispatch_unknown
     cmp     x20, #SYSCALL_QUANTUM_MAX
-    b.le    .Ldispatch_quantum
+    b.ls    .Ldispatch_quantum
 
     ; Security range
     cmp     x20, #SYSCALL_SECURITY_BASE
-    b.lt    .Ldispatch_unknown
+    b.lo    .Ldispatch_unknown
     cmp     x20, #SYSCALL_SECURITY_MAX
-    b.le    .Ldispatch_security
+    b.ls    .Ldispatch_security
 
     ; Scheduler range
     cmp     x20, #SYSCALL_SCHEDULER_BASE
-    b.lt    .Ldispatch_unknown
+    b.lo    .Ldispatch_unknown
     cmp     x20, #SYSCALL_SCHEDULER_MAX
-    b.le    .Ldispatch_scheduler
+    b.ls    .Ldispatch_scheduler
 
     b       .Ldispatch_unknown
 
