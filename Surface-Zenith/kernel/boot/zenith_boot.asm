@@ -73,8 +73,7 @@ _start:
 ; Drop from EL3 to EL2
 ; -----------------------------------------------------------------------------
 .Lfrom_el3:
-    mov     x0, #0x5B1              ; SCR_EL3: NS=1, HCE=1, RW=1 (AArch64)
-    msr     SCR_EL3, x0
+    mov     x0, #0x501              ; SCR_EL3: NS=1, HCE=1, RW=1 (AArch64)
     mov     x0, #0x3C9              ; SPSR_EL3: EL2h, all interrupts masked
     msr     SPSR_EL3, x0
     adr     x0, .Lfrom_el2
