@@ -1,0 +1,354 @@
+# =============================================================================
+# Windows AGI Benchmark Lab — Prometheus Alerting Rules
+# Copyright (c) 2026 Microsoft Corporation. All Rights Reserved.
+# =============================================================================
+
+groups:
+
+  # ===========================================================================
+  # GPU Alerts
+  # ===========================================================================
+  - name: gpu_alerts
+    interval: 30s
+    rules:
+
+      # AMD GPU Temperature Critical
+      - alert: AMDGPUTemperatureCritical
+        expr: amd_gpu_temp_edge_c > 90
+        for: 2m
+        labels:
+          severity: critical
+          vendor: amd
+          project: windows-agi-benchmark
+        annotations:
+          summary: "AMD GPU temperature critical: {{ $value }}°C"
+          description: "GPU {{ $labels.name }} temperature {{ $value }}°C exceeds 90°C threshold"
+          runbook: "Check GPU cooling, reduce workload, verify thermal paste"
+
+      # AMD GPU Temperature Warning
+      - alert: AMDGPUTemperatureWarning
+        expr: amd_gpu_temp_edge_c > 80
+        for: 5m
+        labels:
+          severity: warning
+          vendor: amd
+          project: windows-agi-benchmark
+        annotations:
+          summary: "AMD GPU temperature warning: {{ $value }}°C"
+          description: "GPU {{ $labels.name }} temperature {{ $value }}°C exceeds 80°C"
+
+      # NVIDIA GPU Temperature Critical
+      - alert: NVIDIAGPUTemperatureCritical
+        expr: nvidia_gpu_temp_gpu_c > 90
+        for: 2m
+        labels:
+          severity: critical
+          vendor: nvidia
+          project: windows-agi-benchmark
+        annotations:
+          summary: "NVIDIA GPU temperature critical: {{ $value }}°C"
+          description: "GPU {{ $labels.name }} temperature {{ $value }}°C exceeds 90°C"
+
+      # NVIDIA GPU Temperature Warning
+      - alert: NVIDIAGPUTemperatureWarning
+        expr: nvidia_gpu_temp_gpu_c > 80
+        for: 5m
+        labels:
+          severity: warning
+          vendor: nvidia
+          project: windows-agi-benchmark
+        annotations:
+          summary: "NVIDIA GPU temperature warning: {{ $value }}°C"
+          description: "GPU {{ $labels.name }} temperature {{ $value }}°C exceeds 80°C"
+
+      # AMD GPU Power Limit Exceeded
+      - alert: AMDGPUPowerLimitExceeded
+        expr: amd_gpu_power_watts > amd_gpu_power_cap_watts * 0.95
+        for: 5m
+        labels:
+          severity: warning
+          vendor: amd
+          project: windows-agi-benchmark
+        annotations:
+          summary: "AMD GPU near power limit: {{ $value }}W"
+          description: "GPU {{ $labels.name }} power {{ $value }}W is near cap"
+
+      # NVIDIA GPU Power Limit Exceeded
+      - alert: NVIDIAGPUPowerLimitExceeded
+        expr: nvidia_gpu_power_watts > nvidia_gpu_power_limit_watts * 0.95
+        for: 5m
+        labels:
+          severity: warning
+          vendor: nvidia
+          project: windows-agi-benchmark
+        annotations:
+          summary: "NVIDIA GPU near power limit: {{ $value }}W"
+          description: "GPU {{ $labels.name }} power {{ $value }}W is near limit"
+
+      # NVIDIA ECC Double-Bit Errors
+      - alert: NVIDIAGPUECCError
+        expr: increase(nvidia_gpu_ecc_double_bit[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          vendor: nvidia
+          project: windows-agi-benchmark
+        annotations:
+          summary: "NVIDIA GPU ECC double-bit error detected"
+          description: "GPU {{ $labels.name }} has uncorrectable ECC errors — data corruption risk"
+
+      # GPU VRAM Near Full (AMD)
+      - alert: AMDGPUVRAMNearFull
+        expr: amd_gpu_vram_used_gb / amd_gpu_vram_total_gb > 0.95
+        for: 5m
+        labels:
+          severity: warning
+          vendor: amd
+          project: windows-agi-benchmark
+        annotations:
+          summary: "AMD GPU VRAM near full: {{ $value | humanizePercentage }}"
+          description: "GPU {{ $labels.name }} VRAM usage is {{ $value | humanizePercentage }}"
+
+      # GPU VRAM Near Full (NVIDIA)
+      - alert: NVIDIAGPUVRAMNearFull
+        expr: nvidia_gpu_vram_used_gb / nvidia_gpu_vram_total_gb > 0.95
+        for: 5m
+        labels:
+          severity: warning
+          vendor: nvidia
+          project: windows-agi-benchmark
+        annotations:
+          summary: "NVIDIA GPU VRAM near full: {{ $value | humanizePercentage }}"
+          description: "GPU {{ $labels.name }} VRAM usage is {{ $value | humanizePercentage }}"
+
+  # ===========================================================================
+  # System Alerts
+  # ===========================================================================
+  - name: system_alerts
+    interval: 30s
+    rules:
+
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: system_cpu_util_pct > 95
+        for: 10m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+        annotations:
+          summary: "High CPU usage: {{ $value }}%"
+          description: "CPU utilization {{ $value }}% for more than 10 minutes"
+
+      # High RAM Usage
+      - alert: HighRAMUsage
+        expr: system_ram_util_pct > 90
+        for: 5m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+        annotations:
+          summary: "High RAM usage: {{ $value }}%"
+          description: "RAM utilization {{ $value }}% — risk of OOM"
+
+      # Critical RAM Usage
+      - alert: CriticalRAMUsage
+        expr: system_ram_util_pct > 98
+        for: 2m
+        labels:
+          severity: critical
+          project: windows-agi-benchmark
+        annotations:
+          summary: "Critical RAM usage: {{ $value }}%"
+          description: "RAM utilization {{ $value }}% — OOM imminent"
+
+      # High Disk Usage
+      - alert: HighDiskUsage
+        expr: system_disk_util_pct > 85
+        for: 5m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+        annotations:
+          summary: "High disk usage: {{ $value }}%"
+          description: "Disk {{ $labels.mount }} usage {{ $value }}%"
+
+      # Critical Disk Usage
+      - alert: CriticalDiskUsage
+        expr: system_disk_util_pct > 95
+        for: 2m
+        labels:
+          severity: critical
+          project: windows-agi-benchmark
+        annotations:
+          summary: "Critical disk usage: {{ $value }}%"
+          description: "Disk {{ $labels.mount }} usage {{ $value }}% — nearly full"
+
+      # High System Load
+      - alert: HighSystemLoad
+        expr: system_cpu_load_avg_5m > 16
+        for: 10m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+        annotations:
+          summary: "High system load: {{ $value }}"
+          description: "5-minute load average {{ $value }} is very high"
+
+      # High Swap Usage
+      - alert: HighSwapUsage
+        expr: system_swap_util_pct > 50
+        for: 5m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+        annotations:
+          summary: "High swap usage: {{ $value }}%"
+          description: "Swap utilization {{ $value }}% — system may be memory-constrained"
+
+  # ===========================================================================
+  # Container Alerts
+  # ===========================================================================
+  - name: container_alerts
+    interval: 30s
+    rules:
+
+      # Container Down
+      - alert: ContainerDown
+        expr: absent(container_last_seen{name=~"agi-.*"})
+        for: 2m
+        labels:
+          severity: critical
+          project: windows-agi-benchmark
+        annotations:
+          summary: "AGI container down: {{ $labels.name }}"
+          description: "Container {{ $labels.name }} has been down for 2 minutes"
+
+      # Ollama Container Down
+      - alert: OllamaDown
+        expr: absent(container_last_seen{name=~"agi-ollama.*"})
+        for: 1m
+        labels:
+          severity: critical
+          project: windows-agi-benchmark
+          component: ollama
+        annotations:
+          summary: "Ollama inference server is down"
+          description: "Ollama container has been down — LLM inference unavailable"
+
+      # High Container Memory
+      - alert: ContainerHighMemory
+        expr: container_memory_usage_bytes{name=~"agi-.*"} / container_spec_memory_limit_bytes{name=~"agi-.*"} > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+        annotations:
+          summary: "Container high memory: {{ $labels.name }}"
+          description: "Container {{ $labels.name }} memory usage {{ $value | humanizePercentage }}"
+
+      # Container Restart Loop
+      - alert: ContainerRestartLoop
+        expr: increase(container_start_time_seconds{name=~"agi-.*"}[30m]) > 3
+        for: 0m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+        annotations:
+          summary: "Container restart loop: {{ $labels.name }}"
+          description: "Container {{ $labels.name }} has restarted {{ $value }} times in 30 minutes"
+
+  # ===========================================================================
+  # Benchmark Alerts
+  # ===========================================================================
+  - name: benchmark_alerts
+    interval: 60s
+    rules:
+
+      # Low Inference Throughput
+      - alert: LowInferenceThroughput
+        expr: ollama_tokens_per_second < 5
+        for: 5m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+          component: inference
+        annotations:
+          summary: "Low inference throughput: {{ $value }} tok/s"
+          description: "Ollama inference throughput {{ $value }} tok/s is below 5 tok/s threshold"
+
+      # High Inference Latency
+      - alert: HighInferenceLatency
+        expr: ollama_ttft_ms > 5000
+        for: 5m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+          component: inference
+        annotations:
+          summary: "High inference latency: {{ $value }}ms TTFT"
+          description: "Time to first token {{ $value }}ms exceeds 5000ms threshold"
+
+  # ===========================================================================
+  # Infrastructure Alerts
+  # ===========================================================================
+  - name: infrastructure_alerts
+    interval: 60s
+    rules:
+
+      # Prometheus Target Down
+      - alert: PrometheusTargetDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+        annotations:
+          summary: "Prometheus target down: {{ $labels.job }}"
+          description: "Target {{ $labels.instance }} ({{ $labels.job }}) has been down for 5 minutes"
+
+      # Prometheus Config Reload Failed
+      - alert: PrometheusConfigReloadFailed
+        expr: prometheus_config_last_reload_successful == 0
+        for: 5m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+        annotations:
+          summary: "Prometheus config reload failed"
+          description: "Prometheus configuration reload has failed"
+
+      # Grafana Down
+      - alert: GrafanaDown
+        expr: absent(up{job="grafana"})
+        for: 5m
+        labels:
+          severity: warning
+          project: windows-agi-benchmark
+          component: grafana
+        annotations:
+          summary: "Grafana dashboard is down"
+          description: "Grafana has been unavailable for 5 minutes"
+
+      # Qdrant Down
+      - alert: QdrantDown
+        expr: absent(up{job="qdrant"})
+        for: 2m
+        labels:
+          severity: critical
+          project: windows-agi-benchmark
+          component: qdrant
+        annotations:
+          summary: "Qdrant vector database is down"
+          description: "Qdrant has been unavailable for 2 minutes — vector search unavailable"
+
+      # Redis Down
+      - alert: RedisDown
+        expr: absent(up{job="redis"})
+        for: 2m
+        labels:
+          severity: critical
+          project: windows-agi-benchmark
+          component: redis
+        annotations:
+          summary: "Redis cache is down"
+          description: "Redis has been unavailable for 2 minutes — caching unavailable"
