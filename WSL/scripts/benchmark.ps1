@@ -50,9 +50,7 @@ param(
 
     [Parameter(HelpMessage = "Dry run — show commands without executing")]
     [switch]$DryRun,
-
-    [Parameter(HelpMessage = "Verbose output")]
-    [switch]$Verbose
+    [switch]$DryRun
 )
 
 # ---------------------------------------------------------------------------
