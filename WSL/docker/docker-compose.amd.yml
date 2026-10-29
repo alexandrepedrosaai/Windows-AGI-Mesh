@@ -1,0 +1,209 @@
+# =============================================================================
+# Windows AGI Benchmark Lab — AMD ROCm GPU Profile
+# Copyright (c) 2026 Microsoft Corporation. All Rights Reserved.
+# =============================================================================
+
+version: "3.9"
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Ollama — AMD ROCm GPU Inference Engine
+  # ---------------------------------------------------------------------------
+  ollama:
+    image: ollama/ollama:rocm
+    container_name: agi-ollama-amd
+    restart: unless-stopped
+    profiles:
+      - amd
+
+    # AMD GPU device passthrough
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+
+    group_add:
+      - video
+      - render
+
+    environment:
+      # Ollama configuration
+      - OLLAMA_NUM_PARALLEL=4
+      - OLLAMA_MAX_LOADED_MODELS=2
+      - OLLAMA_FLASH_ATTENTION=1
+      - OLLAMA_GPU_OVERHEAD=0
+      - OLLAMA_KEEP_ALIVE=5m
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_ORIGINS=*
+
+      # ROCm configuration
+      - HSA_OVERRIDE_GFX_VERSION=${HSA_OVERRIDE_GFX_VERSION:-}
+      - ROCR_VISIBLE_DEVICES=${ROCR_VISIBLE_DEVICES:-}
+      - HIP_VISIBLE_DEVICES=${HIP_VISIBLE_DEVICES:-}
+      - GPU_MAX_HW_QUEUES=8
+      - GPU_SINGLE_ALLOC_PERCENT=100
+      - HSA_ENABLE_SDMA=0
+
+      # Performance tuning
+      - MALLOC_TRIM_THRESHOLD_=0
+      - MALLOC_MMAP_THRESHOLD_=0
+
+    ports:
+      - "127.0.0.1:11434:11434"
+
+    volumes:
+      - ollama_models:/root/.ollama
+      - /tmp/ollama:/tmp/ollama
+
+    networks:
+      - agi-net
+
+    labels:
+      - "com.microsoft.project=windows-agi-benchmark"
+      - "com.microsoft.gpu=amd-rocm"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+
+    deploy:
+      resources:
+        limits:
+          memory: 32G
+        reservations:
+          memory: 8G
+
+  # ---------------------------------------------------------------------------
+  # ROCm Metrics Exporter
+  # ---------------------------------------------------------------------------
+  rocm-exporter:
+    image: python:3.12-slim
+    container_name: agi-rocm-exporter
+    restart: unless-stopped
+    profiles:
+      - amd
+
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+
+    group_add:
+      - video
+      - render
+
+    environment:
+      - METRICS_PORT=9400
+      - SCRAPE_INTERVAL=5
+      - GPU_VENDOR=amd
+
+    volumes:
+      - ../collectors:/app/collectors
+      - ../benchmark/reports:/app/reports
+
+    command: >
+      sh -c "pip install prometheus-client psutil --quiet &&
+             python /app/collectors/amd_rocm.py --serve --port 9400"
+
+    ports:
+      - "9400:9400"
+
+    networks:
+      - agi-net
+
+    labels:
+      - "com.microsoft.project=windows-agi-benchmark"
+      - "com.microsoft.component=rocm-exporter"
+
+  # ---------------------------------------------------------------------------
+  # PyTorch ROCm Benchmark Container
+  # ---------------------------------------------------------------------------
+  pytorch-rocm:
+    image: rocm/pytorch:latest
+    container_name: agi-pytorch-rocm
+    restart: "no"
+    profiles:
+      - amd
+      - benchmark
+
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+
+    group_add:
+      - video
+      - render
+
+    environment:
+      - ROCM_VERSION=6.1
+      - HIP_VISIBLE_DEVICES=0
+      - HSA_OVERRIDE_GFX_VERSION=${HSA_OVERRIDE_GFX_VERSION:-}
+      - PYTORCH_ROCM_ARCH=${PYTORCH_ROCM_ARCH:-gfx1100}
+
+    volumes:
+      - ../benchmark:/app/benchmark
+      - ../benchmark/reports:/app/reports
+
+    command: python /app/benchmark/benchmark_pytorch.py --device cuda --vendor amd --output /app/reports/pytorch_results.json
+
+    networks:
+      - agi-net
+
+    labels:
+      - "com.microsoft.project=windows-agi-benchmark"
+      - "com.microsoft.component=pytorch-rocm"
+
+  # ---------------------------------------------------------------------------
+  # ONNX Runtime ROCm Container
+  # ---------------------------------------------------------------------------
+  onnx-rocm:
+    image: python:3.12-slim
+    container_name: agi-onnx-rocm
+    restart: "no"
+    profiles:
+      - amd
+      - benchmark
+
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+
+    group_add:
+      - video
+      - render
+
+    environment:
+      - ONNX_PROVIDER=ROCMExecutionProvider
+      - HIP_VISIBLE_DEVICES=0
+
+    volumes:
+      - ../benchmark:/app/benchmark
+      - ../benchmark/reports:/app/reports
+
+    command: >
+      sh -c "pip install onnxruntime-rocm --quiet &&
+             python /app/benchmark/benchmark_onnx.py --provider ROCMExecutionProvider
+
+    networks:
+      - agi-net
+
+    labels:
+      - "com.microsoft.project=windows-agi-benchmark"
+      - "com.microsoft.component=onnx-rocm"
+
+# =============================================================================
+# Networks (extend base)
+# =============================================================================
+networks:
+  agi-net:
+    external: false
+    name: agi-network
+
+# =============================================================================
+# Volumes (extend base)
+# =============================================================================
+volumes:
+  ollama_models:
+    name: agi-ollama-models-amd
