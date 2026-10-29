@@ -92,11 +92,10 @@ namespace SurfaceZenith.Quantum.QKD {
     operation ApplyChannelNoise(errorRate : Double, qubit : Qubit) : Unit {
         // Simplified: apply X error with probability errorRate
         // In production: use full depolarizing channel model
-        let r = DrawRandomDouble(0.0, 1.0);
-        if r < errorRate {
+        if DrawRandomDouble(0.0, 1.0) < errorRate {
             X(qubit);  // Bit flip error
         }
-        if r < errorRate / 2.0 {
+        if DrawRandomDouble(0.0, 1.0) < errorRate / 2.0 {
             Z(qubit);  // Phase flip error
         }
     }
