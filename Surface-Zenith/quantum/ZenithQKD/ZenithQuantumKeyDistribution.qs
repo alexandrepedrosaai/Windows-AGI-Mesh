@@ -414,21 +414,17 @@ namespace SurfaceZenith.Quantum.QKD {
         }
     }
 
-    /// Convert a Bool[] key to a hex string for logging
+    /// Return a non-reversible key summary safe for diagnostics/logging.
+    /// This intentionally does NOT expose raw key bits or reversible encodings.
     function KeyToHexString(key : Bool[]) : String {
-        mutable hex = "";
-        let nBytes = Length(key) / 8;
-        for byteIdx in 0 .. nBytes - 1 {
-            mutable byteVal = 0;
-            for bitIdx in 0 .. 7 {
-                let globalBit = byteIdx * 8 + bitIdx;
-                if globalBit < Length(key) and key[globalBit] {
-                    set byteVal += 1 <<< bitIdx;
-                }
+        let keyLength = Length(key);
+        mutable onesCount = 0;
+        for bit in key {
+            if bit {
+                set onesCount += 1;
             }
-            set hex += $"{byteVal:X2}";
         }
-        return hex;
+        return $"[key-summary len={keyLength}, ones={onesCount}]";
     }
 
     /// Entry point: Run BB84 and return QBER
