@@ -350,9 +350,9 @@ return 0;
 // LSM (Linux Security Module): Security hook benchmark
 // ---------------------------------------------------------------------------
 SEC("lsm/file_open")
-int lsm_file_open(struct file *file) {
+int lsm_file_open(struct file *file, int ret) {
     increment_counter(COUNTER_READS);
-    return 0;
+    return ret;
 }
 
 // ---------------------------------------------------------------------------
