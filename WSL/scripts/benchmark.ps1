@@ -378,7 +378,7 @@ function Run-GPUMetrics {
         $outFile = Join-Path $OutputDir "amd_metrics.json"
         Invoke-PythonBenchmark `
             -Script "collectors/amd_rocm.py" `
-            -Arguments "--benchmark --duration $Duration" `
+            -Arguments @("--benchmark", "--duration", "$Duration") `
             -OutputFile $outFile
     } elseif ($detectedGPU -eq "nvidia") {
         $outFile = Join-Path $OutputDir "nvidia_metrics.json"
