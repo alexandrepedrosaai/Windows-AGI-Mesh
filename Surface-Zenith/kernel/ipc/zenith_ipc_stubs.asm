@@ -168,6 +168,7 @@ zib_recv:
     cbz     x1, .Lrecv_invalid_arg
     ; Validate buffer length
     cbz     x2, .Lrecv_invalid_arg
+    cbz     x3, .Lrecv_invalid_arg
 
     mov     x8, #SYSCALL_ZIB_RECV
     svc     #0
