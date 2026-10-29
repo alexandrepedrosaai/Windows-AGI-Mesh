@@ -302,7 +302,7 @@ def _format_prometheus(metrics_list: list[AMDGPUMetrics]) -> str:
     lines.append("# HELP amd_gpu_fan_speed_pct GPU fan speed percentage")
     lines.append("# TYPE amd_gpu_fan_speed_pct gauge")
 
-    for m in metrics_list:
+    for m in [x for x in metrics_list if x.status == "ok"]:
         labels = f'card="{m.card_id}",name="{m.card_name}"'
         lines.append(f'amd_gpu_util_pct{{{labels}}} {m.gpu_util_pct}')
         lines.append(f'amd_gpu_vram_used_gb{{{labels}}} {m.vram_used_gb}')
