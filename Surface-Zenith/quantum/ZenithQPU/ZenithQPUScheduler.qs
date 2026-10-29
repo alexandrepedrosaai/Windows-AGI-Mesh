@@ -473,6 +473,9 @@ for _ in 1 .. depth {
     /// Entry point: Run ZNE error mitigation
     @EntryPoint()
     operation RunZNE(nQubits : Int, shots : Int) : Double {
+        if nQubits <= 0 or shots <= 0 {
+            fail "nQubits and shots must be positive.";
+        }
         let noiseLevels = [1.0, 2.0, 3.0];
         return ZeroNoiseExtrapolation(nQubits, noiseLevels, shots);
     }
