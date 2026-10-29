@@ -236,9 +236,9 @@ int kprobe_do_mmap(struct pt_regs *ctx) {
     if (event) {
         event->timestamp_ns = ts;
         event->pid = pid;
-        event->address = PT_REGS_PARM1(ctx);
-        event->size = PT_REGS_PARM2(ctx);
-        event->flags = (__u32)PT_REGS_PARM4(ctx);
+        event->address = PT_REGS_PARM2(ctx);
+        event->size = PT_REGS_PARM3(ctx);
+        event->flags = (__u32)PT_REGS_PARM5(ctx);
         bpf_ringbuf_submit(event, 0);
     }
 
