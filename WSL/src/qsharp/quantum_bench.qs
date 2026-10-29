@@ -535,7 +535,8 @@ namespace MicrosoftAGIBenchmark {
         Message("[ Benchmark 2: Bell State Entanglement ]");
         for idx in 0 .. 3 {
             let (r0, r1) = BenchBellState(idx);
-            Message($"  Bell state {idx}: ({r0}, {r1}) — correlated: {r0 == r1 or idx >= 2}");
+            let relationCorrect = idx < 2 ? r0 == r1 | r0 != r1;
+            Message($"  Bell state {idx}: ({r0}, {r1}) — relation correct: {relationCorrect}");
         }
 
         // Benchmark 3: QFT
