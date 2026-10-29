@@ -453,12 +453,6 @@
   ;; Exports
   ;; =========================================================================
 
-  (export "bench_integer"    (func $bench_integer))
-  (export "bench_fma"        (func $bench_fma))
-  (export "bench_memcopy"    (func $bench_memcopy))
-  (export "bench_memfill"    (func $bench_memfill))
-  (export "bench_fibonacci"  (func $bench_fibonacci))
-  (export "bench_dot_product" (func $bench_dot_product))
-  (export "run_all"          (func $run_all))
+  ;; Exports are declared inline on the function definitions above.
   (export "init_arrays"      (func $init_arrays))
 )
