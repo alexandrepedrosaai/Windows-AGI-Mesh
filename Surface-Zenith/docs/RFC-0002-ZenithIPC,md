@@ -17,7 +17,7 @@ This RFC defines the Zenith Interdomain Bus (ZIB) — the unified message-passin
 Frame {
     magic:       [u8; 4],   // "ZIB\x03"
     version:     u8,        // 1
-    flags:       u8,        // COMPRESSED | ENCRYPTED | FRAGMENTED
+flags:       u8,        // COMPRESSED | ENCRYPTED | FRAGMENTED | LAST_FRAG
     payload_len: u32,       // big-endian
     checksum:    u32,       // CRC32-like
     sequence:    u64,       // per-session sequence number
