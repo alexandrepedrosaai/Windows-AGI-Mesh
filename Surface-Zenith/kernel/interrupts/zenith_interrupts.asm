@@ -196,11 +196,10 @@ zenith_gic_cpu_init:
 
     ; Set timer priority to HIGH
     mov     w2, #PRIORITY_HIGH
-    lsl     w3, w2, #24             ; Priority for IRQ 27 (byte 3 of register 6)
     mov     x4, x1
     add     x4, x4, #GICR_IPRIORITYR0
     add     x4, x4, #(TIMER_IRQ / 4 * 4)
-    str     w3, [x4]
+    strb    w2, [x4, #(TIMER_IRQ % 4)]
 
     dsb     sy
 
