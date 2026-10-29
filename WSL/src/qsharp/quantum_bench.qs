@@ -212,7 +212,7 @@ namespace MicrosoftAGIBenchmark {
         }
 
         // Multi-controlled Z (phase flip on |markedElement⟩)
-        Controlled Z(Most(qubits), Tail(qubits));
+        Controlled Z(Most(qubits), qubits[Length(qubits) - 1]);
 
         // Undo X gates
         for (qubit, bit) in Zipped(qubits, bits) {
