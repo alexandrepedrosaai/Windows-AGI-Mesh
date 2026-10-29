@@ -404,13 +404,15 @@ function Generate-Charts {
 
     Write-Step "Generating Charts"
     $csvFile = Join-Path $OutputDir "benchmark_latest.csv"
-    $cmd = "python3 benchmark/generate_charts.py --input $csvFile --output $OutputDir --sample"
-    if ($Verbose) { $cmd += " --verbose" }
+    $args = @("benchmark/generate_charts.py", "--input", $csvFile, "--output", $OutputDir, "--sample")
+    if ($VerbosePreference -eq "Continue") { $args += "--verbose" }
+    $cmd = "python3 benchmark/generate_charts.py --input `"$csvFile`" --output `"$OutputDir`" --sample"
+    if ($VerbosePreference -eq "Continue") { $cmd += " --verbose" }
 
     if ($UseWSL2) {
         Invoke-WSL2Command -Command $cmd
     } elseif (-not $DryRun) {
-        Invoke-Expression $cmd
+        & python3 @args
     } else {
         Write-Log "[DRY RUN] $cmd"
     }
@@ -426,12 +428,13 @@ function Generate-Report {
     $jsonFile = Join-Path $OutputDir "benchmark_latest.json"
     $htmlFile = Join-Path $OutputDir "report_$Timestamp.html"
 
-    $cmd = "python3 benchmark/generate_html_report.py --csv $csvFile --json $jsonFile --output $htmlFile"
+    $args = @("benchmark/generate_html_report.py", "--csv", $csvFile, "--json", $jsonFile, "--output", $htmlFile)
+    $cmd = "python3 benchmark/generate_html_report.py --csv `"$csvFile`" --json `"$jsonFile`" --output `"$htmlFile`""
 
     if ($UseWSL2) {
         Invoke-WSL2Command -Command $cmd
     } elseif (-not $DryRun) {
-        Invoke-Expression $cmd
+        & python3 @args
         # Open in browser
         if (Test-Path $htmlFile) {
             Start-Process $htmlFile
