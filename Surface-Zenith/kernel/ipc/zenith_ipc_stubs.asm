@@ -226,6 +226,9 @@ zib_recv_timeout:
 zib_send_directed:
     cbz     x5, .Ldirected_invalid
     cbz     x6, .Ldirected_invalid
+    mov     x7, #(16 * 1024 * 1024)
+    cmp     x6, x7
+    b.hi    .Ldirected_invalid
     mov     x8, #SYSCALL_ZIB_SEND_DIRECTED
     svc     #0
     ret
