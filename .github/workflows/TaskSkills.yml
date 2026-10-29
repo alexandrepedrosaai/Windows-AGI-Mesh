@@ -4,18 +4,16 @@ on:
   pull_request:
     paths:
       - ".github/schemas/**"
-      - ".github/workflows/validate-skill.yml"
+      - ".github/workflows/TaskSkills.yml"
       - ".github/skills/code-review/**"
-      - "scripts/policy-check.py"
 
   push:
     branches:
       - main
     paths:
       - ".github/schemas/**"
-      - ".github/workflows/validate-skill.yml"
+      - ".github/workflows/TaskSkills.yml"
       - ".github/skills/code-review/**"
-      - "scripts/policy-check.py"
 
 permissions:
   contents: read
@@ -49,9 +47,7 @@ jobs:
       - name: Install Validation Tools
         run: |
           set -euo pipefail
-
-          npm install -g ajv-cli@5.0.0
-
+          npm install -g ajv-cli@5.0.0 ajv@8 ajv-formats@3
           if command -v jq >/dev/null 2>&1; then
             jq --version
           else
@@ -59,52 +55,23 @@ jobs:
             sudo apt-get install -y jq
           fi
 
-      ####################################################################
-      # DIAGNOSTICS
-      ####################################################################
-
       - name: Repository Diagnostics
         run: |
           set -euo pipefail
-
-          echo "===== BRANCH ====="
           git branch --show-current || true
-
-          echo
-          echo "===== COMMIT ====="
           git rev-parse HEAD || true
-
-          echo
-          echo "===== ROOT ====="
           ls -la
-
-          echo
-          echo "===== .github ====="
           find .github -type f | sort || true
-
-          echo
-          echo "===== scripts ====="
-          find scripts -type f | sort || true
-
-          echo
-          echo "===== AGIMesh ====="
-          find AGIMesh -type f | sort || true
-
-      ####################################################################
-      # REQUIRED FILES
-      ####################################################################
 
       - name: Verify required files exist
         run: |
           set -euo pipefail
-
           required_files=(
             ".github/schemas/review-output.schema.json"
             ".github/schemas/sample-review-output.json"
-            "scripts/policy-check.py"
+            ".github/schemas/policy-check.py"
             ".github/skills/code-review/SKILL.md"
           )
-
           optional_files=(
             ".github/schemas/invalid-schema.json"
             ".github/schemas/invalid-build-failure.json"
@@ -113,80 +80,57 @@ jobs:
             ".github/schemas/invalid-high-finding.json"
             ".github/schemas/invalid-critical-finding.json"
           )
-
           missing_required=0
-
-          echo "===== REQUIRED FILES ====="
-
           for file in "${required_files[@]}"; do
             if [[ -f "$file" ]]; then
-              echo "✅ Found: $file"
+              echo "Found: $file"
             else
-              echo "❌ Missing: $file"
+              echo "Missing: $file"
               missing_required=1
             fi
           done
-
-          echo
-          echo "===== OPTIONAL FIXTURES ====="
-
           for file in "${optional_files[@]}"; do
             if [[ -f "$file" ]]; then
-              echo "✅ Found: $file"
+              echo "Found fixture: $file"
             else
-              echo "⚠️ Optional fixture missing: $file"
+              echo "Optional fixture missing: $file"
             fi
           done
-
-          exit $missing_required
-
-      ####################################################################
-      # JSON VALIDATION
-      ####################################################################
+          exit "$missing_required"
 
       - name: Validate schema syntax
-        run: |
-          set -euo pipefail
-
-          jq empty .github/schemas/review-output.schema.json
+        run: jq empty .github/schemas/review-output.schema.json
 
       - name: Validate JSON syntax
         run: |
           set -euo pipefail
-
-          for file in .github/schemas/*.json
-          do
+          files=(
+            ".github/schemas/review-output.schema.json"
+            ".github/schemas/sample-review-output.json"
+            ".github/schemas/invalid-schema.json"
+            ".github/schemas/invalid-build-failure.json"
+            ".github/schemas/invalid-test-failure.json"
+            ".github/schemas/invalid-security-failure.json"
+            ".github/schemas/invalid-high-finding.json"
+            ".github/schemas/invalid-critical-finding.json"
+          )
+          for file in "${files[@]}"; do
             echo "Checking syntax: $file"
             jq empty "$file"
           done
 
-      ####################################################################
-      # PYTHON VALIDATION
-      ####################################################################
-
       - name: Compile policy checker
-        run: |
-          set -euo pipefail
-
-          python -m py_compile scripts/policy-check.py
-
-      ####################################################################
-      # SCHEMA VALIDATION
-      ####################################################################
+        run: python -m py_compile .github/schemas/policy-check.py
 
       - name: Validate positive sample
         run: |
-          set -euo pipefail
-
-          ajv validate \
-            --spec=draft2020 \
+          ajv validate --spec=draft2020 -c ajv-formats \
             -s .github/schemas/review-output.schema.json \
             -d .github/schemas/sample-review-output.json
 
       - name: Validate optional schema fixtures
         run: |
           set -euo pipefail
-
           fixtures=(
             ".github/schemas/invalid-build-failure.json"
             ".github/schemas/invalid-test-failure.json"
@@ -194,91 +138,48 @@ jobs:
             ".github/schemas/invalid-high-finding.json"
             ".github/schemas/invalid-critical-finding.json"
           )
-
           for file in "${fixtures[@]}"; do
             if [[ -f "$file" ]]; then
-              echo "Schema validation: $file"
-
-              ajv validate \
-                --spec=draft2020 \
-                -s .github/schemas/review-output.schema.json \
-                -d "$file"
-            else
-              echo "Skipping missing fixture: $file"
+              ajv validate --spec=draft2020 -c ajv-formats \
+                -s .github/schemas/review-output.schema.json -d "$file"
             fi
           done
-
-      ####################################################################
-      # NEGATIVE SCHEMA TEST
-      ####################################################################
 
       - name: Validate invalid schema sample fails
         if: ${{ hashFiles('.github/schemas/invalid-schema.json') != '' }}
         run: |
-          set -euo pipefail
-
-          if ajv validate \
-            --spec=draft2020 \
+          if ajv validate --spec=draft2020 -c ajv-formats \
             -s .github/schemas/review-output.schema.json \
-            -d .github/schemas/invalid-schema.json
-          then
+            -d .github/schemas/invalid-schema.json; then
             echo "ERROR: invalid-schema.json unexpectedly passed"
             exit 1
-          else
-            echo "PASS: invalid-schema.json failed as expected"
           fi
-
-      ####################################################################
-      # POSITIVE POLICY TEST
-      ####################################################################
 
       - name: Policy validation positive sample
         run: |
-          set -euo pipefail
-
-          python scripts/policy-check.py \
+          python .github/schemas/policy-check.py \
             .github/schemas/sample-review-output.json
-
-      ####################################################################
-      # OPTIONAL NEGATIVE POLICY TESTS
-      ####################################################################
 
       - name: Policy test - High finding
         if: ${{ hashFiles('.github/schemas/invalid-high-finding.json') != '' }}
         run: |
-          set -euo pipefail
-
-          if python scripts/policy-check.py \
-            .github/schemas/invalid-high-finding.json
-          then
+          if python .github/schemas/policy-check.py .github/schemas/invalid-high-finding.json; then
             echo "ERROR: invalid-high-finding.json unexpectedly passed"
             exit 1
-          else
-            echo "PASS: High finding rejected"
           fi
 
       - name: Policy test - Critical finding
         if: ${{ hashFiles('.github/schemas/invalid-critical-finding.json') != '' }}
         run: |
-          set -euo pipefail
-
-          if python scripts/policy-check.py \
-            .github/schemas/invalid-critical-finding.json
-          then
+          if python .github/schemas/policy-check.py .github/schemas/invalid-critical-finding.json; then
             echo "ERROR: invalid-critical-finding.json unexpectedly passed"
             exit 1
-          else
-            echo "PASS: Critical finding rejected"
           fi
 
       - name: Policy test - Build failure
         if: ${{ hashFiles('.github/schemas/invalid-build-failure.json') != '' }}
         run: |
-          set -euo pipefail
-
-          if python scripts/policy-check.py \
-            .github/schemas/invalid-build-failure.json
-          then
+          if python .github/schemas/policy-check.py .github/schemas/invalid-build-failure.json; then
             echo "ERROR: invalid-build-failure.json unexpectedly passed"
             exit 1
           else
@@ -288,9 +189,9 @@ jobs:
       - name: Policy test - Test failure
         if: ${{ hashFiles('.github/schemas/invalid-test-failure.json') != '' }}
         run: |
-          set -euo pipefail
-
-          if python scripts/policy-check.py \
-            .github/schemas/invalid-test-failure.json
-          then
-            echo "
+          if python .github/schemas/policy-check.py .github/schemas/invalid-test-failure.json; then
+            echo "ERROR: invalid-test-failure.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: Test failure rejected"
+          fi

@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "review_outcome": "Approved",
+  "summary": "Test failure incorrectly approved.",
+  "risk_level": "High",
+  "review_scope": {
+    "qsharp_files": [],
+    "benchmark_files": [],
+    "docs_files": [],
+    "github_files": [],
+    "other_files": []
+  },
+  "repository_validation": {
+    "status": "Pass",
+    "missing_paths": []
+  },
+  "build": {
+    "status": "Pass",
+    "warnings": 0
+  },
+  "tests": {
+    "status": "Fail"
+  },
+  "security": {
+    "status": "Pass"
+  },
+  "architecture": {
+    "status": "Pass"
+  },
+  "qsharp_review": {
+    "status": "NotRun"
+  },
+  "benchmark_impact": {
+    "status": "None"
+  },
+  "release_ready": true,
+  "findings": [],
+  "quantum_operation_reviews": []
+}
