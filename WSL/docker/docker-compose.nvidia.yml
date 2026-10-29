@@ -39,7 +39,7 @@ services:
       - OLLAMA_GPU_OVERHEAD=0
       - OLLAMA_KEEP_ALIVE=5m
       - OLLAMA_HOST=0.0.0.0:11434
-      - OLLAMA_ORIGINS=*
+      - OLLAMA_ORIGINS=http://localhost:3000
 
       # CUDA configuration
       - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-all}
