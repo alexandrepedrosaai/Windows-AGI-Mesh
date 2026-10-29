@@ -604,12 +604,15 @@ zenith_mb_inner_shareable:
     .global zenith_va_to_pa
     .type   zenith_va_to_pa, @function
 zenith_va_to_pa:
+    mov     x1, x0              ; Preserve VA offset
     at      s1e1r, x0           ; Translate VA using EL1 read permissions
     isb
     mrs     x0, PAR_EL1         ; Read Physical Address Register
     tst     x0, #1              ; Bit 0 = fault indicator
     b.ne    .Lva_to_pa_fault
     and     x0, x0, #PAGE_MASK  ; Extract PA (bits [47:12])
+    and     x1, x1, #PAGE_OFFSET_MASK
+    orr     x0, x0, x1
     ret
 
 .Lva_to_pa_fault:
