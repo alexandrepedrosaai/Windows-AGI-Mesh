@@ -404,11 +404,15 @@ export const useZenithStore = create<ZenithState>()(
       })),
 
     updateSession: (id, updates) =>
-      set((state) => ({
-        sessions: state.sessions.map((s) =>
+      set((state) => {
+        const sessions = state.sessions.map((s) =>
           s.id === id ? { ...s, ...updates } : s
-        ),
-      })),
+        );
+        const currentSession = state.currentSession?.id === id
+          ? { ...state.currentSession, ...updates }
+          : state.currentSession;
+        return { sessions, currentSession };
+      }),
 
     setCurrentSession: (session) => set({ currentSession: session }),
 
