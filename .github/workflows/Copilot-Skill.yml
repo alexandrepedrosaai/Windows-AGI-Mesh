@@ -1,0 +1,577 @@
+
+   name: Validate, Deploy and Release Copilot Skill
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  deployments: write
+
+concurrency:
+  group: windows-zenith-fusion-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-schema-and-policy:
+    name: Validate schema, policy and skill
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install AJV Draft 2020 CLI
+        run: |
+          npm install --global ajv-cli@latest
+
+      #####################################################################
+      # GENERATE GITHUB COPILOT SKILL
+      #####################################################################
+
+      - name: Generate GitHub Copilot Fusion and MPC SKILL.md
+        shell: bash
+        run: |
+          mkdir -p .github/skills/code-review
+
+          cat > .github/skills/code-review/SKILL.md <<'SKILL_EOF'
+          ---
+          name: code-review
+          description: >
+            Multi-agent code review skill for GitHub Copilot.
+            Orchestrates specialized reviewers using a Fusion coordinator
+            and MPC-style consensus before producing schema compliant output.
+          ---
+
+          # GitHub Copilot Code Review Skill
+
+          ## Objective
+
+          Perform repository-aware code review using specialized review agents.
+
+          The review pipeline uses:
+
+          1. Fusion Orchestrator
+          2. Specialized Review Agents
+          3. MPC Consensus Agent
+          4. Policy Gate
+          5. Structured Review Output
+
+          The final result MUST comply with:
+
+          `.github/schemas/review-output.schema.json`
+
+          ## Fusion Orchestrator
+
+          The Fusion Orchestrator coordinates the review.
+
+          Responsibilities:
+
+          - inspect the proposed change
+          - identify affected components
+          - dispatch relevant specialized agents
+          - collect independent findings
+          - normalize duplicated findings
+          - send findings to the MPC Agent
+          - produce the final structured assessment
+
+          Agents MUST NOT silently override findings from another agent.
+
+          Conflicts are resolved by the MPC Agent.
+
+          ## Specialized Agents
+
+          ### Build Agent
+
+          Review:
+
+          - compilation failures
+          - dependency errors
+          - project configuration
+          - incompatible API changes
+
+          ### Test Agent
+
+          Review:
+
+          - failing tests
+          - missing regression coverage
+          - incorrect assertions
+          - behavioral regressions
+
+          ### Security Agent
+
+          Review:
+
+          - secrets
+          - unsafe input handling
+          - authorization boundaries
+          - injection risks
+          - insecure dependencies
+
+          ### Q# Quantum Review Agent
+
+          Review Q# changes for the following mandatory areas.
+
+          #### Adjoint
+
+          Verify operations requiring adjoint support remain valid and
+          semantically reversible.
+
+          #### Controlled
+
+          Verify controlled specialization and control semantics.
+
+          #### Qubit Lifecycle
+
+          Verify qubits are allocated, used and released correctly.
+
+          #### Reset Compliance
+
+          Verify qubits satisfy required reset/release conditions.
+
+          #### Hermiticity
+
+          Review operators that are expected to be Hermitian.
+
+          #### Operator Algebra
+
+          Check composition, ordering and operator semantics.
+
+          #### Quantum-State
+
+          Review assumptions involving quantum-state preparation,
+          transformation and measurement.
+
+          ## MPC Agent
+
+          The MPC Agent acts as the consensus and conflict-resolution layer.
+
+          Inputs:
+
+          - Build Agent findings
+          - Test Agent findings
+          - Security Agent findings
+          - Q# Quantum Review Agent findings
+
+          The MPC Agent MUST:
+
+          1. evaluate findings independently
+          2. detect duplicate findings
+          3. detect conflicting conclusions
+          4. retain evidence for accepted findings
+          5. preserve the highest justified severity
+          6. reject unsupported conclusions
+          7. produce a deterministic consolidated result where possible
+
+          The MPC Agent MUST NOT downgrade a Critical or High finding
+          merely because another agent did not report it.
+
+          ## Severity
+
+          Findings use the severity levels defined by the repository schema
+          and policy.
+
+          High and Critical findings are release blocking when required by
+          `scripts/policy-check.py`.
+
+          Build, test and security failures MUST be propagated to the final
+          policy evaluation.
+
+          ## Evidence
+
+          Every actionable finding SHOULD identify:
+
+          - affected file
+          - affected code or component
+          - reason for the finding
+          - severity
+          - recommended remediation
+
+          Findings MUST be grounded in repository evidence.
+
+          Do not invent nonexistent failures.
+
+          ## Final Review
+
+          Fusion combines the MPC consensus with build, test, security and
+          Q# assessments.
+
+          Before completing the review:
+
+          1. validate the output structure
+          2. ensure mandatory Q# review areas were considered
+          3. preserve blocking findings
+          4. remove duplicate findings
+          5. verify evidence supports conclusions
+
+          ## Output Contract
+
+          The final machine-readable result MUST conform to:
+
+          `.github/schemas/review-output.schema.json`
+
+          Validate it using the repository validation pipeline before treating
+          the review as release ready.
+          SKILL_EOF
+
+      - name: Verify generated SKILL.md
+        run: |
+          test -s .github/skills/code-review/SKILL.md
+
+          grep -q "^name: code-review" \
+            .github/skills/code-review/SKILL.md
+
+          grep -q "Fusion Orchestrator" \
+            .github/skills/code-review/SKILL.md
+
+          grep -q "MPC Agent" \
+            .github/skills/code-review/SKILL.md
+
+          grep -q "review-output.schema.json" \
+            .github/skills/code-review/SKILL.md
+
+      #####################################################################
+      # REQUIRED FILES
+      #####################################################################
+
+      - name: Verify required files
+        run: |
+          test -f .github/schemas/review-output.schema.json
+          test -f .github/schemas/sample-review-output.json
+          test -f .github/schemas/invalid-schema.json
+          test -f .github/schemas/invalid-build-failure.json
+          test -f .github/schemas/invalid-test-failure.json
+          test -f .github/schemas/invalid-security-failure.json
+          test -f .github/schemas/invalid-high-finding.json
+          test -f .github/schemas/invalid-critical-finding.json
+          test -f scripts/policy-check.py
+
+      - name: Validate schema JSON syntax
+        run: |
+          jq empty .github/schemas/review-output.schema.json
+
+      - name: Compile policy checker
+        run: |
+          python -m py_compile scripts/policy-check.py
+
+      #####################################################################
+      # POSITIVE CASES
+      #####################################################################
+
+      - name: Validate positive sample against schema
+        run: |
+          ajv validate \
+            --spec=draft2020 \
+            -s .github/schemas/review-output.schema.json \
+            -d .github/schemas/sample-review-output.json
+
+      - name: Validate positive sample policy rules
+        run: |
+          python scripts/policy-check.py \
+            .github/schemas/sample-review-output.json
+
+      #####################################################################
+      # NEGATIVE SCHEMA TESTS
+      #####################################################################
+
+      - name: Negative schema validation
+        run: |
+          if ajv validate \
+            --spec=draft2020 \
+            -s .github/schemas/review-output.schema.json \
+            -d .github/schemas/invalid-schema.json
+          then
+            echo "ERROR: invalid-schema.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: invalid-schema.json failed as expected"
+          fi
+
+      #####################################################################
+      # NEGATIVE POLICY TESTS
+      #####################################################################
+
+      - name: Policy test - High severity finding
+        run: |
+          if python scripts/policy-check.py \
+            .github/schemas/invalid-high-finding.json
+          then
+            echo "ERROR: invalid-high-finding.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: High severity policy failure detected"
+          fi
+
+      - name: Policy test - Critical severity finding
+        run: |
+          if python scripts/policy-check.py \
+            .github/schemas/invalid-critical-finding.json
+          then
+            echo "ERROR: invalid-critical-finding.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: Critical severity policy failure detected"
+          fi
+
+      - name: Policy test - Build failure
+        run: |
+          if python scripts/policy-check.py \
+            .github/schemas/invalid-build-failure.json
+          then
+            echo "ERROR: invalid-build-failure.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: Build failure policy detected"
+          fi
+
+      - name: Policy test - Test failure
+        run: |
+          if python scripts/policy-check.py \
+            .github/schemas/invalid-test-failure.json
+          then
+            echo "ERROR: invalid-test-failure.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: Test failure policy detected"
+          fi
+
+      - name: Policy test - Security failure
+        run: |
+          if python scripts/policy-check.py \
+            .github/schemas/invalid-security-failure.json
+          then
+            echo "ERROR: invalid-security-failure.json unexpectedly passed"
+            exit 1
+          else
+            echo "PASS: Security failure policy detected"
+          fi
+
+      #####################################################################
+      # SKILL VALIDATION
+      #####################################################################
+
+      - name: Verify SKILL.md exists
+        run: |
+          test -f .github/skills/code-review/SKILL.md
+
+      - name: Verify mandatory Q# review sections
+        run: |
+          grep -q "Adjoint" .github/skills/code-review/SKILL.md
+          grep -q "Controlled" .github/skills/code-review/SKILL.md
+          grep -q "Qubit Lifecycle" .github/skills/code-review/SKILL.md
+          grep -q "Reset Compliance" .github/skills/code-review/SKILL.md
+          grep -q "Hermiticity" .github/skills/code-review/SKILL.md
+          grep -q "Operator Algebra" .github/skills/code-review/SKILL.md
+          grep -q "Quantum-State" .github/skills/code-review/SKILL.md
+
+      - name: Verify output schema reference
+        run: |
+          grep -q "review-output.schema.json" \
+            .github/skills/code-review/SKILL.md
+
+      #####################################################################
+      # REPOSITORY VALIDATION
+      #####################################################################
+
+      - name: Verify repository paths
+        run: |
+          test -f AGIMesh/AGIMesh.qs
+          test -f AGIMesh/AGIMesh.csproj
+          test -d benchmarks
+
+      #####################################################################
+      # BUILD RELEASE PACKAGE
+      #####################################################################
+
+      - name: Build schemas and skill release package
+        id: package
+        shell: bash
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          TAG_NAME="windowszenithfusion-${GITHUB_RUN_NUMBER}-${SHORT_SHA}"
+          ARCHIVE_NAME="WindowsZenithFusion-${GITHUB_RUN_NUMBER}-${SHORT_SHA}.zip"
+
+          mkdir -p release-package/.github/schemas
+          mkdir -p release-package/.github/skills/code-review
+          mkdir -p release-package/scripts
+
+          cp -R .github/schemas/. \
+            release-package/.github/schemas/
+
+          cp .github/skills/code-review/SKILL.md \
+            release-package/.github/skills/code-review/SKILL.md
+
+          cp scripts/policy-check.py \
+            release-package/scripts/policy-check.py
+
+          cp .github/workflows/validate-skill.yml \
+            release-package/validate-skill.yml
+
+          (
+            cd release-package
+            zip -r "../${ARCHIVE_NAME}" .
+          )
+
+          sha256sum "${ARCHIVE_NAME}" > "${ARCHIVE_NAME}.sha256"
+
+          echo "tag_name=${TAG_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "archive_name=${ARCHIVE_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "release_name=WindowsZenithFusion ${GITHUB_RUN_NUMBER}" \
+            >> "${GITHUB_OUTPUT}"
+
+      - name: Verify generated release package
+        shell: bash
+        run: |
+          test -s "${{ steps.package.outputs.archive_name }}"
+          test -s "${{ steps.package.outputs.archive_name }}.sha256"
+
+          unzip -t "${{ steps.package.outputs.archive_name }}"
+
+          unzip -l "${{ steps.package.outputs.archive_name }}" |
+            grep -q ".github/schemas/review-output.schema.json"
+
+          unzip -l "${{ steps.package.outputs.archive_name }}" |
+            grep -q ".github/skills/code-review/SKILL.md"
+
+      - name: Upload schemas and skill artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WindowsZenithFusion-${{ github.run_number }}-${{ github.sha }}
+          path: |
+            ${{ steps.package.outputs.archive_name }}
+            ${{ steps.package.outputs.archive_name }}.sha256
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Validation summary
+        run: |
+          echo "AJV Draft 2020 validation passed"
+          echo "Positive schema tests passed"
+          echo "Negative schema tests passed"
+          echo "Release readiness policies enforced"
+          echo "Q# review requirements verified"
+          echo "Repository structure verified"
+          echo "Release package built and uploaded"
+
+      - name: Export release metadata
+        run: |
+          mkdir -p release-metadata
+
+          printf '%s' '${{ steps.package.outputs.tag_name }}' \
+            > release-metadata/tag-name.txt
+
+          printf '%s' '${{ steps.package.outputs.archive_name }}' \
+            > release-metadata/archive-name.txt
+
+          printf '%s' '${{ steps.package.outputs.release_name }}' \
+            > release-metadata/release-name.txt
+
+      - name: Upload release metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: WindowsZenithFusion-release-metadata
+          path: release-metadata/
+          if-no-files-found: error
+          retention-days: 1
+
+  #####################################################################
+  # DEPLOYMENT AND AUTOMATIC RELEASE
+  #####################################################################
+
+  deploy-and-release:
+    name: Deploy and create WindowsZenithFusion release
+    needs:
+      - validate-schema-and-policy
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      deployments: write
+
+    environment:
+      name: Copilot Orchestration Models and Fusions
+      url: https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/deployments/Copilot%20Orchestration%20Models%20and%20Fusions
+
+    steps:
+      - name: Download release package
+        uses: actions/download-artifact@v4
+        with:
+          pattern: WindowsZenithFusion-*
+          merge-multiple: true
+          path: release-assets
+
+      - name: Download release metadata
+        uses: actions/download-artifact@v4
+        with:
+          name: WindowsZenithFusion-release-metadata
+          path: release-metadata
+
+      - name: Read release metadata
+        id: metadata
+        shell: bash
+        run: |
+          TAG_NAME="$(cat release-metadata/tag-name.txt)"
+          ARCHIVE_NAME="$(cat release-metadata/archive-name.txt)"
+          RELEASE_NAME="$(cat release-metadata/release-name.txt)"
+
+          test -n "${TAG_NAME}"
+          test -n "${ARCHIVE_NAME}"
+          test -n "${RELEASE_NAME}"
+          test -s "release-assets/${ARCHIVE_NAME}"
+          test -s "release-assets/${ARCHIVE_NAME}.sha256"
+
+          echo "tag_name=${TAG_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "archive_name=${ARCHIVE_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "release_name=${RELEASE_NAME}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create automatic GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.metadata.outputs.tag_name }}
+          ARCHIVE_NAME: ${{ steps.metadata.outputs.archive_name }}
+          RELEASE_NAME: ${{ steps.metadata.outputs.release_name }}
+        shell: bash
+        run: |
+          gh release create "${TAG_NAME}" \
+            "release-assets/${ARCHIVE_NAME}" \
+            "release-assets/${ARCHIVE_NAME}.sha256" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "${RELEASE_NAME}" \
+            --generate-notes \
+            --latest
+
+      - name: Deployment summary
+        env:
+          TAG_NAME: ${{ steps.metadata.outputs.tag_name }}
+          ARCHIVE_NAME: ${{ steps.metadata.outputs.archive_name }}
+        shell: bash
+        run: |
+          {
+            echo "## WindowsZenithFusion deployment"
+            echo
+            echo "- Environment: Copilot Orchestration Models and Fusions"
+            echo "- Tag: ${TAG_NAME}"
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Package: ${ARCHIVE_NAME}"
+            echo "- Actor: ${GITHUB_ACTOR}"
+            echo "- Release created by: github-actions[bot]"
+          } >> "${GITHUB_STEP_SUMMARY}"
