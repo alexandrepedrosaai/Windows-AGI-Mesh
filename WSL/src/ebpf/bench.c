@@ -367,7 +367,7 @@ int trace_sched_switch(struct trace_event_raw_sched_switch *ctx) {
 // ---------------------------------------------------------------------------
 // Benchmark: Spin loop in eBPF (measures BPF instruction throughput)
 // ---------------------------------------------------------------------------
-SEC("xdp")
+SEC("xdp/spin")
 int xdp_spin_bench(struct xdp_md *ctx) {
     __u64 acc = 0;
     __u32 i;
