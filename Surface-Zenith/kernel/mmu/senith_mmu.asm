@@ -253,6 +253,9 @@ zenith_mmu_walk_to_l3:
     lsr     x2, x1, #L3_SHIFT
     and     x2, x2, #TABLE_INDEX_MASK
     add     x0, x0, x2, lsl #3
+    ldr     x3, [x0]
+    tst     x3, #PTE_VALID
+    b.eq    .Lwalk_not_found
     ret
 
 .Lwalk_not_found:
