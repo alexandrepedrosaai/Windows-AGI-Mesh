@@ -19,6 +19,8 @@ services:
 
     deploy:
       resources:
+        limits:
+          memory: 64G
         reservations:
           devices:
             - driver: nvidia
@@ -27,9 +29,6 @@ services:
                 - gpu
                 - compute
                 - utility
-        limits:
-          memory: 64G
-        reservations:
           memory: 8G
 
     environment:
