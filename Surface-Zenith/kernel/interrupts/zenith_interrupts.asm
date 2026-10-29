@@ -535,12 +535,17 @@ zenith_gic_disable_irq:
     .global zenith_gic_set_priority
     .type   zenith_gic_set_priority, @function
 zenith_gic_set_priority:
+    adrp    x3, zenith_gic_max_irqs
+    add     x3, x3, :lo12:zenith_gic_max_irqs
+    ldr     w4, [x3]
+    cmp     w0, w4
+    b.hs    1f                      ; out of range: ignore request
     mov     x2, #GICD_BASE
     add     x2, x2, #GICD_IPRIORITYR0
     add     x2, x2, x0              ; byte offset = irq_id
     strb    w1, [x2]
     dsb     sy
-    ret
+1:  ret
 
     .size   zenith_gic_set_priority, . - zenith_gic_set_priority
 
@@ -553,6 +558,15 @@ zenith_gic_set_priority:
     .extern zenith_kern_scheduler_tick
     .extern zenith_spi_handler
     .extern zenith_tlb_flush_all
+
+; =============================================================================
+; GIC runtime bounds metadata
+; =============================================================================
+    .section .bss.interrupts, "aw", @nobits
+    .align  2
+    .global zenith_gic_max_irqs
+zenith_gic_max_irqs:
+    .word   0
 
 ; =============================================================================
 ; End of zenith_interrupts.asm
