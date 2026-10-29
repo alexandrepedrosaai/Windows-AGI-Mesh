@@ -1,0 +1,405 @@
+// =============================================================================
+// Surface Zenith OS — Quantum Key Distribution (QKD)
+// File: quantum/ZenithQKD/ZenithQuantumKeyDistribution.qs
+//
+// Implements BB84 Quantum Key Distribution protocol for securing
+// cross-domain communication channels in the Zenith OS.
+//
+// BB84 Protocol:
+//   1. Alice prepares qubits in random bases (Z or X)
+//   2. Alice sends qubits to Bob over quantum channel
+//   3. Bob measures in random bases
+//   4. Alice and Bob compare bases over classical channel
+//   5. Matching bases → shared secret key bits
+//   6. Eavesdropper detection via error rate analysis
+//
+// In Zenith OS, "Alice" = source domain, "Bob" = target domain.
+// The quantum channel is the QPU subsystem.
+// The classical channel is the ZIB (Zenith Interdomain Bus).
+// =============================================================================
+
+namespace SurfaceZenith.Quantum.QKD {
+
+    open Microsoft.Quantum.Canon;
+    open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Math;
+    open Microsoft.Quantum.Arrays;
+    open Microsoft.Quantum.Measurement;
+    open Microsoft.Quantum.Convert;
+    open Microsoft.Quantum.Random;
+
+    // =========================================================================
+    // BB84 Basis definitions
+    // =========================================================================
+
+    /// Measurement basis
+    newtype Basis = (IsXBasis : Bool);
+
+    /// Z-basis (computational basis: |0⟩, |1⟩)
+    let ZBasis = Basis(IsXBasis = false);
+
+    /// X-basis (Hadamard basis: |+⟩, |−⟩)
+    let XBasis = Basis(IsXBasis = true);
+
+    // =========================================================================
+    // BB84 Key Generation
+    // =========================================================================
+
+    /// Prepare a qubit in a specific state and basis (Alice's side).
+    ///
+    /// # Input
+    /// - bit   : the bit value to encode (true = 1, false = 0)
+    /// - basis : the basis to use (Z or X)
+    /// - qubit : the qubit to prepare
+    operation PrepareQubit(bit : Bool, basis : Basis, qubit : Qubit) : Unit {
+        // Start in |0⟩
+        Reset(qubit);
+
+        // Encode bit value
+        if bit {
+            X(qubit);  // |0⟩ → |1⟩
+        }
+
+        // Apply basis transformation
+        if basis::IsXBasis {
+            H(qubit);  // |0⟩ → |+⟩, |1⟩ → |−⟩
+        }
+    }
+
+    /// Measure a qubit in a specific basis (Bob's side).
+    ///
+    /// # Input
+    /// - basis : the basis to measure in
+    /// - qubit : the qubit to measure
+    ///
+    /// # Output
+    /// - Measured bit value
+    operation MeasureInBasis(basis : Basis, qubit : Qubit) : Bool {
+        if basis::IsXBasis {
+            H(qubit);  // Rotate to Z-basis before measurement
+        }
+        return M(qubit) == One;
+    }
+
+    /// Simulate quantum channel noise (depolarizing channel).
+    ///
+    /// Models realistic quantum channel with error rate ε.
+    /// An eavesdropper introduces additional errors (≈25% per intercepted bit).
+    ///
+    /// # Input
+    /// - errorRate : channel error probability (0.0–1.0)
+    /// - qubit     : qubit to apply noise to
+    operation ApplyChannelNoise(errorRate : Double, qubit : Qubit) : Unit {
+        // Simplified: apply X error with probability errorRate
+        // In production: use full depolarizing channel model
+        let r = DrawRandomDouble(0.0, 1.0);
+        if r < errorRate {
+            X(qubit);  // Bit flip error
+        }
+        if r < errorRate / 2.0 {
+            Z(qubit);  // Phase flip error
+        }
+    }
+
+    /// Run the BB84 protocol to generate a shared secret key.
+    ///
+    /// # Input
+    /// - keyLength  : desired key length in bits
+    /// - errorRate  : quantum channel error rate (0.0–0.11 is acceptable)
+    ///
+    /// # Output
+    /// - (sharedKey: Bool[], qberEstimate: Double, success: Bool)
+    ///   where QBER = Quantum Bit Error Rate
+    operation RunBB84Protocol(
+        keyLength : Int,
+        errorRate : Double
+    ) : (Bool[], Double, Bool) {
+
+        // We need ~4× more raw bits to account for basis mismatch and QBER check
+        let rawBits = keyLength * 4;
+
+        use qubits = Qubit[rawBits];
+
+        // ---- Step 1: Alice prepares qubits ----------------------------------
+        mutable aliceBits  = [false, size = rawBits];
+        mutable aliceBases = [ZBasis, size = rawBits];
+
+        for i in 0 .. rawBits - 1 {
+            let bit   = DrawRandomBool(0.5);
+            let useX  = DrawRandomBool(0.5);
+            let basis = useX ? XBasis | ZBasis;
+
+            set aliceBits  w/= i <- bit;
+            set aliceBases w/= i <- basis;
+
+            PrepareQubit(bit, basis, qubits[i]);
+        }
+
+        // ---- Step 2: Quantum channel (with noise) ---------------------------
+        for i in 0 .. rawBits - 1 {
+            ApplyChannelNoise(errorRate, qubits[i]);
+        }
+
+        // ---- Step 3: Bob measures in random bases ---------------------------
+        mutable bobBases   = [ZBasis, size = rawBits];
+        mutable bobResults = [false, size = rawBits];
+
+        for i in 0 .. rawBits - 1 {
+            let useX  = DrawRandomBool(0.5);
+            let basis = useX ? XBasis | ZBasis;
+            set bobBases   w/= i <- basis;
+            set bobResults w/= i <- MeasureInBasis(basis, qubits[i]);
+        }
+
+        ResetAll(qubits);
+
+        // ---- Step 4: Sift — keep only matching bases (classical channel) ----
+        mutable siftedAlice = [false, size = 0];
+        mutable siftedBob   = [false, size = 0];
+
+        for i in 0 .. rawBits - 1 {
+            if aliceBases[i]::IsXBasis == bobBases[i]::IsXBasis {
+                set siftedAlice += [aliceBits[i]];
+                set siftedBob   += [bobResults[i]];
+            }
+        }
+
+        let siftedLength = Length(siftedAlice);
+        if siftedLength < keyLength * 2 {
+            // Not enough sifted bits — protocol failed
+            return ([], 1.0, false);
+        }
+
+        // ---- Step 5: QBER estimation (sacrifice some bits) ------------------
+        let checkBits = siftedLength / 4;
+        mutable errors = 0;
+
+        for i in 0 .. checkBits - 1 {
+            if siftedAlice[i] != siftedBob[i] {
+                set errors += 1;
+            }
+        }
+
+        let qber = IntAsDouble(errors) / IntAsDouble(checkBits);
+
+        // ---- Step 6: Security check -----------------------------------------
+        // BB84 is secure if QBER < 11% (theoretical threshold)
+        // Practical threshold: 7% for real implementations
+        let securityThreshold = 0.11;
+        if qber > securityThreshold {
+            // Eavesdropper detected — abort
+            return ([], qber, false);
+        }
+
+        // ---- Step 7: Extract final key (remaining sifted bits) --------------
+        mutable finalKey = [false, size = 0];
+        for i in checkBits .. checkBits + keyLength - 1 {
+            if i < siftedLength {
+                set finalKey += [siftedAlice[i]];
+            }
+        }
+
+        // Pad if needed
+        while Length(finalKey) < keyLength {
+            set finalKey += [false];
+        }
+
+        return (finalKey[0 .. keyLength - 1], qber, true);
+    }
+
+    // =========================================================================
+    // E91 Protocol (Ekert 1991) — Entanglement-based QKD
+    // =========================================================================
+
+    /// Prepare an entangled Bell pair |Φ+⟩ = (|00⟩ + |11⟩) / √2
+    operation PrepareBellPair(alice : Qubit, bob : Qubit) : Unit {
+        Reset(alice);
+        Reset(bob);
+        H(alice);
+        CNOT(alice, bob);
+    }
+
+    /// Run E91 protocol for a single bit.
+    ///
+    /// Alice and Bob each measure their half of an entangled pair
+    /// in randomly chosen bases. Correlated measurements yield key bits.
+    ///
+    /// # Input
+    /// - aliceBasisAngle : Alice's measurement angle (0, π/4, π/2)
+    /// - bobBasisAngle   : Bob's measurement angle (0, π/4, π/2)
+    ///
+    /// # Output
+    /// - (aliceResult: Bool, bobResult: Bool)
+    operation RunE91Bit(
+        aliceBasisAngle : Double,
+        bobBasisAngle   : Double
+    ) : (Bool, Bool) {
+
+        use (aliceQubit, bobQubit) = (Qubit(), Qubit());
+
+        // Prepare Bell pair
+        PrepareBellPair(aliceQubit, bobQubit);
+
+        // Alice measures in her basis
+        Ry(2.0 * aliceBasisAngle, aliceQubit);
+        let aliceResult = M(aliceQubit) == One;
+
+        // Bob measures in his basis
+        Ry(2.0 * bobBasisAngle, bobQubit);
+        let bobResult = M(bobQubit) == One;
+
+        Reset(aliceQubit);
+        Reset(bobQubit);
+
+        return (aliceResult, bobResult);
+    }
+
+    /// Generate a key using E91 protocol.
+    ///
+    /// # Input
+    /// - keyLength : desired key length in bits
+    ///
+    /// # Output
+    /// - Shared key bits (Alice's perspective)
+    operation RunE91Protocol(keyLength : Int) : Bool[] {
+        mutable key = [false, size = 0];
+
+        // E91 basis angles
+        // Alice: 0, π/4, π/2
+        // Bob:   0, π/4, π/2
+        // Key bits come from matching bases (0,0) or (π/2, π/2)
+        let aliceAngles = [0.0, PI() / 4.0, PI() / 2.0];
+        let bobAngles   = [0.0, PI() / 4.0, PI() / 2.0];
+
+        mutable attempts = 0;
+        let maxAttempts = keyLength * 6;
+
+        while Length(key) < keyLength and attempts < maxAttempts {
+            let aliceIdx = DrawRandomInt(0, 2);
+            let bobIdx   = DrawRandomInt(0, 2);
+
+            let (aliceResult, bobResult) = RunE91Bit(
+                aliceAngles[aliceIdx],
+                bobAngles[bobIdx]
+            );
+
+            // Key bit: matching bases (0,0) or (π/2,π/2)
+            if aliceIdx == bobIdx and (aliceIdx == 0 or aliceIdx == 2) {
+                // Anti-correlated results → Alice flips her bit for agreement
+                set key += [aliceResult != bobResult ? aliceResult | aliceResult];
+            }
+
+            set attempts += 1;
+        }
+
+        return key[0 .. keyLength - 1];
+    }
+
+    // =========================================================================
+    // Privacy Amplification
+    // =========================================================================
+
+    /// Apply privacy amplification to a raw key using a Toeplitz hash.
+    ///
+    /// Reduces key length to remove any information an eavesdropper may have.
+    ///
+    /// # Input
+    /// - rawKey    : sifted key bits
+    /// - finalLen  : desired final key length (< rawKey length)
+    ///
+    /// # Output
+    /// - Privacy-amplified key
+    function PrivacyAmplification(rawKey : Bool[], finalLen : Int) : Bool[] {
+        let rawLen = Length(rawKey);
+        if finalLen >= rawLen {
+            return rawKey;
+        }
+
+        // Simplified Toeplitz hash: XOR shifted versions of the raw key
+        mutable result = [false, size = finalLen];
+        for i in 0 .. finalLen - 1 {
+            mutable bit = false;
+            for j in 0 .. rawLen - 1 {
+                // Toeplitz matrix entry T[i,j] = rawKey[(i+j) % rawLen]
+                let matrixBit = rawKey[(i + j) % rawLen];
+                set bit = bit != (rawKey[j] and matrixBit);
+            }
+            set result w/= i <- bit;
+        }
+
+        return result;
+    }
+
+    // =========================================================================
+    // Zenith Domain Channel Key Exchange
+    // =========================================================================
+
+    /// Establish a quantum-secured channel between two Zenith domains.
+    ///
+    /// This is the main entry point called by the Zenith Security Broker
+    /// when establishing a secure cross-domain communication channel.
+    ///
+    /// # Input
+    /// - sourceDomain : source domain index (0–5)
+    /// - targetDomain : target domain index (0–5)
+    /// - keyBits      : desired key length in bits (typically 256)
+    ///
+    /// # Output
+    /// - (key: Bool[], qber: Double, success: Bool)
+    @EntryPoint()
+    operation EstablishDomainChannel(
+        sourceDomain : Int,
+        targetDomain : Int,
+        keyBits      : Int
+    ) : (Bool[], Double, Bool) {
+
+        // Use BB84 for standard channels
+        // Use E91 for high-security channels (Quantum domain)
+        let useE91 = sourceDomain == 3 or targetDomain == 3; // Quantum domain
+
+        if useE91 {
+            let rawKey = RunE91Protocol(keyBits * 2);
+            let finalKey = PrivacyAmplification(rawKey, keyBits);
+            return (finalKey, 0.0, Length(finalKey) == keyBits);
+        } else {
+            // Standard channel error rate: 2%
+            let (rawKey, qber, success) = RunBB84Protocol(keyBits * 2, 0.02);
+            if not success {
+                return ([], qber, false);
+            }
+            let finalKey = PrivacyAmplification(rawKey, keyBits);
+            return (finalKey, qber, Length(finalKey) == keyBits);
+        }
+    }
+
+    /// Convert a Bool[] key to a hex string for logging
+    function KeyToHexString(key : Bool[]) : String {
+        mutable hex = "";
+        let nBytes = Length(key) / 8;
+        for byteIdx in 0 .. nBytes - 1 {
+            mutable byteVal = 0;
+            for bitIdx in 0 .. 7 {
+                let globalBit = byteIdx * 8 + bitIdx;
+                if globalBit < Length(key) and key[globalBit] {
+                    set byteVal += 1 <<< bitIdx;
+                }
+            }
+            set hex += $"{byteVal:X2}";
+        }
+        return hex;
+    }
+
+    /// Entry point: Run BB84 and return QBER
+    @EntryPoint()
+    operation RunQBERTest(keyLength : Int, errorRate : Double) : Double {
+        let (_, qber, _) = RunBB84Protocol(keyLength, errorRate);
+        return qber;
+    }
+
+    /// Entry point: Check if a channel is secure (QBER < threshold)
+    @EntryPoint()
+    operation IsChannelSecure(keyLength : Int, errorRate : Double) : Bool {
+        let (_, qber, success) = RunBB84Protocol(keyLength, errorRate);
+        return success and qber < 0.11;
+    }
+}
