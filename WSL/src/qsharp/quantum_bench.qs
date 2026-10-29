@@ -393,6 +393,9 @@ namespace MicrosoftAGIBenchmark {
     /// # Summary
     /// Generates a random integer in [0, max)
     operation QuantumRandomInt(max : Int) : Int {
+        if max <= 0 {
+            fail "max must be greater than zero.";
+        }
         let nBits = BitSizeI(max);
         mutable result = max;
 
