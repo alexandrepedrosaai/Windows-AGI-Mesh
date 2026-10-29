@@ -1,9 +1,157 @@
 version: 2
+
+# =========================================================
+# INFRAESTRUTURA
+# Agrupa Docker + Terraform
+# =========================================================
+multi-ecosystem-groups:
+  infrastructure:
+    schedule:
+      interval: "cron"
+      cronjob: "0 */4 * * *"
+    labels:
+      - "dependencies"
+      - "infrastructure"
+
 updates:
 
-  # Dockerfiles
+  # =======================================================
+  # Docker
+  # =======================================================
   - package-ecosystem: "docker"
     directory: "/"
-    schedule:
-      interval: "daily"
 
+    patterns:
+      - "nginx"
+      - "redis"
+
+    multi-ecosystem-group: "infrastructure"
+
+  # =======================================================
+  # Terraform
+  # =======================================================
+  - package-ecosystem: "terraform"
+    directory: "/"
+
+    patterns:
+      - "aws"
+
+    multi-ecosystem-group: "infrastructure"
+
+  # =======================================================
+  # npm / Node.js
+  # =======================================================
+  - package-ecosystem: "npm"
+    directory: "/"
+
+    schedule:
+      interval: "cron"
+      cronjob: "0 */4 * * *"
+
+    open-pull-requests-limit: 10
+
+    labels:
+      - "dependencies"
+      - "npm"
+      - "triage-board"
+
+    groups:
+      angular-security:
+        applies-to: security-updates
+        patterns:
+          - "@angular*"
+
+      production-dependencies:
+        applies-to: version-updates
+        dependency-type: "production"
+        patterns:
+          - "*"
+
+      security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # =======================================================
+  # NuGet / .NET
+  # =======================================================
+  - package-ecosystem: "nuget"
+    directory: "/"
+
+    schedule:
+      interval: "cron"
+      cronjob: "0 */4 * * *"
+
+    open-pull-requests-limit: 10
+
+    labels:
+      - "dependencies"
+      - "nuget"
+      - "security"
+
+    groups:
+      nuget-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+      nuget-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+
+  # =======================================================
+  # Apache Maven / Java
+  # =======================================================
+  - package-ecosystem: "maven"
+    directory: "/"
+
+    schedule:
+      interval: "cron"
+      cronjob: "0 */4 * * *"
+
+    open-pull-requests-limit: 10
+
+    labels:
+      - "dependencies"
+      - "maven"
+      - "security"
+
+    groups:
+      maven-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+      maven-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+
+  # =======================================================
+  # RubyGems / Bundler
+  # =======================================================
+  - package-ecosystem: "bundler"
+    directory: "/"
+
+    schedule:
+      interval: "cron"
+      cronjob: "0 */4 * * *"
+
+    open-pull-requests-limit: 10
+
+    labels:
+      - "dependencies"
+      - "rubygems"
+      - "security"
+
+    groups:
+      rubygems-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+      rubygems-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
