@@ -502,8 +502,8 @@ jobs:
       deployments: write
 
     environment:
-      name: copilot
-      url: https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/deployments/copilot
+      name: Copilot Orchestration Models and Fusions
+      url: https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/deployments/Copilot%20Orchestration%20Models%20and%20Fusions
 
     steps:
       - name: Download release package
@@ -537,6 +537,33 @@ jobs:
           echo "archive_name=${ARCHIVE_NAME}" >> "${GITHUB_OUTPUT}"
           echo "release_name=${RELEASE_NAME}" >> "${GITHUB_OUTPUT}"
 
+      - name: Create Copilot deployment as GitHub Actions Bot
+        id: create_deployment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'Copilot Orchestration Models and Fusions',
+              description: 'Automatic Copilot Skill deployment',
+              auto_merge: false,
+              required_contexts: []
+            });
+
+            core.setOutput('deployment_id', String(deployment.data.id));
+
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.data.id,
+              state: 'in_progress',
+              description: 'GitHub Actions Bot is deploying the Copilot Skill',
+              environment_url: 'https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/deployments/Copilot%20Orchestration%20Models%20and%20Fusions'
+            });
+
       - name: Create automatic GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -553,6 +580,32 @@ jobs:
             --title "${RELEASE_NAME}" \
             --generate-notes \
             --latest
+
+      - name: Complete Copilot deployment status
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          DEPLOYMENT_ID: ${{ steps.create_deployment.outputs.deployment_id }}
+          DEPLOYMENT_STATE: ${{ job.status == 'success' && 'success' || 'failure' }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const deploymentId = process.env.DEPLOYMENT_ID;
+            if (!deploymentId) {
+              core.warning('No deployment ID was created; skipping deployment status update.');
+              return;
+            }
+
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: Number(deploymentId),
+              state: process.env.DEPLOYMENT_STATE,
+              description: process.env.DEPLOYMENT_STATE === 'success'
+                ? 'Copilot Skill deployed successfully by GitHub Actions Bot'
+                : 'Copilot Skill deployment failed',
+              environment_url: 'https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/deployments/Copilot%20Orchestration%20Models%20and%20Fusions'
+            });
 
       - name: Deployment summary
         env:
