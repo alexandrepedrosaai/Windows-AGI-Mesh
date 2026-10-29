@@ -124,8 +124,11 @@
 ; Called from zenith_sync_el0_64 exception handler.
 ; x0 = pointer to saved ExceptionFrame on kernel stack
 ; =============================================================================
+    .global zenith_syscall_dispatch
     .global zenith_syscall_table_dispatch
+    .type   zenith_syscall_dispatch, @function
     .type   zenith_syscall_table_dispatch, @function
+zenith_syscall_dispatch:
 zenith_syscall_table_dispatch:
     stp     x29, x30, [sp, #-32]!
     stp     x19, x20, [sp, #16]
