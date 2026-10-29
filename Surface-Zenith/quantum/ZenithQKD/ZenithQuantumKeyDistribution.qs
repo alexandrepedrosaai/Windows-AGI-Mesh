@@ -438,7 +438,6 @@ namespace SurfaceZenith.Quantum.QKD {
     }
 
     /// Entry point: Check if a channel is secure (QBER < threshold)
-    @EntryPoint()
     operation IsChannelSecure(keyLength : Int, errorRate : Double) : Bool {
         let (_, _, success) = RunBB84Protocol(keyLength, errorRate);
         return success;
