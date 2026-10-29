@@ -279,6 +279,7 @@ zib_capability_check:
     .type   zib_session_open, @function
 zib_session_open:
     cbz     x0, .Lsession_open_invalid
+    cbz     x1, .Lsession_open_invalid
     cbz     x3, .Lsession_open_invalid
     cbz     x4, .Lsession_open_invalid
     mov     x8, #SYSCALL_ZIB_SESSION_OPEN
