@@ -337,8 +337,9 @@ Adjoint T(target);
                 let shiftedPlus  = params w/ i <- params[i] + PI() / 2.0;
                 let shiftedMinus = params w/ i <- params[i] - PI() / 2.0;
 
-                let ePlus  = EstimateZZExpectation(qubits, shiftedPlus,  layers, shots / 4);
-                let eMinus = EstimateZZExpectation(qubits, shiftedMinus, layers, shots / 4);
+                let gradientShots = if shots / 4 > 0 { shots / 4 } else { 1 };
+                let ePlus  = EstimateZZExpectation(qubits, shiftedPlus,  layers, gradientShots);
+                let eMinus = EstimateZZExpectation(qubits, shiftedMinus, layers, gradientShots);
                 let grad   = (ePlus - eMinus) / 2.0;
 
                 set newParams w/= i <- params[i] - learningRate * grad;
