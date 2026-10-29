@@ -184,7 +184,7 @@ services:
 
     command: >
       sh -c "pip install onnxruntime-rocm --quiet &&
-             python /app/benchmark/benchmark_onnx.py --provider rocm"
+             python /app/benchmark/benchmark_onnx.py --provider ROCMExecutionProvider
 
     networks:
       - agi-net
