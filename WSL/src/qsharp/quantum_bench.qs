@@ -589,7 +589,7 @@ namespace MicrosoftAGIBenchmark {
         Message("[ Benchmark 8: Quantum Random Number Generation ]");
         for nBits in [8, 16, 32, 64] {
             let bits = BenchQuantumRNG(nBits);
-            let asInt = BoolArrayAsInt(bits[0..Min([63, nBits-1])..1]);
+            let asInt = BoolArrayAsInt(bits[0..1..Min([63, nBits-1])]);
             Message($"  {nBits} random bits: {asInt}");
         }
 
