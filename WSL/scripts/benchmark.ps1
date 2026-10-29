@@ -194,44 +194,53 @@ function Detect-GPU {
 # ---------------------------------------------------------------------------
 function Invoke-WSL2Command {
     param(
-        [string]$Command,
+        [string]$Script,
+        [string[]]$Arguments = @(),
         [string]$WorkingDir = "."
     )
 
+    $wslDir = "/mnt/c/$(($WorkingDir -replace '\\', '/').TrimStart('C:/'))"
+    $displayCmd = "python3 $Script $($Arguments -join ' ')"
+
     if ($DryRun) {
-        Write-Log "[DRY RUN] WSL2: $Command"
+        Write-Log "[DRY RUN] WSL2: $displayCmd"
         return 0
     }
 
-    Write-Log "WSL2: $Command"
-    wsl bash -c "cd /mnt/c/$(($WorkingDir -replace '\\', '/').TrimStart('C:/')) && $Command"
+    Write-Log "WSL2: $displayCmd"
+    wsl --cd $wslDir python3 $Script @Arguments
     return $LASTEXITCODE
 }
 
 function Invoke-PythonBenchmark {
     param(
         [string]$Script,
-        [string]$Arguments = "",
+        [string[]]$Arguments = @(),
         [string]$OutputFile = ""
     )
 
-    $cmd = "python3 $Script $Arguments"
+    $argList = @($Script)
+    if ($Arguments) {
+        $argList += $Arguments
+    }
     if ($OutputFile) {
-        $cmd += " --output $OutputFile"
+        $argList += @("--output", $OutputFile)
     }
     if ($Verbose) {
-        $cmd += " --verbose"
+        $argList += "--verbose"
     }
 
+    $displayCmd = "python3 $($argList -join ' ')"
+
     if ($UseWSL2) {
-        return Invoke-WSL2Command -Command $cmd
+        return Invoke-WSL2Command -Script $Script -Arguments $argList[1..($argList.Count - 1)] -WorkingDir (Get-Location).Path
     } else {
         if ($DryRun) {
-            Write-Log "[DRY RUN] $cmd"
+            Write-Log "[DRY RUN] $displayCmd"
             return 0
         }
-        Write-Log "Running: $cmd"
-        Invoke-Expression $cmd
+        Write-Log "Running: $displayCmd"
+        & python3 @argList
         return $LASTEXITCODE
     }
 }
