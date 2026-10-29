@@ -137,10 +137,11 @@ _start:
     isb
 
     ; -------------------------------------------------------------------------
-    ; Step 7: Load page table base address
+    ; Step 7: Load page table base addresses (separate user/kernel roots)
     ; -------------------------------------------------------------------------
+    adr     x0, zenith_user_page_table_l0
+    msr     TTBR0_EL1, x0          ; User space page table (empty/invalid at boot)
     adr     x0, zenith_page_table_l0
-    msr     TTBR0_EL1, x0          ; User space page table
     msr     TTBR1_EL1, x0          ; Kernel space page table
     isb
 
