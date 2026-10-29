@@ -137,8 +137,7 @@ namespace SurfaceZenith.Quantum.QPUScheduler {
     ) : Unit is Adj + Ctl {
         H(target);
         CNOT(control2, target);
-        T(target);
-        Adjoint T(target);
+Adjoint T(target);
         CNOT(control1, target);
         T(target);
         CNOT(control2, target);
