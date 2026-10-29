@@ -502,8 +502,8 @@ jobs:
       deployments: write
 
     environment:
-      name: Copilot Orchestration Models and Fusions
-      url: https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/deployments/Copilot%20Orchestration%20Models%20and%20Fusions
+      name: copilot
+      url: https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/deployments/copilot
 
     steps:
       - name: Download release package
