@@ -478,7 +478,7 @@ zenith_mmu_cow_fault:
     orr     x1, x1, #PTE_DIRTY  ; set dirty
     orr     x1, x1, x23         ; OR in preserved new PA
     ; Re-add write permission (clear AP read-only bits)
-    bic     x1, x1, #PTE_AP_RO_EL1
+    bic     x1, x1, #(3 << 6)
     orr     x1, x1, #PTE_AP_RW_EL1
     str     x1, [x22]
 
