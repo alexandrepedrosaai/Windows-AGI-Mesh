@@ -146,7 +146,7 @@ BenchResult bench_float64(void) {
     }
 
     double elapsed = get_time_sec() - t0;
-    uint64_t total_flops = (ITERS / N) * N * 5ULL; /* 5 FLOPs per inner iteration */
+    uint64_t total_flops = (ITERS / N) * N * 6ULL; /* 6 FLOPs per inner iteration */
     double gflops = (double)total_flops / elapsed / 1e9;
 
     /* Prevent optimization */
