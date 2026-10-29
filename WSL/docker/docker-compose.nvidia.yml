@@ -52,7 +52,7 @@ services:
       - TENSORRT_PRECISION=${TENSORRT_PRECISION:-fp16}
 
     ports:
-      - "11434:11434"
+      - "127.0.0.1:11434:11434"
 
     volumes:
       - ollama_models_nvidia:/root/.ollama
