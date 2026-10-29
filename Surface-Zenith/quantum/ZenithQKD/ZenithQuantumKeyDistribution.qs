@@ -165,7 +165,7 @@ namespace SurfaceZenith.Quantum.QKD {
         }
 
         let siftedLength = Length(siftedAlice);
-        if siftedLength < keyLength * 2 {
+        if siftedLength < keyLength * 2 or siftedLength < 4 {
             // Not enough sifted bits — protocol failed
             return ([], 1.0, false);
         }
