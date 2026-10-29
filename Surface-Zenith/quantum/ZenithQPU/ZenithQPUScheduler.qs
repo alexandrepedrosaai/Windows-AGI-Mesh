@@ -388,11 +388,12 @@ Adjoint T(target);
                 for shot in 0 .. shots - 1 {
                     use qubits = Qubit[nQubits];
 
-                    // Apply a representative circuit (H + CNOT chain)
-                    ApplyToEach(H, qubits);
-                    for i in 0 .. nQubits - 2 {
-                        CNOT(qubits[i], qubits[i + 1]);
-                    }
+for _ in 1 .. depth {
+    ApplyToEach(H, qubits);
+    for i in 0 .. nQubits - 2 {
+        CNOT(qubits[i], qubits[i + 1]);
+    }
+}
 
                     // Measure and encode as integer
                     let measured = MeasureInteger(LittleEndian(qubits));
