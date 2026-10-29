@@ -251,7 +251,7 @@ function Invoke-PythonBenchmark {
 function Run-CPUBenchmark {
     Write-Step "CPU Benchmark"
     $outFile = Join-Path $OutputDir "cpu_results.json"
-    $result = Invoke-PythonBenchmark -Script "benchmark/benchmark_cpu.py" -OutputFile $outFile
+    $result = Invoke-PythonBenchmark -Script "benchmark/benchmark_cpu.py" -Arguments "--duration $Duration" -OutputFile $outFile
     if ($result -eq 0) {
         Write-Log "CPU benchmark complete ✅"
     } else {
