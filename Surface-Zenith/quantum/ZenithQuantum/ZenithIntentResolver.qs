@@ -375,10 +375,13 @@ namespace SurfaceZenith.Quantum.IntentResolver {
     // Quantum Random Number Generation — Capability Token Entropy
     // =========================================================================
 
-    /// Generate cryptographically secure random bytes using quantum measurement.
+    /// Generate random bits from quantum measurement.
     ///
-    /// Each qubit measured in the |+⟩ basis provides one truly random bit.
-    /// This is used to seed the capability token generator.
+    /// SECURITY NOTE:
+    /// - On simulator targets, measurement outcomes are not suitable as a
+    ///   cryptographic entropy source for capability tokens.
+    /// - Cryptographic token entropy must come from a platform CSPRNG
+    ///   (or a real hardware QPU path explicitly gated by runtime).
     ///
     /// # Input
     /// - nBits : number of random bits to generate
@@ -386,19 +389,11 @@ namespace SurfaceZenith.Quantum.IntentResolver {
     /// # Output
     /// - Array of random bits (true = 1, false = 0)
     operation GenerateQuantumRandomBits(nBits : Int) : Bool[] {
-        use qubits = Qubit[nBits];
-
-        // Put all qubits in superposition
-        ApplyToEach(H, qubits);
-
-        // Measure — each measurement is a truly random bit
-        mutable bits = [false, size = nBits];
-        for i in 0 .. nBits - 1 {
-            set bits w/= i <- M(qubits[i]) == One;
+        if nBits < 0 {
+            fail "GenerateQuantumRandomBits: nBits must be non-negative.";
         }
 
-        ResetAll(qubits);
-        return bits;
+        fail "GenerateQuantumRandomBits is disabled for cryptographic entropy on simulator/runtime targets. Use platform CSPRNG-backed entropy for capability tokens, or gate this call to verified real QPU hardware.";
     }
 
     /// Generate a 256-bit quantum random number for capability token seeding.
