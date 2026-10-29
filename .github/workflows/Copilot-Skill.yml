@@ -38,7 +38,7 @@ jobs:
 
       - name: Install AJV Draft 2020 CLI
         run: |
-          npm install --global ajv-cli@latest
+          npm install --global ajv-cli@5.0.0
 
       #####################################################################
       # GENERATE GITHUB COPILOT SKILL
