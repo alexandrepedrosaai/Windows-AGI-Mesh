@@ -309,25 +309,46 @@ namespace SurfaceZenith.Quantum.QKD {
     ///
     /// # Output
     /// - Privacy-amplified key
+    function PrivacyAmplificationWithSeed(rawKey : Bool[], finalLen : Int, toeplitzSeed : Bool[]) : Bool[] {
+        let rawLen = Length(rawKey);
+        if finalLen >= rawLen {
+            return rawKey;
+        }
+
+        let requiredSeedLen = rawLen + finalLen - 1;
+        if Length(toeplitzSeed) != requiredSeedLen {
+            fail "PrivacyAmplificationWithSeed: invalid Toeplitz seed length.";
+        }
+
+        // Standard Toeplitz hashing over GF(2):
+        // output[i] = XOR_j (T[i,j] AND rawKey[j]), with T[i,j] = toeplitzSeed[i + j].
+        mutable result = [false, size = finalLen];
+        for i in 0 .. finalLen - 1 {
+            mutable bit = false;
+            for j in 0 .. rawLen - 1 {
+                let matrixBit = toeplitzSeed[i + j];
+                set bit = bit != (matrixBit and rawKey[j]);
+            }
+            set result w/= i <- bit;
+        }
+
+        return result;
+    }
+
     function PrivacyAmplification(rawKey : Bool[], finalLen : Int) : Bool[] {
         let rawLen = Length(rawKey);
         if finalLen >= rawLen {
             return rawKey;
         }
 
-        // Simplified Toeplitz hash: XOR shifted versions of the raw key
-        mutable result = [false, size = finalLen];
-        for i in 0 .. finalLen - 1 {
-            mutable bit = false;
-            for j in 0 .. rawLen - 1 {
-                // Toeplitz matrix entry T[i,j] = rawKey[(i+j) % rawLen]
-                let matrixBit = rawKey[(i + j) % rawLen];
-                set bit = bit != (rawKey[j] and matrixBit);
-            }
-            set result w/= i <- bit;
+        // Draw an independent random Toeplitz seed of length (rawLen + finalLen - 1).
+        let seedLen = rawLen + finalLen - 1;
+        mutable toeplitzSeed = [false, size = seedLen];
+        for k in 0 .. seedLen - 1 {
+            set toeplitzSeed w/= k <- DrawRandomBool(0.5);
         }
 
-        return result;
+        return PrivacyAmplificationWithSeed(rawKey, finalLen, toeplitzSeed);
     }
 
     // =========================================================================
