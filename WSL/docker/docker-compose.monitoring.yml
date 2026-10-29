@@ -31,7 +31,6 @@ services:
       - "--web.console.libraries=/usr/share/prometheus/console_libraries"
       - "--web.console.templates=/usr/share/prometheus/consoles"
       - "--web.enable-lifecycle"
-      - "--web.enable-admin-api"
       - "--log.level=warn"
     volumes:
       - ../observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
