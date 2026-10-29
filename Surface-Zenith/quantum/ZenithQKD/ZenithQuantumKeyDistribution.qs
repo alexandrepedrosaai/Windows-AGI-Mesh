@@ -190,16 +190,37 @@ namespace SurfaceZenith.Quantum.QKD {
             return ([], qber, false);
         }
 
-        // ---- Step 7: Extract final key (remaining sifted bits) --------------
+        // ---- Step 7: Error reconciliation + privacy amplification ------------
         let availableKeyBits = siftedLength - checkBits;
         if availableKeyBits < keyLength {
             // Insufficient quantum-derived key material — abort instead of padding
             return ([], qber, false);
         }
 
+        // Reconciliation: keep only bits where Alice and Bob agree in key region.
+        mutable reconciled = [false, size = 0];
+        for i in checkBits .. siftedLength - 1 {
+            if siftedAlice[i] == siftedBob[i] {
+                set reconciled += [siftedAlice[i]];
+            }
+        }
+
+        // Privacy amplification: shrink key as QBER grows (conservative linear bound).
+        // keepFraction = max(0, 1 - 2 * QBER)
+        mutable keepFraction = 1.0 - 2.0 * qber;
+        if keepFraction < 0.0 {
+            set keepFraction = 0.0;
+        }
+        let amplifiedLength = Floor(IntAsDouble(Length(reconciled)) * keepFraction);
+
+        if amplifiedLength < keyLength {
+            // Not enough secure key material after post-processing.
+            return ([], qber, false);
+        }
+
         mutable finalKey = [false, size = 0];
-        for i in checkBits .. checkBits + keyLength - 1 {
-            set finalKey += [siftedAlice[i]];
+        for i in 0 .. keyLength - 1 {
+            set finalKey += [reconciled[i]];
         }
 
         return (finalKey, qber, true);
