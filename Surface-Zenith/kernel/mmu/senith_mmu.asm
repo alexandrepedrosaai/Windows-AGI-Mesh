@@ -157,6 +157,8 @@ zenith_mmu_map_page:
 
     ; DSB to ensure page table write is visible before TLB use
     dsb     ishst
+    mov     x0, x20
+    bl      zenith_tlb_invalidate_va
 
     mov     x0, #0              ; success
     b       .Lmap_done
