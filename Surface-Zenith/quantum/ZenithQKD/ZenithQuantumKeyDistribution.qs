@@ -184,8 +184,7 @@ namespace SurfaceZenith.Quantum.QKD {
         let qber = IntAsDouble(errors) / IntAsDouble(checkBits);
 
         // ---- Step 6: Security check -----------------------------------------
-        // BB84 is secure if QBER < 11% (theoretical threshold)
-        // Practical threshold: 7% for real implementations
+        // BB84 is secure if QBER < 11% (theoretical threshold).
         let securityThreshold = 0.11;
         if qber > securityThreshold {
             // Eavesdropper detected — abort
