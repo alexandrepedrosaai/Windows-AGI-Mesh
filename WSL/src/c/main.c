@@ -456,7 +456,7 @@ BenchResult bench_compression(void) {
 
     /* Generate compressible data */
     for (size_t i = 0; i < DATA_SIZE; i++) {
-        src[i] = (uint8_t)(i % 16); /* repeating pattern */
+        src[i] = (uint8_t)((i / 16) % 16); /* 16-byte runs */
     }
 
     double t0 = get_time_sec();
