@@ -10,6 +10,12 @@
 ;   4. Set up the GIC (Generic Interrupt Controller)
 ;   5. Initialize the BSS segment
 ;   6. Jump to the Rust kernel entry point (zenith_kernel_main)
+
+    .section .bss.boot, "aw", %nobits
+    .align 12
+    .global zenith_user_page_table_l0
+zenith_user_page_table_l0:
+    .skip 4096
 ;
 ; Target: AArch64 (ARM64), EL1 (Kernel mode)
 ; Assembler: GNU AS (gas) / LLVM integrated assembler
@@ -136,7 +142,14 @@ _start:
     isb
 
     ; -------------------------------------------------------------------------
-    ; Step 7: Load page table base addresses (separate user/kernel roots)
+    ; Step 7: Initialize BSS segment to zero (must happen before page table use)
+    ; -------------------------------------------------------------------------
+    adr     x0, __bss_start
+    adr     x1, __bss_end
+.Lbss_zero_loop:
+
+    ; -------------------------------------------------------------------------
+    ; Step 8: Load page table base addresses (separate user/kernel roots)
     ; -------------------------------------------------------------------------
     adr     x0, zenith_user_page_table_l0
     msr     TTBR0_EL1, x0          ; User space page table (empty/invalid at boot)
@@ -145,7 +158,7 @@ _start:
     isb
 
     ; -------------------------------------------------------------------------
-    ; Step 8: Enable MMU, D-cache, I-cache, and EL1 hardening controls
+    ; Step 9: Enable MMU, D-cache, I-cache, and EL1 hardening controls
     ; -------------------------------------------------------------------------
     mrs     x0, SCTLR_EL1
     orr     x0, x0, #SCTLR_EL1_MMU_ENABLE
@@ -156,13 +169,6 @@ _start:
     msr     SCTLR_EL1, x0
     isb
     dsb     sy
-
-    ; -------------------------------------------------------------------------
-    ; Step 9: Initialize BSS segment to zero
-    ; -------------------------------------------------------------------------
-    adr     x0, __bss_start
-    adr     x1, __bss_end
-.Lbss_zero_loop:
     cmp     x0, x1
     b.ge    .Lbss_done
     str     xzr, [x0], #8
