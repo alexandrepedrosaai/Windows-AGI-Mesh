@@ -11,7 +11,7 @@
 //   - Cloud Domain
 // =============================================================================
 
-#include "DomainStatusPanel.h"
+#include "DomainStatusPanel.sh"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
