@@ -225,6 +225,8 @@ zenith_mmu_walk_to_l3:
     ldr     x3, [x0, x2, lsl #3]
     tst     x3, #PTE_VALID
     b.eq    .Lwalk_not_found
+    tst     x3, #PTE_TABLE
+    b.eq    .Lwalk_not_found
     and     x0, x3, #PAGE_MASK
 
     ; L1
@@ -233,6 +235,8 @@ zenith_mmu_walk_to_l3:
     ldr     x3, [x0, x2, lsl #3]
     tst     x3, #PTE_VALID
     b.eq    .Lwalk_not_found
+    tst     x3, #PTE_TABLE
+    b.eq    .Lwalk_not_found
     and     x0, x3, #PAGE_MASK
 
     ; L2
@@ -240,6 +244,8 @@ zenith_mmu_walk_to_l3:
     and     x2, x2, #TABLE_INDEX_MASK
     ldr     x3, [x0, x2, lsl #3]
     tst     x3, #PTE_VALID
+    b.eq    .Lwalk_not_found
+    tst     x3, #PTE_TABLE
     b.eq    .Lwalk_not_found
     and     x0, x3, #PAGE_MASK
 
