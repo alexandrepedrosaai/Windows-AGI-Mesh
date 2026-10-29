@@ -438,7 +438,8 @@ namespace MicrosoftAGIBenchmark {
         if m1 == One { X(bob); }
         if m0 == One { Z(bob); }
 
-        // Measure Bob's qubit (should match original state statistics)
+        // Undo the known preparation so a successful teleportation measures |0⟩.
+        Ry(-angle, bob);
         let result = M(bob);
 
         Reset(message);
