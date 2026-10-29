@@ -11,7 +11,7 @@ services:
   # Ollama — AMD ROCm GPU Inference Engine
   # ---------------------------------------------------------------------------
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama:rocm
     container_name: agi-ollama-amd
     restart: unless-stopped
     profiles:
