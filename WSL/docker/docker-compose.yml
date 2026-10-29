@@ -124,7 +124,7 @@ services:
       - MICROSOFT_CLIENT_ID=${MICROSOFT_CLIENT_ID:-}
       - MICROSOFT_CLIENT_SECRET=${MICROSOFT_CLIENT_SECRET:-}
     volumes:
-      - ./agents:/app/agents
+      - ../benchmark/Agents:/app/agents
       - agent_data:/app/data
     depends_on:
       - redis
