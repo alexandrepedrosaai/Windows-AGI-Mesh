@@ -329,6 +329,8 @@ zib_session_close:
 zib_intent_submit:
     cbz     x2, .Lintent_submit_invalid
     cbz     x3, .Lintent_submit_invalid
+    cbz     x4, .Lintent_submit_invalid
+    cbz     x5, .Lintent_submit_invalid
     mov     x8, #SYSCALL_ZIB_INTENT_SUBMIT
     svc     #0
     ret
