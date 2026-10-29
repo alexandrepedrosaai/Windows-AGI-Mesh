@@ -39,7 +39,7 @@ namespace MicrosoftAGIBenchmark {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Arithmetic;
     open Microsoft.Quantum.Preparation;
-    open Microsoft.Quantum.Simulation;
+    // Simulator selection is performed by the host program; no Q# simulation namespace is needed.
 
     // =========================================================================
     // Benchmark 1: Quantum Superposition
