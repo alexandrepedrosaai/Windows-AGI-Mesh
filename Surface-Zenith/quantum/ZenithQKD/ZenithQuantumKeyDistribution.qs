@@ -292,6 +292,10 @@ namespace SurfaceZenith.Quantum.QKD {
             set attempts += 1;
         }
 
+        if Length(key) < keyLength {
+            fail $"E91 key exchange failed: collected {Length(key)} bits, required {keyLength}.";
+        }
+
         return key[0 .. keyLength - 1];
     }
 
