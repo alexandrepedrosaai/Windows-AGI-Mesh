@@ -425,9 +425,9 @@ zib_snapshot_restore:
     .global zib_migrate_task
     .type   zib_migrate_task, @function
 zib_migrate_task:
-    ; Validate migration mode (0, 1, or 2)
-    cmp     x3, #2
-    b.gt    .Lmigrate_invalid
+    ; Validate migration mode (0, 1, or 2) as uint32_t
+    cmp     w3, #2
+    b.hi    .Lmigrate_invalid
     mov     x8, #SYSCALL_ZIB_MIGRATE_TASK
     svc     #0
     ret
