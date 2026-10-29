@@ -9,8 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  deployments: write
+  contents: read
 
 concurrency:
   group: windows-zenith-fusion-${{ github.ref }}
