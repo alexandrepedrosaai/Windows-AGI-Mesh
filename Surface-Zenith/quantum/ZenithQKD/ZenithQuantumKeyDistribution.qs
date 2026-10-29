@@ -191,19 +191,18 @@ namespace SurfaceZenith.Quantum.QKD {
         }
 
         // ---- Step 7: Extract final key (remaining sifted bits) --------------
+        let availableKeyBits = siftedLength - checkBits;
+        if availableKeyBits < keyLength {
+            // Insufficient quantum-derived key material — abort instead of padding
+            return ([], qber, false);
+        }
+
         mutable finalKey = [false, size = 0];
         for i in checkBits .. checkBits + keyLength - 1 {
-            if i < siftedLength {
-                set finalKey += [siftedAlice[i]];
-            }
+            set finalKey += [siftedAlice[i]];
         }
 
-        // Pad if needed
-        while Length(finalKey) < keyLength {
-            set finalKey += [false];
-        }
-
-        return (finalKey[0 .. keyLength - 1], qber, true);
+        return (finalKey, qber, true);
     }
 
     // =========================================================================
