@@ -485,29 +485,34 @@ function Run-WindowsNativeBenchmark {
 # Docker Stack Management
 # ---------------------------------------------------------------------------
 function Start-DockerStack {
-    param([string]$Profile = "amd")
+    param([string]$DockerProfile = "amd")
 
-    Write-Step "Starting Docker Stack (profile: $Profile)"
+    Write-Step "Starting Docker Stack (profile: $DockerProfile)"
 
     if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
         Write-Log "Docker not found — install Docker Desktop" -Level "WARN"
         return
     }
 
-    $composeFiles = "-f docker/docker-compose.yml -f docker/docker-compose.monitoring.yml"
-    if ($Profile -eq "amd") {
-        $composeFiles += " -f docker/docker-compose.amd.yml"
-    } elseif ($Profile -eq "nvidia") {
-        $composeFiles += " -f docker/docker-compose.nvidia.yml"
+    $composeArgs = @(
+        "-f", "docker/docker-compose.yml",
+        "-f", "docker/docker-compose.monitoring.yml"
+    )
+
+    if ($DockerProfile -eq "amd") {
+        $composeArgs += @("-f", "docker/docker-compose.amd.yml")
+    } elseif ($DockerProfile -eq "nvidia") {
+        $composeArgs += @("-f", "docker/docker-compose.nvidia.yml")
     }
 
-    $cmd = "docker compose $composeFiles --profile $Profile up -d"
+    $composeArgs += @("--profile", $DockerProfile, "up", "-d")
+    $cmdDisplay = "docker compose $($composeArgs -join ' ')"
 
     if ($DryRun) {
-        Write-Log "[DRY RUN] $cmd"
+        Write-Log "[DRY RUN] $cmdDisplay"
     } else {
-        Write-Log "Starting: $cmd"
-        Invoke-Expression $cmd
+        Write-Log "Starting: $cmdDisplay"
+        & docker compose @composeArgs
         Write-Log "Docker stack started ✅"
         Write-Log "OpenWebUI:  http://localhost:3000"
         Write-Log "Grafana:    http://localhost:3001"
