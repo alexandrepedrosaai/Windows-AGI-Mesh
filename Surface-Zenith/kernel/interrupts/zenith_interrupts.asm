@@ -261,7 +261,11 @@ zenith_irq_handler:
     ; Pass to Rust SPI handler
     mov     x2, x0                  ; full IAR value
     mov     x0, x1                  ; interrupt ID
+    sub     sp, sp, #16
+    str     x2, [sp]
     bl      zenith_spi_handler
+    ldr     x2, [sp]
+    add     sp, sp, #16
     ; EOI
     msr     S3_0_C12_C12_1, x2     ; ICC_EOIR1_EL1
     b       .Lirq_loop
