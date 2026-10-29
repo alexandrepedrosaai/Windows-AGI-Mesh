@@ -151,7 +151,7 @@
 
     (block $break
       (loop $loop
-        (br_if $break (i64.ge_u (local.get $i) (local.get $iters)))
+        (br_if $break (i64.ge_s (local.get $i) (local.get $iters)))
 
         ;; acc = acc * mul + add
         (local.set $acc
