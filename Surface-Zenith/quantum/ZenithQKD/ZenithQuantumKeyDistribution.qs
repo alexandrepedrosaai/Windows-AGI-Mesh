@@ -431,7 +431,6 @@ namespace SurfaceZenith.Quantum.QKD {
     }
 
     /// Entry point: Run BB84 and return QBER
-    @EntryPoint()
     operation RunQBERTest(keyLength : Int, errorRate : Double) : Double {
         let (_, qber, _) = RunBB84Protocol(keyLength, errorRate);
         return qber;
