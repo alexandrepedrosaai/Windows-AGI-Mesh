@@ -169,7 +169,7 @@ module acr 'modules/acr.bicep' = if (enableACR) {
     location: location
     tags: tags
     sku: 'Standard'
-    adminUserEnabled: true
+    adminUserEnabled: false
   }
 }
 
