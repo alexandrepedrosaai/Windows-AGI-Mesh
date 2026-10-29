@@ -380,7 +380,7 @@ int xdp_spin_bench(struct xdp_md *ctx) {
     }
 
     // Store result to prevent optimization
-    __u32 key = 0;
+    __u64 key = 0;
     bpf_map_update_elem(&recent_events, &key, &acc, BPF_ANY);
 
     return XDP_PASS;
