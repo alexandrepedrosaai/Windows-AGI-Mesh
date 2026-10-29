@@ -330,10 +330,12 @@ class PrometheusHandler(BaseHTTPRequestHandler):
                 self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
                 self.wfile.write(body)
-            except Exception as exc:
+            except Exception:
+                log.exception("Failed to collect AMD GPU metrics")
                 self.send_response(500)
+                self.send_header("Content-Type", "text/plain; charset=utf-8")
                 self.end_headers()
-                self.wfile.write(str(exc).encode())
+                self.wfile.write(b"Internal error collecting AMD GPU metrics")
         elif self.path == "/health":
             self.send_response(200)
             self.end_headers()
