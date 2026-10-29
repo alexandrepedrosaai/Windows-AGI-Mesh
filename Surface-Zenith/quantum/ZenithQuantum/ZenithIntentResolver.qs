@@ -240,7 +240,7 @@ namespace SurfaceZenith.Quantum.IntentResolver {
         }
 
         // Controlled Rz on last qubit
-        Controlled Rz(Most(register), (angle, Tail(register)));
+        Controlled R1(Most(register), (angle, Tail(register)));
 
         for (qubit, bit) in Zipped(register, bits) {
             if not bit { X(qubit); }
