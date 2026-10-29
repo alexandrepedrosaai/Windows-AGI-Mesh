@@ -114,7 +114,6 @@ services:
     container_name: agi-pytorch-cuda
     restart: "no"
     profiles:
-      - nvidia
       - benchmark
 
     deploy:
