@@ -350,14 +350,14 @@ zenith_ipi_handler:
     .type   zenith_send_ipi, @function
 zenith_send_ipi:
     ; Build ICC_SGI1R_EL1 value:
-    ; [23:16] = TargetList (bitmask of CPUs in cluster)
-    ; [15:0]  = INTID (SGI number)
-    ; [47:32] = Aff1 (cluster)
-    and     x0, x0, #0xFF           ; CPU ID (Aff0)
+    ; [15:0]  = TargetList (bitmask of CPUs in cluster)
+    ; [27:24] = INTID (SGI number)
+    ; [39:32] = Aff2 (cluster hierarchy)
+    and     x0, x0, #0xF            ; CPU ID (Aff0), TargetList supports 16 PEs
     mov     x2, #1
     lsl     x2, x2, x0              ; TargetList bitmask
-    lsl     x2, x2, #16
     and     x1, x1, #0xF            ; SGI ID
+    lsl     x1, x1, #24
     orr     x2, x2, x1
     msr     S3_0_C12_C11_5, x2     ; ICC_SGI1R_EL1
     isb
