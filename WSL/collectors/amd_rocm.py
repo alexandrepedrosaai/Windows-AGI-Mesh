@@ -266,7 +266,7 @@ def collect_gpu_metrics() -> list[AMDGPUMetrics]:
             fan_speed_pct=fan_pct,
             pcie_bw_sent_mb=pcie_sent,
             pcie_bw_recv_mb=pcie_recv,
-            compute_unit_active_pct=gpu_util,  # Approximation
+            compute_unit_active_pct=0.0,  # Not sourced from rocm-smi yet
             rocm_version=rocm_ver,
             driver_version=driver_ver,
             status="ok",
