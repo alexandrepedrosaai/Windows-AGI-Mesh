@@ -227,7 +227,7 @@ namespace MicrosoftAGIBenchmark {
     operation GroverDiffusion(qubits : Qubit[]) : Unit is Adj + Ctl {
         ApplyToEach(H, qubits);
         ApplyToEach(X, qubits);
-        Controlled Z(Most(qubits), Tail(qubits));
+        Controlled Z(Most(qubits), qubits[Length(qubits) - 1]);
         ApplyToEach(X, qubits);
         ApplyToEach(H, qubits);
     }
