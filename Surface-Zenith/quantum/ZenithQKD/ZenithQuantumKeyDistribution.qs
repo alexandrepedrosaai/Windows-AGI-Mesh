@@ -381,7 +381,26 @@ namespace SurfaceZenith.Quantum.QKD {
         if useE91 {
             let rawKey = RunE91Protocol(keyBits * 2);
             let finalKey = PrivacyAmplification(rawKey, keyBits);
-            return (finalKey, 0.0, Length(finalKey) == keyBits);
+
+            // Do not report a hardcoded perfect channel.
+            // Estimate channel error from raw key statistics and fail closed on high error.
+            // (A full E91 implementation should expose CHSH/Bell-test metrics here.)
+            mutable ones = 0;
+            for bit in rawKey {
+                if bit {
+                    set ones += 1;
+                }
+            }
+            let rawLen = Length(rawKey);
+            let qber =
+                if rawLen == 0 {
+                    1.0
+                } else {
+                    IntAsDouble(MinI(ones, rawLen - ones)) / IntAsDouble(rawLen)
+                };
+
+            let success = qber < 0.11 and Length(finalKey) == keyBits;
+            return (finalKey, qber, success);
         } else {
             // Standard channel error rate: 2%
             let (rawKey, qber, success) = RunBB84Protocol(keyBits * 2, 0.02);
