@@ -337,7 +337,7 @@ namespace SurfaceZenith.Quantum.QKD {
         return result;
     }
 
-    function PrivacyAmplification(rawKey : Bool[], finalLen : Int) : Bool[] {
+    operation PrivacyAmplification(rawKey : Bool[], finalLen : Int) : Bool[] {
         let rawLen = Length(rawKey);
         if finalLen >= rawLen {
             return rawKey;
