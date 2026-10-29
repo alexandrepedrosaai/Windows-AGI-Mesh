@@ -343,7 +343,7 @@ int tc_bench_egress(struct __sk_buff *skb) {
     if (val) {
         __sync_fetch_and_add(val, 1);
     }
-    return TC_ACT_OK;
+return 0;
 }
 
 // ---------------------------------------------------------------------------
