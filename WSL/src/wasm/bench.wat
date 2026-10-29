@@ -13,7 +13,7 @@
 
 (module
   ;; Module metadata
-  (;; Microsoft Windows AGI Benchmark Lab — WebAssembly Module ;;)
+  ;; Microsoft Windows AGI Benchmark Lab — WebAssembly Module
 
   ;; =========================================================================
   ;; Memory — 16 pages = 1 MB
