@@ -334,11 +334,12 @@ BenchResult bench_string_ops(void) {
 
     double t0 = get_time_sec();
 
+    volatile size_t checksum = 0;
     for (int r = 0; r < REPS; r++) {
         memcpy(dst, src, STR_LEN);
-        memset(dst, 'B', STR_LEN / 2);
-        (void)strlen(src);
-        (void)memcmp(src, dst, STR_LEN / 4);
+        memset(dst + STR_LEN / 2, 'B', STR_LEN / 2);
+        checksum += strlen(src);
+        checksum ^= (size_t)(unsigned int)memcmp(src, dst, STR_LEN / 4);
     }
 
     double elapsed = get_time_sec() - t0;
