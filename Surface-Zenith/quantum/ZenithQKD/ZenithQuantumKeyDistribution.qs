@@ -378,6 +378,10 @@ namespace SurfaceZenith.Quantum.QKD {
         keyBits      : Int
     ) : (Bool[], Double, Bool) {
 
+        if sourceDomain < 0 or sourceDomain > 5 or targetDomain < 0 or targetDomain > 5 or keyBits <= 0 {
+            fail "Domain indices must be in 0..5 and keyBits must be positive";
+        }
+
         // Use BB84 for standard channels
         // Use E91 for high-security channels (Quantum domain)
         let useE91 = sourceDomain == 3 or targetDomain == 3; // Quantum domain
