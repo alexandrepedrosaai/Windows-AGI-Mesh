@@ -188,7 +188,7 @@ jobs:
           and policy.
 
           High and Critical findings are release blocking when required by
-          `scripts/policy-check.py`.
+          `.github/schemas/policy-check.py`.
 
           Build, test and security failures MUST be propagated to the final
           policy evaluation.
@@ -260,7 +260,7 @@ jobs:
           test -f .github/schemas/invalid-security-failure.json
           test -f .github/schemas/invalid-high-finding.json
           test -f .github/schemas/invalid-critical-finding.json
-          test -f scripts/policy-check.py
+          test -f .github/schemas/policy-check.py
 
       - name: Validate schema JSON syntax
         run: |
@@ -268,7 +268,7 @@ jobs:
 
       - name: Compile policy checker
         run: |
-          python -m py_compile scripts/policy-check.py
+          python -m py_compile .github/schemas/policy-check.py
 
       #####################################################################
       # POSITIVE CASES
@@ -283,7 +283,7 @@ jobs:
 
       - name: Validate positive sample policy rules
         run: |
-          python scripts/policy-check.py \
+          python .github/schemas/policy-check.py \
             .github/schemas/sample-review-output.json
 
       #####################################################################
@@ -309,7 +309,7 @@ jobs:
 
       - name: Policy test - High severity finding
         run: |
-          if python scripts/policy-check.py \
+          if python .github/schemas/policy-check.py \
             .github/schemas/invalid-high-finding.json
           then
             echo "ERROR: invalid-high-finding.json unexpectedly passed"
@@ -320,7 +320,7 @@ jobs:
 
       - name: Policy test - Critical severity finding
         run: |
-          if python scripts/policy-check.py \
+          if python .github/schemas/policy-check.py \
             .github/schemas/invalid-critical-finding.json
           then
             echo "ERROR: invalid-critical-finding.json unexpectedly passed"
@@ -331,7 +331,7 @@ jobs:
 
       - name: Policy test - Build failure
         run: |
-          if python scripts/policy-check.py \
+          if python .github/schemas/policy-check.py \
             .github/schemas/invalid-build-failure.json
           then
             echo "ERROR: invalid-build-failure.json unexpectedly passed"
@@ -342,7 +342,7 @@ jobs:
 
       - name: Policy test - Test failure
         run: |
-          if python scripts/policy-check.py \
+          if python .github/schemas/policy-check.py \
             .github/schemas/invalid-test-failure.json
           then
             echo "ERROR: invalid-test-failure.json unexpectedly passed"
@@ -353,7 +353,7 @@ jobs:
 
       - name: Policy test - Security failure
         run: |
-          if python scripts/policy-check.py \
+          if python .github/schemas/policy-check.py \
             .github/schemas/invalid-security-failure.json
           then
             echo "ERROR: invalid-security-failure.json unexpectedly passed"
@@ -409,7 +409,6 @@ jobs:
 
           mkdir -p release-package/.github/schemas
           mkdir -p release-package/.github/skills/code-review
-          mkdir -p release-package/scripts
 
           cp -R .github/schemas/. \
             release-package/.github/schemas/
@@ -417,10 +416,7 @@ jobs:
           cp .github/skills/code-review/SKILL.md \
             release-package/.github/skills/code-review/SKILL.md
 
-          cp scripts/policy-check.py \
-            release-package/scripts/policy-check.py
-
-          cp .github/workflows/validate-skill.yml \
+          cp .github/workflows/Copilot-Skill.yml \
             release-package/validate-skill.yml
 
           (
