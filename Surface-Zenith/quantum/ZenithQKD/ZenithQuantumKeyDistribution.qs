@@ -285,8 +285,8 @@ namespace SurfaceZenith.Quantum.QKD {
 
             // Key bit: matching bases (0,0) or (π/2,π/2)
             if aliceIdx == bobIdx and (aliceIdx == 0 or aliceIdx == 2) {
-                // Anti-correlated results → Alice flips her bit for agreement
-                set key += [aliceResult != bobResult ? aliceResult | aliceResult];
+                // Matching settings on the |Φ+⟩ pair give identical outcomes, so Alice's bit is the shared key bit.
+                set key += [aliceResult];
             }
 
             set attempts += 1;
