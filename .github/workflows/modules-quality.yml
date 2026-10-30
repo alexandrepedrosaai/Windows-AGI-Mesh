@@ -25,9 +25,7 @@ concurrency:
 
 jobs:
 
-  validate-build:
-
-    name: Validate ${{ matrix.module }} on ${{ matrix.os }}
+  build-test:
 
     strategy:
       fail-fast: false
