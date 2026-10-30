@@ -82,17 +82,17 @@ jobs:
 
           FILE="${{ matrix.module }}"
 
-          if ! grep -qi "module" "$FILE"; then
+          if ! grep -Eq '^// module: ' "$FILE"; then
             echo "Missing module declaration"
             exit 1
           fi
 
-          if ! grep -qi "version" "$FILE"; then
+          if ! grep -Eq '^[[:space:]]*version = "' "$FILE"; then
             echo "Missing version metadata"
             exit 1
           fi
 
-          if ! grep -qi "author" "$FILE"; then
+          if ! grep -Eq '^// author: ' "$FILE"; then
             echo "Missing author metadata"
             exit 1
           fi
