@@ -589,11 +589,24 @@ jobs:
             test -s "$asset" || { echo "Empty release asset: $asset" >&2; exit 1; }
           done
 
+          # Create the release as a draft so repository release immutability is
+          # applied only after every asset has been uploaded successfully.
+          # If this commit already has an immutable published release, use a
+          # unique retry tag because immutable releases cannot accept changes.
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            is_draft=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft')
+            if [[ "$is_draft" != "true" ]]; then
+              tag="${tag}-${GITHUB_RUN_ID}"
+              echo "Existing release is already published/immutable; using retry tag $tag"
+            fi
+          fi
+
           if ! gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release create "$tag" \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
               --title "ACC $tag" \
-              --notes "Automated validated release for commit $GITHUB_SHA. Benchmark value: 1.0. Files, Windows binaries, MCP Agents cross-deploy evidence, Zenith Parameters, inference evidence and benchmark data are attached. External release remains human-approval gated."
+              --notes "Automated validated release for commit $GITHUB_SHA. Benchmark value: 1.0. Files, Windows binaries, MCP Agents cross-deploy evidence, Zenith Parameters, inference evidence and benchmark data are attached. External release remains human-approval gated." \
+              --draft
           fi
 
           # Upload one concrete local file at a time. Retry only transient upload
@@ -610,3 +623,6 @@ jobs:
             done
             test "$uploaded" -eq 1 || { echo "Failed to upload release asset: $asset" >&2; exit 1; }
           done
+
+          # Publish only after all assets and the final checksum manifest are present.
+          gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false --latest
