@@ -23,9 +23,6 @@ concurrency:
   group: agimesh-modules-quality-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  PR_BRANCH: Copilot-CLI-GITHUB
-
 jobs:
 
   validate-build:
@@ -257,157 +254,58 @@ jobs:
 
   create-quality-pr:
 
-    name: Create Quality Pull Request
+    name: Create Quality Pull Request from existing branch
 
     needs:
       - validate-build
 
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref != 'refs/heads/main'
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      pull-requests: write
+
     steps:
 
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Create or reuse Pull Request as GitHub Actions Bot
+        uses: actions/github-script@v7
+        env:
+          HEAD_BRANCH: ${{ github.ref_name }}
         with:
-          ref: ${{ github.ref_name }}
-          fetch-depth: 0
+          github-token: ${{ github.token }}
+          script: |
+            const head = process.env.HEAD_BRANCH;
+            const base = 'main';
 
-      - name: Configure Git
-        run: |
+            if (!head || head === base) {
+              core.setFailed('A non-main correction branch is required to create the Pull Request.');
+              return;
+            }
 
-          git config \
-            user.name \
-            "github-actions[bot]"
+            const existing = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              base,
+              head: `${context.repo.owner}:${head}`
+            });
 
-          git config \
-            user.email \
-            "41898282+github-actions[bot]@users.noreply.github.com"
+            if (existing.data.length > 0) {
+              core.info(`Pull Request already exists: ${existing.data[0].html_url}`);
+              core.setOutput('pull_request_url', existing.data[0].html_url);
+              return;
+            }
 
-      - name: Create report
-        run: |
+            const pull = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head,
+              base,
+              title: 'AGIMesh Modules Quality Automation',
+              body: `## Automated Quality Pipeline\n\nThis Pull Request was opened automatically by GitHub Actions Bot from the existing correction branch \`${head}\`.\n\n### Corrections\n\n- Added QS module, version, and author metadata.\n- Preserved QS structural validation.\n- Avoided creating a restricted auxiliary branch.\n- Kept artifact names safe for all operating systems.\n\n### Modules\n\n- DeepSpace.qs\n- EdgeAIApp.qs\n- MagneticMajorana.qs\n- Nemotron.qs\n- XboxQuantumXR.qs`
+            });
 
-          mkdir -p reports
-
-          cat > reports/modules-quality.md <<EOF
-          # AGIMesh Modules Quality Report
-
-          Generated automatically.
-
-          ## Validation
-
-          ✅ QS metadata validation
-
-          ✅ QS structural validation
-
-          ✅ Forbidden token validation
-
-          ## Supply Chain Security
-
-          ✅ CycloneDX SBOM (Syft)
-
-          ✅ SHA256 hashes
-
-          ✅ GitHub Artifact Attestation
-
-          ## Operating Systems
-
-          ✅ Ubuntu
-
-          ✅ Windows
-
-          ✅ macOS
-
-          ## Runtime Support
-
-          ✅ .NET 8 SDK
-
-          ✅ .NET 9 SDK
-
-          EOF
-
-      - name: Create branch
-        run: |
-
-          git checkout -B "${{ env.PR_BRANCH }}"
-
-      - name: Commit changes
-        run: |
-
-          git add reports/
-
-          git commit \
-            -m "chore: update AGIMesh quality report" \
-            || echo "No changes"
-
-      - name: Sync branch safely
-        run: |
-
-          git pull \
-            --rebase \
-            origin \
-            "${{ env.PR_BRANCH }}" \
-            || true
-
-      - name: Push branch
-        run: |
-
-          git push \
-            origin \
-            "${{ env.PR_BRANCH }}" \
-            --force-with-lease
-
-      - name: Create or update PR
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ github.token }}
-
-          branch: ${{ env.PR_BRANCH }}
-
-          base: main
-
-          delete-branch: false
-
-          title: |
-            AGIMesh Modules Quality Automation
-
-          commit-message: |
-            chore: update AGIMesh quality artifacts
-
-          body: |
-            ## Automated Quality Pipeline
-
-            This Pull Request was created automatically.
-
-            ### Validation
-
-            ✅ QS metadata validation
-
-            ✅ QS structural validation
-
-            ✅ Forbidden token validation
-
-            ### Security
-
-            ✅ CycloneDX SBOM generated with Syft
-
-            ✅ SHA256 generated
-
-            ✅ GitHub Artifact Attestation
-
-            ### Platforms
-
-            ✅ Ubuntu
-            ✅ Windows
-            ✅ macOS
-
-            ### Modules
-
-            ✅ DeepSpace.qs
-            ✅ EdgeAIApp.qs
-            ✅ MagneticMajorana.qs
-            ✅ Nemotron.qs
-            ✅ XboxQuantumXR.qs
-
-            Generated by GitHub Actions Bot.
+            core.info(`Pull Request created: ${pull.data.html_url}`);
+            core.setOutput('pull_request_url', pull.data.html_url);
