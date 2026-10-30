@@ -1,3 +1,7 @@
+// module: MagneticMajorana
+// version: 0.1
+// author: Windows AGI Mesh
+
 circuit MagneticMajorana {
   version = "0.1"
   kind = quantum_persistence_study

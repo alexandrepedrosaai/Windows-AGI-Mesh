@@ -1,3 +1,7 @@
+// module: DeepSpace
+// version: 0.1
+// author: Windows AGI Mesh
+
 namespace AGIMesh.Modules.DeepSpace {
 
     open Microsoft.Quantum.Intrinsic;

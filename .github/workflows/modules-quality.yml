@@ -264,7 +264,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Configure Git
@@ -354,7 +354,7 @@ jobs:
       - name: Create or update PR
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
 
           branch: ${{ env.PR_BRANCH }}
 
