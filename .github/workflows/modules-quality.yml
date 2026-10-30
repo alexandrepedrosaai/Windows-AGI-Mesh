@@ -4,22 +4,33 @@ on:
   push:
     paths:
       - "modules/**/*.qs"
+      - ".github/workflows/modules-quality.yml"
 
   pull_request:
     paths:
       - "modules/**/*.qs"
+      - ".github/workflows/modules-quality.yml"
 
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   attestations: write
   id-token: write
 
+concurrency:
+  group: agimesh-modules-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PR_BRANCH: Copilot-CLI-GITHUB
+
 jobs:
 
-  build-test:
+  validate-build:
+
+    name: Validate ${{ matrix.module }} on ${{ matrix.os }}
 
     strategy:
       fail-fast: false
@@ -38,11 +49,358 @@ jobs:
           - modules/XboxQuantumXR.qs
 
     runs-on: ${{ matrix.os }}
-          ✅ CycloneDX SBOM generated
 
-          ✅ SHA256 generated
+    steps:
 
-          ✅ Artifact attestation generated
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-          ✅ Package generated`
-            })
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Verify module exists
+        shell: bash
+        run: |
+
+          echo "Checking module..."
+
+          test -f "${{ matrix.module }}"
+
+          test -s "${{ matrix.module }}"
+
+          echo "Module found."
+
+      - name: Validate QS module metadata
+        shell: bash
+        run: |
+
+          FILE="${{ matrix.module }}"
+
+          if ! grep -qi "module" "$FILE"; then
+            echo "Missing module declaration"
+            exit 1
+          fi
+
+          if ! grep -qi "version" "$FILE"; then
+            echo "Missing version metadata"
+            exit 1
+          fi
+
+          if ! grep -qi "author" "$FILE"; then
+            echo "Missing author metadata"
+            exit 1
+          fi
+
+      - name: Validate forbidden tokens
+        shell: bash
+        run: |
+
+          FILE="${{ matrix.module }}"
+
+          if grep -q "TODO_ERROR" "$FILE"; then
+            echo "TODO_ERROR detected"
+            exit 1
+          fi
+
+          if grep -q "FIXME" "$FILE"; then
+            echo "FIXME detected"
+            exit 1
+          fi
+
+      - name: Validate QS structure
+        shell: bash
+        run: |
+
+          python3 << 'PY'
+          from pathlib import Path
+
+          path = Path("${{ matrix.module }}")
+
+          text = path.read_text(
+              encoding="utf-8",
+              errors="ignore"
+          )
+
+          if text.count("{") != text.count("}"):
+              raise SystemExit(
+                  f"Brace mismatch in {path}"
+              )
+
+          if text.count("(") != text.count(")"):
+              raise SystemExit(
+                  f"Parenthesis mismatch in {path}"
+              )
+
+          if text.count("[") != text.count("]"):
+              raise SystemExit(
+                  f"Bracket mismatch in {path}"
+              )
+
+          print("QS structural validation passed.")
+          PY
+
+      - name: Install Syft
+        uses: anchore/sbom-action/download-syft@v0
+
+      - name: Generate CycloneDX SBOM
+        shell: bash
+        run: |
+
+          mkdir -p sbom
+
+          syft . \
+            --output cyclonedx-json \
+            > sbom/agimesh-sbom.json
+
+      - name: Generate SHA256 Linux/macOS
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+
+          mkdir -p hash
+
+          sha256sum \
+            "${{ matrix.module }}" \
+            > "hash/$(basename "${{ matrix.module }}").sha256"
+
+      - name: Generate SHA256 Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            hash
+
+          $file =
+            Get-Item "${{ matrix.module }}"
+
+          Get-FileHash `
+            $file.FullName `
+            -Algorithm SHA256 |
+            Format-List |
+            Out-File `
+            "hash/$($file.Name).sha256"
+
+      - name: Package module Linux/macOS
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+
+          mkdir -p dist
+
+          MODULE_NAME=$(basename "${{ matrix.module }}" .qs)
+
+          tar \
+            -czf \
+            "dist/${MODULE_NAME}-${{ matrix.os }}.tar.gz" \
+            "${{ matrix.module }}"
+
+      - name: Package module Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            dist
+
+          $ModuleName =
+            [System.IO.Path]::GetFileNameWithoutExtension(
+              "${{ matrix.module }}"
+            )
+
+          Compress-Archive `
+            -Path "${{ matrix.module }}" `
+            -DestinationPath `
+            "dist/$ModuleName-${{ matrix.os }}.zip" `
+            -Force
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-${{ matrix.os }}-${{ matrix.module }}
+          path: |
+            sbom/**
+            hash/**
+            dist/**
+
+      - name: Generate attestation Linux/macOS
+        if: runner.os != 'Windows'
+        uses: actions/attest@v4
+        with:
+          subject-path: dist/*.tar.gz
+
+      - name: Generate attestation Windows
+        if: runner.os == 'Windows'
+        uses: actions/attest@v4
+        with:
+          subject-path: dist/*.zip
+
+  create-quality-pr:
+
+    name: Create Quality Pull Request
+
+    needs:
+      - validate-build
+
+    if: github.event_name != 'pull_request'
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+
+          git config \
+            user.name \
+            "github-actions[bot]"
+
+          git config \
+            user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create report
+        run: |
+
+          mkdir -p reports
+
+          cat > reports/modules-quality.md <<EOF
+          # AGIMesh Modules Quality Report
+
+          Generated automatically.
+
+          ## Validation
+
+          ✅ QS metadata validation
+
+          ✅ QS structural validation
+
+          ✅ Forbidden token validation
+
+          ## Supply Chain Security
+
+          ✅ CycloneDX SBOM (Syft)
+
+          ✅ SHA256 hashes
+
+          ✅ GitHub Artifact Attestation
+
+          ## Operating Systems
+
+          ✅ Ubuntu
+
+          ✅ Windows
+
+          ✅ macOS
+
+          ## Runtime Support
+
+          ✅ .NET 8 SDK
+
+          ✅ .NET 9 SDK
+
+          EOF
+
+      - name: Create branch
+        run: |
+
+          git checkout -B "${{ env.PR_BRANCH }}"
+
+      - name: Commit changes
+        run: |
+
+          git add reports/
+
+          git commit \
+            -m "chore: update AGIMesh quality report" \
+            || echo "No changes"
+
+      - name: Sync branch safely
+        run: |
+
+          git pull \
+            --rebase \
+            origin \
+            "${{ env.PR_BRANCH }}" \
+            || true
+
+      - name: Push branch
+        run: |
+
+          git push \
+            origin \
+            "${{ env.PR_BRANCH }}" \
+            --force-with-lease
+
+      - name: Create or update PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+          branch: ${{ env.PR_BRANCH }}
+
+          base: main
+
+          delete-branch: false
+
+          title: |
+            AGIMesh Modules Quality Automation
+
+          commit-message: |
+            chore: update AGIMesh quality artifacts
+
+          body: |
+            ## Automated Quality Pipeline
+
+            This Pull Request was created automatically.
+
+            ### Validation
+
+            ✅ QS metadata validation
+
+            ✅ QS structural validation
+
+            ✅ Forbidden token validation
+
+            ### Security
+
+            ✅ CycloneDX SBOM generated with Syft
+
+            ✅ SHA256 generated
+
+            ✅ GitHub Artifact Attestation
+
+            ### Platforms
+
+            ✅ Ubuntu
+            ✅ Windows
+            ✅ macOS
+
+            ### Modules
+
+            ✅ DeepSpace.qs
+            ✅ EdgeAIApp.qs
+            ✅ MagneticMajorana.qs
+            ✅ Nemotron.qs
+            ✅ XboxQuantumXR.qs
+
+            Generated by GitHub Actions Bot.
