@@ -1,0 +1,205 @@
+name: AG-UI Majorana MCP Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+  deployments: write
+
+env:
+  AGUI_ROOT: AG-UI
+  DOTNET_VERSION: "9.0.x"
+
+jobs:
+  build-package-hash:
+    name: Build AG-UI packages and immutable hashes
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact main commit
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build C# runtime
+        run: dotnet publish AG-UI/src/csharp/AGUI.csproj --configuration Release --output build/csharp --nologo
+
+      - name: Build native C runtime
+        run: |
+          set -euo pipefail
+          mkdir -p build/native
+          gcc -std=c11 -Wall -Wextra -Werror \
+            AG-UI/src/c/main.c AG-UI/src/c/ag_runtime.c \
+            -o build/native/ag-ui-native
+          ./build/native/ag-ui-native
+
+      - name: Validate all AG-UI JSON schemas
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for path in Path('AG-UI').rglob('*.json'):
+              json.loads(path.read_text())
+              print(f'validated {path}')
+          PY
+
+      - name: Package every AG-UI runtime and source family
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$AGUI_ROOT"
+          stage="build/packages-stage"
+          out="build/packages"
+          rm -rf "$stage" "$out"
+          mkdir -p "$stage" "$out"
+
+          package() {
+            local name="$1"
+            shift
+            local dir="$stage/$name"
+            mkdir -p "$dir"
+            cp -a "$root/appsettings.json" "$dir/"
+            cat > "$dir/package-manifest.json" <<JSON
+          {
+            "package": "${name}",
+            "commit": "${GITHUB_SHA}",
+            "ag_ui": "Agent-User Interaction Protocol",
+            "release_policy": "one immutable package set per main commit"
+          }
+          JSON
+            for item in "$@"; do
+              cp -a "$item" "$dir/"
+            done
+            (
+              cd "$dir"
+              find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS.txt
+            )
+            tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+              -czf "$out/${name}.tar.gz" -C "$stage" "$name"
+            sha256sum "$out/${name}.tar.gz" > "$out/${name}.tar.gz.sha256"
+            cp "$stage/$name/SHA256SUMS.txt" "$out/${name}.SHA256SUMS.txt"
+          }
+
+          package ag-ui-csharp "$root/src/csharp" build/csharp
+          package ag-ui-c-native "$root/src/c" build/native
+          package ag-ui-msil "$root/src/il"
+          package ag-ui-qsharp "$root/src/qsharp" "$root/src/schemas"
+          package ag-ui-runtimes "$root/runtimes"
+          package ag-ui-agents "$root/agents"
+          package ag-ui-source "$root/README.md" "$root/skill.md" "$root/agui.schema.json" "$root/appsettings.json" "$root/src" "$root/tests"
+
+          sha256sum "$out"/* > "$out/SHA256SUMS.txt"
+          cp "$out/SHA256SUMS.txt" "$out/SHA256SUMS.txt.sha256"
+          find "$out" -maxdepth 1 -type f -print | sort
+
+      - name: Upload immutable AG-UI package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ag-ui-packages-${{ github.sha }}
+          path: build/packages/
+          if-no-files-found: error
+          retention-days: 90
+
+  release:
+    name: GitHub Actions Bot immutable release
+    needs: build-package-hash
+    if: needs.build-package-hash.result == 'success'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download immutable package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ag-ui-packages-${{ github.sha }}
+          path: packages
+
+      - name: Create draft, upload packages and publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="ag-ui-${GITHUB_SHA}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            is_draft=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft')
+            if [[ "$is_draft" != "true" ]]; then
+              tag="${tag}-${GITHUB_RUN_ID}"
+            fi
+          fi
+
+          cat > release-notes.md <<'EOF'
+          # AG-UI Majorana MCP Release
+
+          ## Official AG-UI meaning
+
+          AG-UI means **Agent-User Interaction Protocol**. Microsoft describes AG-UI as a protocol for building web-based AI agent applications with real-time streaming, state management, interactive UI components, standardized communication, session management, and human-in-the-loop interactions. Microsoft's .NET announcement describes AG-UI as standardizing how agents communicate with user-facing applications through typed lifecycle, message, tool, and state events.
+
+          This release packages the Windows-AGI-Mesh AG-UI foundation across C#/.NET, native C, MSIL, Q#, runtimes, containers, agent skills, schemas, and source files. Each package contains an internal `SHA256SUMS.txt`, and each archive has an external `.sha256` integrity file.
+
+          Official references:
+          - Microsoft Learn: https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/ui/ag-ui/
+          - Microsoft .NET Blog: https://devblogs.microsoft.com/dotnet/ag-ui-dotnet-sdk/
+          - AG-UI protocol documentation: https://docs.ag-ui.com/introduction
+          EOF
+
+          if ! gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$tag" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "AG-UI Majorana MCP ${GITHUB_SHA:0:12}" \
+              --notes-file release-notes.md \
+              --draft
+          fi
+
+          mapfile -t assets < <(find packages -maxdepth 1 -type f -print | sort)
+          test "${#assets[@]}" -gt 0
+          for asset in "${assets[@]}"; do
+            test -s "$asset"
+            gh release upload "$tag" "$asset" --repo "$GITHUB_REPOSITORY"
+          done
+
+          gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+
+  deploy:
+    name: Deploy MCP Agents workloads topological Majorana
+    needs: release
+    if: needs.release.result == 'success'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      deployments: write
+    environment:
+      name: MCP Agents workloads topological Majorana
+      url: https://github.com/${{ github.repository }}/deployments/MCP%20Agents%20workloads%20topological%20Majorana
+    steps:
+      - name: Register Majorana MCP workload deployment as GitHub Actions Bot
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'MCP Agents workloads topological Majorana',
+              description: 'AG-UI packages deployed to MCP Agents topological Majorana workloads by GitHub Actions Bot',
+              auto_merge: false,
+              required_contexts: []
+            });
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.data.id,
+              state: 'success',
+              description: 'Immutable AG-UI package release deployed to Majorana MCP workloads',
+              environment_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/deployments/MCP%20Agents%20workloads%20topological%20Majorana`
+            });
+            core.info(`Deployment created: ${deployment.data.html_url}`);
