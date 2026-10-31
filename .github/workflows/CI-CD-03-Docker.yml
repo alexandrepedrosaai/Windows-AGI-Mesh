@@ -11,7 +11,8 @@ permissions:
   packages: write
 
 env:
-  IMAGE: ghcr.io/${{ github.repository }}
+  # OCI image names are case-sensitive and must be lowercase.
+  IMAGE: ghcr.io/alexandrepedrosaai/windows-agi-mesh
 
 jobs:
   docker-build:
@@ -19,17 +20,17 @@ jobs:
     if: (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - name: Login GHCR with GitHub Actions Bot token
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
       - name: Build And Push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
