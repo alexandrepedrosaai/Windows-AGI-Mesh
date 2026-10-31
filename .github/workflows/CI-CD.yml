@@ -24,7 +24,7 @@ jobs:
   dependency-review:
     name: Dependency Security Review
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       pull-requests: write
@@ -35,7 +35,7 @@ jobs:
 
   build-test-publish:
     name: Build Test Publish
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: dependency-review
     if: always() && (needs.dependency-review.result == 'success' || needs.dependency-review.result == 'skipped')
     outputs:
@@ -93,7 +93,7 @@ jobs:
 
   sonarcloud:
     name: SonarCloud
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build-test-publish
     if: needs.build-test-publish.result == 'success'
     steps:
@@ -118,7 +118,7 @@ jobs:
 
   quality-gate:
     name: Sonar Quality Gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: sonarcloud
     steps:
       - name: Check Quality Gate
@@ -129,7 +129,7 @@ jobs:
 
   docker-build:
     name: Docker Build And Push
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: quality-gate
     outputs:
       image: ghcr.io/${{ github.repository }}:${{ github.sha }}
@@ -157,7 +157,7 @@ jobs:
 
   release:
     name: GitHub Actions Bot Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/main'
     needs: docker-build
     steps:
@@ -182,7 +182,7 @@ jobs:
 
   deploy:
     name: Cross-Security-Fusion Deployment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/main'
     needs: release
     environment:
