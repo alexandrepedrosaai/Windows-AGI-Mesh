@@ -1,0 +1,40 @@
+name: CI-CD 03 SonarCloud
+
+on:
+  workflow_run:
+    workflows: ["CI-CD 02 Build Test Publish"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: "9.0.x"
+  SOLUTION_FILE: "Windows-AGI-Mesh/Windows-AGI-Mesh.sln"
+
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Install Sonar Scanner
+        run: dotnet tool install --global dotnet-sonarscanner
+      - name: Sonar Begin
+        run: |
+          ~/.dotnet/tools/dotnet-sonarscanner begin \
+            /k:"${{ vars.SONAR_PROJECT_KEY }}" \
+            /o:"${{ vars.SONAR_ORGANIZATION }}" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      - name: Build For Sonar
+        run: dotnet build "${{ env.SOLUTION_FILE }}" --configuration Release
+      - name: Sonar End
+        run: ~/.dotnet/tools/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"

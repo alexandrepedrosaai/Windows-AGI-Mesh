@@ -1,0 +1,45 @@
+name: CI-CD 06 Release
+
+on:
+  workflow_run:
+    workflows: ["CI-CD 05 Docker Build Push"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  release:
+    name: GitHub Actions Bot Release
+    if: (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download published app from Build Test Publish
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: CI-CD-02-Build-Test-Publish.yml
+          commit: ${{ github.event.workflow_run.head_sha || github.sha }}
+          name: dotnet-publish-${{ github.event.workflow_run.head_sha || github.sha }}
+          path: artifacts
+          workflow_conclusion: success
+          search_artifacts: true
+      - name: Create draft, upload assets and publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          sha="${{ github.event.workflow_run.head_sha || github.sha }}"
+          tag="ci-cd-${sha}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            tag="${tag}-${GITHUB_RUN_ID}"
+          fi
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$sha" \
+            --title "CI-CD ${sha:0:12}" \
+            --generate-notes \
+            --draft
+          gh release upload "$tag" artifacts/** --repo "$GITHUB_REPOSITORY"
+          gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false --latest
