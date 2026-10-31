@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/blob/main/AG-UI/src/schemas/workflow.schema.json",
+  "title": "AG-UI Workflow",
+  "type": "object",
+  "required": [
+    "id",
+    "steps"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "agent"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "agent": {
+            "type": "string"
+          },
+          "task": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "onFailure": {
+      "type": "string",
+      "enum": [
+        "stop",
+        "continue",
+        "retry"
+      ]
+    }
+  }
+}

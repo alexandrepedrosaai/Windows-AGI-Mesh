@@ -1,0 +1,7 @@
+services:
+  ag-ui:
+    build:
+      context: ../..
+      dockerfile: runtimes/containers/Dockerfile
+    image: windows-agi-mesh/ag-ui:local
+    restart: unless-stopped
