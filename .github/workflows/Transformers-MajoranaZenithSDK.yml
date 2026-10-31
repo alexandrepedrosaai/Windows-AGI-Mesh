@@ -108,28 +108,28 @@ jobs:
         if: matrix.id == 'domain'
         working-directory: ${{ runner.temp }}/transformer-domain
         run: |
-          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --no-restore
+          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --prerelease --no-restore
           dotnet restore TransformerPackage.csproj --configfile "$RUNNER_TEMP/transformer-domain/NuGet.Config" --source "$NUGET_SOURCE" --no-cache --force
 
       - name: Download MajoranaZenithSDK (2 of 4 per matrix build)
         if: matrix.id == 'neural'
         working-directory: ${{ runner.temp }}/transformer-neural
         run: |
-          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --no-restore
+          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --prerelease --no-restore
           dotnet restore TransformerPackage.csproj --configfile "$RUNNER_TEMP/transformer-neural/NuGet.Config" --source "$NUGET_SOURCE" --no-cache --force
 
       - name: Download MajoranaZenithSDK (3 of 4 per matrix build)
         if: matrix.id == 'source'
         working-directory: ${{ runner.temp }}/transformer-source
         run: |
-          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --no-restore
+          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --prerelease --no-restore
           dotnet restore TransformerPackage.csproj --configfile "$RUNNER_TEMP/transformer-source/NuGet.Config" --source "$NUGET_SOURCE" --no-cache --force
 
       - name: Download MajoranaZenithSDK (4 of 4 per matrix build)
         if: matrix.id == 'bundle'
         working-directory: ${{ runner.temp }}/transformer-bundle
         run: |
-          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --no-restore
+          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --prerelease --no-restore
           dotnet restore TransformerPackage.csproj --configfile "$RUNNER_TEMP/transformer-bundle/NuGet.Config" --source "$NUGET_SOURCE" --no-cache --force
 
       - name: Verify MajoranaZenithSDK was restored
