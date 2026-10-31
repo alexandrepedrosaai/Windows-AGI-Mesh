@@ -46,13 +46,22 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/transformer-${{ matrix.id }}"
+          config_dir="$RUNNER_TEMP/transformer-${{ matrix.id }}"
+          mkdir -p "$config_dir"
+          cat > "$config_dir/NuGet.Config" <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+            </packageSources>
+          </configuration>
+          XML
           dotnet nuget add source "$NUGET_SOURCE" \
             --name github \
             --username "${{ github.actor }}" \
             --password "$GITHUB_TOKEN" \
             --store-password-in-clear-text \
-            --configfile "$RUNNER_TEMP/transformer-${{ matrix.id }}/NuGet.Config"
+            --configfile "$config_dir/NuGet.Config"
 
       - name: Prepare transformer package project
         shell: bash
