@@ -1,0 +1,147 @@
+name: Transformers MajoranaZenithSDK Package Build
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  DOTNET_VERSION: "9.0.x"
+  NUGET_NAMESPACE: alexandrepedrosaai
+  NUGET_SOURCE: https://nuget.pkg.github.com/alexandrepedrosaai/index.json
+
+jobs:
+  build-transformer-package:
+    name: Build transformer ${{ matrix.id }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: domain
+            package_id: MajoranaZenithSDK.Transformer.Domain
+          - id: neural
+            package_id: MajoranaZenithSDK.Transformer.Neural
+          - id: source
+            package_id: MajoranaZenithSDK.Transformer.Source
+          - id: bundle
+            package_id: MajoranaZenithSDK.Transformer.Bundle
+
+    steps:
+      - name: Checkout transformer sources
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Configure GitHub Packages NuGet source
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/transformer-${{ matrix.id }}"
+          dotnet nuget add source "$NUGET_SOURCE" \
+            --name github \
+            --username "${{ github.actor }}" \
+            --password "$GITHUB_TOKEN" \
+            --store-password-in-clear-text \
+            --configfile "$RUNNER_TEMP/transformer-${{ matrix.id }}/NuGet.Config"
+
+      - name: Prepare transformer package project
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/transformer-${{ matrix.id }}"
+          mkdir -p "$work/transformer-source" "$work/packages"
+          case "${{ matrix.id }}" in
+            domain)
+              cp WINDOWS-AI-QUANTUM-AGENT/DOMAINS/QuantumTransformer.qs "$work/transformer-source/"
+              ;;
+            neural)
+              cp WINDOWS-AI-QUANTUM-AGENT/NEURAL/transformer/QuantumTransformer.qs "$work/transformer-source/"
+              ;;
+            source)
+              cp WINDOWS-AI-QUANTUM-AGENT/DOMAINS/QuantumTransformer.qs "$work/transformer-source/domain-QuantumTransformer.qs"
+              cp WINDOWS-AI-QUANTUM-AGENT/NEURAL/transformer/QuantumTransformer.qs "$work/transformer-source/neural-QuantumTransformer.qs"
+              ;;
+            bundle)
+              cp -a WINDOWS-AI-QUANTUM-AGENT/DOMAINS "$work/transformer-source/"
+              cp -a WINDOWS-AI-QUANTUM-AGENT/NEURAL "$work/transformer-source/"
+              ;;
+          esac
+          cat > "$work/TransformerPackage.csproj" <<XML
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <TargetFramework>net9.0</TargetFramework>
+              <IsPackable>true</IsPackable>
+              <PackageId>${{ matrix.package_id }}</PackageId>
+              <Version>0.1.0-ci.${GITHUB_RUN_NUMBER}</Version>
+              <Authors>Windows-AGI-Mesh</Authors>
+              <Description>Quantum transformer package for Windows-AGI-Mesh using MajoranaZenithSDK.</Description>
+              <PackageTags>transformer;quantum;MajoranaZenithSDK;QSharp</PackageTags>
+              <RepositoryUrl>https://github.com/${{ github.repository }}</RepositoryUrl>
+            </PropertyGroup>
+            <ItemGroup>
+              <PackageReference Include="MajoranaZenithSDK" />
+              <None Include="transformer-source/**/*" Pack="true" PackagePath="transformers/" />
+            </ItemGroup>
+          </Project>
+          XML
+
+      - name: Download MajoranaZenithSDK (1 of 4 per matrix build)
+        if: matrix.id == 'domain'
+        working-directory: ${{ runner.temp }}/transformer-domain
+        run: |
+          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --no-restore
+          dotnet restore TransformerPackage.csproj --configfile "$RUNNER_TEMP/transformer-domain/NuGet.Config" --source "$NUGET_SOURCE" --no-cache --force
+
+      - name: Download MajoranaZenithSDK (2 of 4 per matrix build)
+        if: matrix.id == 'neural'
+        working-directory: ${{ runner.temp }}/transformer-neural
+        run: |
+          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --no-restore
+          dotnet restore TransformerPackage.csproj --configfile "$RUNNER_TEMP/transformer-neural/NuGet.Config" --source "$NUGET_SOURCE" --no-cache --force
+
+      - name: Download MajoranaZenithSDK (3 of 4 per matrix build)
+        if: matrix.id == 'source'
+        working-directory: ${{ runner.temp }}/transformer-source
+        run: |
+          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --no-restore
+          dotnet restore TransformerPackage.csproj --configfile "$RUNNER_TEMP/transformer-source/NuGet.Config" --source "$NUGET_SOURCE" --no-cache --force
+
+      - name: Download MajoranaZenithSDK (4 of 4 per matrix build)
+        if: matrix.id == 'bundle'
+        working-directory: ${{ runner.temp }}/transformer-bundle
+        run: |
+          dotnet add TransformerPackage.csproj package MajoranaZenithSDK --source "$NUGET_SOURCE" --no-restore
+          dotnet restore TransformerPackage.csproj --configfile "$RUNNER_TEMP/transformer-bundle/NuGet.Config" --source "$NUGET_SOURCE" --no-cache --force
+
+      - name: Verify MajoranaZenithSDK was restored
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d "$HOME/.nuget/packages/majoranazenithsdk"
+          find "$HOME/.nuget/packages/majoranazenithsdk" -maxdepth 2 -type f -print | head -20
+
+      - name: Pack transformer NuGet package
+        working-directory: ${{ runner.temp }}/transformer-${{ matrix.id }}
+        run: |
+          dotnet pack TransformerPackage.csproj --configuration Release --no-restore --output packages --nologo
+          test -s packages/${{ matrix.package_id }}.0.1.0-ci.${GITHUB_RUN_NUMBER}.nupkg
+          sha256sum packages/*.nupkg > packages/SHA256SUMS.txt
+          sha256sum packages/SHA256SUMS.txt > packages/SHA256SUMS.txt.sha256
+
+      - name: Upload immutable transformer package
+        uses: actions/upload-artifact@v4
+        with:
+          name: transformer-${{ matrix.id }}-${{ github.sha }}
+          path: ${{ runner.temp }}/transformer-${{ matrix.id }}/packages/
+          if-no-files-found: error
+          retention-days: 90
