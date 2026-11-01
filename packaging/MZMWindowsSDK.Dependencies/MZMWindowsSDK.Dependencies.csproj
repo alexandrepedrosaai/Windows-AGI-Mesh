@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <PackageId>MZMWindowsSDK.Dependencies</PackageId>
+    <PackageVersion Condition="'$(PackageVersion)' == ''">0.1.0-local</PackageVersion>
+    <PackageTitle>MZMWindowsSDK Dependencies</PackageTitle>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Description>Dependency bundle for MZMWindowsSDK release consumers.</Description>
+    <Authors>alexandrepedrosaai</Authors>
+    <RepositoryUrl>https://github.com/alexandrepedrosaai/Windows-AGI-Mesh</RepositoryUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MZMWindowsSDK" Version="$(PackageVersion)" />
+    <None Include="README.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
+</Project>

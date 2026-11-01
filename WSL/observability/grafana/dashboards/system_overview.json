@@ -1,0 +1,129 @@
+{
+  "title": "Windows AGI Benchmark Lab \u2014 System Overview",
+  "uid": "agi-system-overview",
+  "version": 1,
+  "schemaVersion": 38,
+  "tags": [
+    "agi",
+    "system",
+    "benchmark",
+    "microsoft"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "CPU Utilization",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "system_cpu_util_pct",
+          "legendFormat": "CPU %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "RAM Usage (GB)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "system_ram_used_gb",
+          "legendFormat": "RAM Used",
+          "refId": "A"
+        },
+        {
+          "expr": "system_ram_total_gb",
+          "legendFormat": "RAM Total",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Disk I/O (MB/s)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "system_disk_read_mb_s{mount=\"/\"}",
+          "legendFormat": "Read",
+          "refId": "A"
+        },
+        {
+          "expr": "system_disk_write_mb_s{mount=\"/\"}",
+          "legendFormat": "Write",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Network I/O (MB/s)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "system_net_recv_mb_s{interface=\"eth0\"}",
+          "legendFormat": "RX",
+          "refId": "A"
+        },
+        {
+          "expr": "system_net_sent_mb_s{interface=\"eth0\"}",
+          "legendFormat": "TX",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Load Average",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "targets": [
+        {
+          "expr": "system_cpu_load_avg_1m",
+          "legendFormat": "1m",
+          "refId": "A"
+        },
+        {
+          "expr": "system_cpu_load_avg_5m",
+          "legendFormat": "5m",
+          "refId": "B"
+        },
+        {
+          "expr": "system_cpu_load_avg_15m",
+          "legendFormat": "15m",
+          "refId": "C"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "name": "zenith-dashboard",
+  "version": "0.1.0",
+  "description": "Surface Zenith OS — Developer Dashboard (React/TypeScript)",
+  "private": true,
+  "scripts": {
+    "start":   "react-scripts start",
+    "build":   "react-scripts build",
+    "test":    "react-scripts test",
+    "lint":    "eslint src --ext .ts,.tsx",
+    "format":  "prettier --write src/**/*.{ts,tsx,css}"
+  },
+  "dependencies": {
+    "react":                    "^18.2.0",
+    "react-dom":                "^18.2.0",
+    "react-router-dom":         "^6.20.0",
+    "recharts":                 "^2.10.0",
+    "zustand":                  "^4.4.7",
+    "axios":                    "^1.6.2",
+    "date-fns":                 "^3.0.0",
+    "clsx":                     "^2.0.0",
+    "lucide-react":             "^0.294.0",
+    "@radix-ui/react-dialog":   "^1.0.5",
+    "@radix-ui/react-tabs":     "^1.0.4",
+    "@radix-ui/react-tooltip":  "^1.0.7",
+    "@radix-ui/react-progress": "^1.0.3",
+    "@radix-ui/react-badge":    "^1.0.0",
+    "framer-motion":            "^10.16.16",
+    "react-force-graph-2d":     "^1.25.4",
+    "d3":                       "^7.8.5",
+    "uuid":                     "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/react":             "^18.2.43",
+    "@types/react-dom":         "^18.2.17",
+    "@types/d3":                "^7.4.3",
+    "@types/uuid":              "^9.0.7",
+    "@types/node":              "^20.10.4",
+    "typescript":               "^5.3.3",
+    "react-scripts":            "5.0.1",
+    "eslint":                   "^8.55.0",
+    "prettier":                 "^3.1.1",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser":        "^6.14.0"
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version"]
+  }
+}

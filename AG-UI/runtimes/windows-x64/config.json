@@ -1,0 +1,6 @@
+{
+  "platform": "windows-x64",
+  "entrypoint": "src/csharp/AGUI.dll",
+  "runtime": "dotnet",
+  "environment": "production"
+}

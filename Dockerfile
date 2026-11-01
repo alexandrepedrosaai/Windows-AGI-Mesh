@@ -1,5 +1,4 @@
 # Base image: Ubuntu + .NET + Q#
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 # Instalar dependências básicas
 RUN apt-get update && apt-get install -y \
@@ -24,7 +23,7 @@ COPY . .
 RUN dotnet build MajoranaStarship.qsproj -c Release
 
 # Runtime image
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS runtime
+
 
 WORKDIR /app/WebGPU/Majoran-Starship
 

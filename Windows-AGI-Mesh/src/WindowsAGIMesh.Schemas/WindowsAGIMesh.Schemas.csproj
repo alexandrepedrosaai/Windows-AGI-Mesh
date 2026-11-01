@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>WindowsAGIMesh.Schemas</RootNamespace>
+    <AssemblyName>WindowsAGIMesh.Schemas</AssemblyName>
+    <Description>JSON Schema validation utilities for the Windows AGI Mesh platform.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WindowsAGIMesh.Contracts\WindowsAGIMesh.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,3008 @@
+{
+  "schemaVersion": 1,
+  "artifactCount": 500,
+  "language": "English",
+  "status": "architecture-scaffold",
+  "artifacts": [
+    {
+      "number": 1,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/platform-architecture.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 2,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/qmesh-grammar.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 3,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/qmesh-types.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 4,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/qil-opcodes.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 5,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/qil-binary-format.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 6,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/lexer-tokenizer.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 7,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/parser.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 8,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/semantic-binder.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 9,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/meshir-graph-builder.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 10,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/qil-generator.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 11,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/quantum-h.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 12,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/quantum-cnot.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 13,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/qir-lowering.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 14,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/qubit-manager.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 15,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/gate-dispatcher.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 16,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/agent-runtime.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 17,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/planner-agent.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 18,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/working-memory.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 19,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/vector-store.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 20,
+      "section": "Core Specifications",
+      "path": "mzm-windows-sdk/specs/core/semantic-memory.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 21,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/grammar.ebnf",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 22,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/ast.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 23,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/mesh-node.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 24,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/mesh-link.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 25,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/mesh-agent.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 26,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/mesh-flow.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 27,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/mesh-memory.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 28,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/mesh-quantum.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 29,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/import-parser.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 30,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/type-parser.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 31,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-031.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 32,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-032.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 33,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-033.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 34,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-034.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 35,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-035.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 36,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-036.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 37,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-037.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 38,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-038.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 39,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-039.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 40,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-040.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 41,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-041.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 42,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-042.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 43,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-043.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 44,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-044.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 45,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-045.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 46,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-046.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 47,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-047.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 48,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-048.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 49,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-049.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 50,
+      "section": "QMesh Language",
+      "path": "mzm-windows-sdk/compiler/qmesh/artifact-050.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 51,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-051.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 52,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-052.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 53,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-053.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 54,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-054.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 55,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-055.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 56,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-056.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 57,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-057.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 58,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-058.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 59,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-059.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 60,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-060.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 61,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-061.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 62,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-062.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 63,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-063.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 64,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-064.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 65,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-065.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 66,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-066.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 67,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-067.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 68,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-068.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 69,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-069.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 70,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-070.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 71,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-071.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 72,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-072.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 73,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-073.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 74,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-074.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 75,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-075.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 76,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-076.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 77,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-077.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 78,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-078.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 79,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-079.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 80,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-080.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 81,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-081.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 82,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-082.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 83,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-083.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 84,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-084.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 85,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-085.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 86,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-086.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 87,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-087.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 88,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-088.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 89,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-089.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 90,
+      "section": "Q# IL",
+      "path": "mzm-windows-sdk/compiler/qil/artifact-090.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 91,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-091.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 92,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-092.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 93,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-093.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 94,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-094.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 95,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-095.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 96,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-096.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 97,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-097.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 98,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-098.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 99,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-099.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 100,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-100.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 101,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-101.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 102,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-102.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 103,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-103.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 104,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-104.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 105,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-105.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 106,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-106.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 107,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-107.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 108,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-108.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 109,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-109.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 110,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-110.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 111,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-111.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 112,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-112.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 113,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-113.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 114,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-114.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 115,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-115.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 116,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-116.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 117,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-117.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 118,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-118.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 119,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-119.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 120,
+      "section": "QIR Backend",
+      "path": "mzm-windows-sdk/compiler/qir/artifact-120.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 121,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-121.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 122,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-122.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 123,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-123.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 124,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-124.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 125,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-125.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 126,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-126.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 127,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-127.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 128,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-128.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 129,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-129.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 130,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-130.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 131,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-131.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 132,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-132.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 133,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-133.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 134,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-134.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 135,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-135.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 136,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-136.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 137,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-137.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 138,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-138.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 139,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-139.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 140,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-140.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 141,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-141.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 142,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-142.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 143,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-143.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 144,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-144.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 145,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-145.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 146,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-146.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 147,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-147.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 148,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-148.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 149,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-149.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 150,
+      "section": "Quantum Runtime",
+      "path": "mzm-windows-sdk/runtime/quantum/artifact-150.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 151,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-151.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 152,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-152.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 153,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-153.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 154,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-154.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 155,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-155.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 156,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-156.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 157,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-157.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 158,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-158.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 159,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-159.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 160,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-160.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 161,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-161.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 162,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-162.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 163,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-163.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 164,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-164.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 165,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-165.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 166,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-166.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 167,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-167.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 168,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-168.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 169,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-169.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 170,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-170.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 171,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-171.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 172,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-172.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 173,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-173.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 174,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-174.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 175,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-175.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 176,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-176.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 177,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-177.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 178,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-178.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 179,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-179.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 180,
+      "section": "Agent Runtime",
+      "path": "mzm-windows-sdk/runtime/agents/artifact-180.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 181,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-181.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 182,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-182.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 183,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-183.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 184,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-184.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 185,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-185.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 186,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-186.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 187,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-187.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 188,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-188.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 189,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-189.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 190,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-190.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 191,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-191.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 192,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-192.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 193,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-193.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 194,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-194.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 195,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-195.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 196,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-196.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 197,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-197.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 198,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-198.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 199,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-199.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 200,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-200.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 201,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-201.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 202,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-202.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 203,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-203.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 204,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-204.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 205,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-205.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 206,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-206.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 207,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-207.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 208,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-208.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 209,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-209.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 210,
+      "section": "Memory Fabric",
+      "path": "mzm-windows-sdk/memory/fabric/artifact-210.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 211,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-211.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 212,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-212.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 213,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-213.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 214,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-214.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 215,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-215.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 216,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-216.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 217,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-217.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 218,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-218.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 219,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-219.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 220,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-220.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 221,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-221.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 222,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-222.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 223,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-223.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 224,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-224.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 225,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-225.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 226,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-226.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 227,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-227.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 228,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-228.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 229,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-229.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 230,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-230.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 231,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-231.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 232,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-232.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 233,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-233.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 234,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-234.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 235,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-235.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 236,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-236.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 237,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-237.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 238,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-238.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 239,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-239.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 240,
+      "section": "Mesh Fabric",
+      "path": "mzm-windows-sdk/fabric/mesh/artifact-240.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 241,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-241.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 242,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-242.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 243,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-243.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 244,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-244.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 245,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-245.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 246,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-246.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 247,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-247.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 248,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-248.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 249,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-249.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 250,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-250.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 251,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-251.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 252,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-252.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 253,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-253.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 254,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-254.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 255,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-255.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 256,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-256.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 257,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-257.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 258,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-258.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 259,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-259.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 260,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-260.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 261,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-261.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 262,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-262.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 263,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-263.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 264,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-264.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 265,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-265.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 266,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-266.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 267,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-267.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 268,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-268.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 269,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-269.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 270,
+      "section": "Distributed Scheduler",
+      "path": "mzm-windows-sdk/scheduler/artifact-270.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 271,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-271.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 272,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-272.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 273,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-273.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 274,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-274.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 275,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-275.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 276,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-276.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 277,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-277.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 278,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-278.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 279,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-279.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 280,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-280.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 281,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-281.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 282,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-282.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 283,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-283.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 284,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-284.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 285,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-285.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 286,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-286.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 287,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-287.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 288,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-288.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 289,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-289.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 290,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-290.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 291,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-291.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 292,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-292.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 293,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-293.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 294,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-294.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 295,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-295.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 296,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-296.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 297,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-297.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 298,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-298.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 299,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-299.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 300,
+      "section": "Cloud Integration",
+      "path": "mzm-windows-sdk/cloud/artifact-300.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 301,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-301.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 302,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-302.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 303,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-303.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 304,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-304.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 305,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-305.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 306,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-306.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 307,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-307.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 308,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-308.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 309,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-309.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 310,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-310.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 311,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-311.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 312,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-312.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 313,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-313.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 314,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-314.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 315,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-315.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 316,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-316.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 317,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-317.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 318,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-318.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 319,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-319.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 320,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-320.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 321,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-321.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 322,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-322.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 323,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-323.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 324,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-324.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 325,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-325.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 326,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-326.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 327,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-327.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 328,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-328.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 329,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-329.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 330,
+      "section": "Security",
+      "path": "mzm-windows-sdk/security/artifact-330.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 331,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-331.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 332,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-332.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 333,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-333.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 334,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-334.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 335,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-335.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 336,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-336.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 337,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-337.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 338,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-338.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 339,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-339.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 340,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-340.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 341,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-341.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 342,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-342.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 343,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-343.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 344,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-344.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 345,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-345.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 346,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-346.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 347,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-347.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 348,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-348.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 349,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-349.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 350,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-350.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 351,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-351.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 352,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-352.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 353,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-353.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 354,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-354.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 355,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-355.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 356,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-356.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 357,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-357.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 358,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-358.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 359,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-359.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 360,
+      "section": "SDKs",
+      "path": "mzm-windows-sdk/sdk/artifact-360.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 361,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-361.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 362,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-362.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 363,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-363.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 364,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-364.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 365,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-365.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 366,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-366.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 367,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-367.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 368,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-368.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 369,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-369.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 370,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-370.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 371,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-371.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 372,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-372.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 373,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-373.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 374,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-374.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 375,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-375.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 376,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-376.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 377,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-377.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 378,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-378.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 379,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-379.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 380,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-380.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 381,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-381.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 382,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-382.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 383,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-383.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 384,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-384.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 385,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-385.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 386,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-386.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 387,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-387.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 388,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-388.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 389,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-389.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 390,
+      "section": "Toolchain",
+      "path": "mzm-windows-sdk/tools/artifact-390.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 391,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-391.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 392,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-392.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 393,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-393.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 394,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-394.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 395,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-395.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 396,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-396.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 397,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-397.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 398,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-398.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 399,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-399.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 400,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-400.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 401,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-401.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 402,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-402.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 403,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-403.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 404,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-404.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 405,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-405.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 406,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-406.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 407,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-407.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 408,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-408.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 409,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-409.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 410,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-410.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 411,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-411.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 412,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-412.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 413,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-413.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 414,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-414.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 415,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-415.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 416,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-416.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 417,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-417.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 418,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-418.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 419,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-419.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 420,
+      "section": "Diagnostics",
+      "path": "mzm-windows-sdk/diagnostics/artifact-420.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 421,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-421.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 422,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-422.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 423,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-423.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 424,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-424.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 425,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-425.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 426,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-426.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 427,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-427.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 428,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-428.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 429,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-429.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 430,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-430.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 431,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-431.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 432,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-432.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 433,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-433.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 434,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-434.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 435,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-435.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 436,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-436.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 437,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-437.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 438,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-438.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 439,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-439.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 440,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-440.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 441,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-441.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 442,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-442.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 443,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-443.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 444,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-444.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 445,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-445.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 446,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-446.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 447,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-447.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 448,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-448.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 449,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-449.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 450,
+      "section": "Testing",
+      "path": "mzm-windows-sdk/tests/artifact-450.cs",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 451,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/bellpair.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 452,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/teleportation.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 453,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/grover.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 454,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/agent-routing.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 455,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/smart-memory.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 456,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/distributed-reasoning.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 457,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-457.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 458,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-458.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 459,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-459.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 460,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-460.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 461,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-461.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 462,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-462.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 463,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-463.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 464,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-464.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 465,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-465.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 466,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-466.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 467,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-467.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 468,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-468.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 469,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-469.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 470,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-470.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 471,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-471.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 472,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-472.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 473,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-473.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 474,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-474.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 475,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-475.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 476,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-476.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 477,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-477.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 478,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-478.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 479,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-479.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 480,
+      "section": "Examples",
+      "path": "mzm-windows-sdk/samples/artifact-480.qmesh",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 481,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/empty-project.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 482,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/agent-project.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 483,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/research-project.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 484,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/quantum-project.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 485,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/cloud-project.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 486,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/enterprise-project.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 487,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/distributed-project.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 488,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/hybrid-project.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 489,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-489.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 490,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-490.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 491,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-491.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 492,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-492.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 493,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-493.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 494,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-494.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 495,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-495.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 496,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-496.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 497,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-497.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 498,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-498.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 499,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-499.md",
+      "status": "architecture-scaffold"
+    },
+    {
+      "number": 500,
+      "section": "Templates",
+      "path": "mzm-windows-sdk/templates/artifact-500.md",
+      "status": "architecture-scaffold"
+    }
+  ]
+}

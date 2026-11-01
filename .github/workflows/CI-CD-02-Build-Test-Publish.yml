@@ -1,0 +1,63 @@
+name: CI-CD 02 Build Test Publish
+
+on:
+  workflow_run:
+    workflows: ["CI-CD 01 Dependency Review"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: "9.0.x"
+  SOLUTION_FILE: "Windows-AGI-Mesh/Windows-AGI-Mesh.sln"
+  INTEGRATION_TEST_PROJECT: "Windows-AGI-Mesh/tests/WindowsAGIMesh.SchemaTests/WindowsAGIMesh.SchemaTests.csproj"
+
+jobs:
+  build-test-publish:
+    name: Build Test Publish
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.local/share/NuGet/v3-cache
+          key: nuget-${{ runner.os }}-${{ hashFiles('Windows-AGI-Mesh/Windows-AGI-Mesh.sln','**/*.csproj','**/packages.lock.json') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore "${{ env.SOLUTION_FILE }}"
+      - name: Build
+        run: dotnet build "${{ env.SOLUTION_FILE }}" --configuration Release --no-restore
+      - name: Unit Tests
+        run: dotnet test "${{ env.SOLUTION_FILE }}" --configuration Release --no-build --collect:"XPlat Code Coverage" --logger trx
+      - name: Integration Tests
+        run: dotnet test "${{ env.INTEGRATION_TEST_PROJECT }}" --configuration Release --logger trx
+      - name: Publish
+        run: dotnet publish "${{ env.SOLUTION_FILE }}" --configuration Release --no-build --output publish
+      - name: Upload Published App
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-publish-${{ github.event.workflow_run.head_sha || github.sha }}
+          path: publish/
+          retention-days: 30
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.event.workflow_run.head_sha || github.sha }}
+          path: "**/*.trx"
+          if-no-files-found: warn
