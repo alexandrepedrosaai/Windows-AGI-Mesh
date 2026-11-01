@@ -1,14 +1,115 @@
-# `dependabot.yml` file with
-# customized schedule for version updates
-
 version: 2
+
+multi-ecosystem-groups:
+  infrastructure:
+    schedule:
+      interval: "daily"
+      time: "04:00"
+      timezone: "America/Sao_Paulo"
+    labels:
+      - "dependencies"
+      - "infrastructure"
+
 updates:
-  # Keep npm dependencies up to date
+  - package-ecosystem: "docker"
+    directory: "/"
+    patterns:
+      - "nginx"
+      - "redis"
+    multi-ecosystem-group: "infrastructure"
+
+  - package-ecosystem: "terraform"
+    directory: "/"
+    patterns:
+      - "aws"
+    multi-ecosystem-group: "infrastructure"
+
   - package-ecosystem: "npm"
     directory: "/"
-    # Check the npm registry every week on Tuesday at 02:00 Japan Standard Time (UTC +09:00)
     schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "02:00"
-      timezone: "Asia/Tokyo"
+      interval: "daily"
+      time: "04:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "npm"
+      - "triage-board"
+    groups:
+      angular-security:
+        applies-to: security-updates
+        patterns:
+          - "@angular*"
+      production-dependencies:
+        applies-to: version-updates
+        dependency-type: "production"
+        patterns:
+          - "*"
+      security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "04:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "nuget"
+      - "security"
+    groups:
+      nuget-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+      nuget-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "04:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "maven"
+      - "security"
+    groups:
+      maven-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+      maven-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "04:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "rubygems"
+      - "security"
+    groups:
+      rubygems-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+      rubygems-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+          - "*"

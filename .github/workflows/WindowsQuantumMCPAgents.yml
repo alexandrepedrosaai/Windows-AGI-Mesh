@@ -1,0 +1,172 @@
+name: Windows Quantum MCP Agents
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Go.Windows.go/**'
+      - '.github/workflows/WindowsQuantumMCPAgents.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  deployments: write
+
+concurrency:
+  group: windows-quantum-mcp-agents-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GO_ROOT: Go.Windows.go
+  BOT_NAME: github-advanced-security[bot]
+  BOT_EMAIL: 62310815+github-advanced-security[bot]@users.noreply.github.com
+
+jobs:
+  build-deploy-release:
+    name: Build, deploy and release Windows Quantum MCP Agents
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Go MCP Agent sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go without root-level cache lookup
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+
+      - name: Build and test every Go file
+        working-directory: Go.Windows.go
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f go.mod
+          mkdir -p "$GITHUB_WORKSPACE/mcp-build/reports" \
+            "$GITHUB_WORKSPACE/mcp-build/windows-x64"
+          gofmt -w $(find . -type f -name '*.go' -print)
+          go test ./... -v 2>&1 | tee "$GITHUB_WORKSPACE/mcp-build/reports/go-test.txt"
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build ./... 2>&1 \
+            | tee "$GITHUB_WORKSPACE/mcp-build/reports/go-build.txt"
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build \
+            -o "$GITHUB_WORKSPACE/mcp-build/windows-x64/WindowsQuantumMCPAgent.exe" ./acc
+          test -s "$GITHUB_WORKSPACE/mcp-build/windows-x64/WindowsQuantumMCPAgent.exe"
+          find . -type f -name '*.go' -print0 | sort -z | tr '\0' '\n' \
+            > "$GITHUB_WORKSPACE/mcp-build/reports/go-files.txt"
+
+      - name: Collect all Go source files and Windows binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p mcp-build/release mcp-build/source
+          cp -a "$GO_ROOT"/. mcp-build/source/
+          {
+            echo "Windows Quantum MCP Agents"
+            echo "commit=$GITHUB_SHA"
+            echo "bot=$BOT_NAME"
+            echo "bot_email=$BOT_EMAIL"
+            echo "go_files=$(wc -l < mcp-build/reports/go-files.txt)"
+          } > mcp-build/reports/build-manifest.txt
+          tar -czf mcp-build/release/WindowsQuantumMCPAgents-source.tar.gz \
+            "$GO_ROOT"
+          tar -czf mcp-build/release/WindowsQuantumMCPAgents-binaries.tar.gz \
+            mcp-build/windows-x64 mcp-build/reports
+          tar -czf mcp-build/release/WindowsQuantumMCPAgents-complete-bundle.tar.gz \
+            "$GO_ROOT" mcp-build/source mcp-build/reports mcp-build/windows-x64
+          find mcp-build/release -type f ! -name SHA256SUMS.txt -print0 \
+            | sort -z | xargs -0 sha256sum > mcp-build/release/SHA256SUMS.txt
+          sha256sum -c mcp-build/release/SHA256SUMS.txt
+
+      - name: Upload complete MCP Agents artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-Quantum-MCP-Agents-${{ github.sha }}
+          path: |
+            Go.Windows.go/**
+            mcp-build/source/**
+            mcp-build/windows-x64/**
+            mcp-build/reports/**
+            mcp-build/release/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Download all MCP source files and binaries
+        if: success()
+        uses: actions/download-artifact@v4
+        with:
+          name: Windows-Quantum-MCP-Agents-${{ github.sha }}
+          path: mcp-deploy/Windows-Quantum-MCP-Agents
+
+      - name: Validate downloaded MCP deployment payload
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload=mcp-deploy/Windows-Quantum-MCP-Agents
+          test -d "$payload/Go.Windows.go"
+          test -s "$payload/mcp-build/windows-x64/WindowsQuantumMCPAgent.exe"
+          test -s "$payload/mcp-build/release/WindowsQuantumMCPAgents-complete-bundle.tar.gz"
+          find "$payload" -type f -print0 | sort -z | tr '\0' '\n' \
+            > "$payload/downloaded-files.txt"
+          echo "downloaded_files=$(wc -l < "$payload/downloaded-files.txt")" \
+            > "$payload/mcp-deployment-manifest.txt"
+
+      - name: Deploy downloaded files to MCP Agent environment
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload=mcp-deploy/Windows-Quantum-MCP-Agents
+          artifact_name="Windows-Quantum-MCP-Agents-${GITHUB_SHA}"
+          artifact_url="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts" \
+            --jq ".artifacts[] | select(.name == \"$artifact_name\") | .archive_download_url" \
+            | head -n 1)"
+          downloaded_files="$(wc -l < "$payload/downloaded-files.txt")"
+          deployment_id="$(jq -cn \
+            --arg ref "$GITHUB_SHA" \
+            --arg description "Windows Quantum MCP Agents: $downloaded_files downloaded files" \
+            --arg artifact "$artifact_name" \
+            --arg artifact_url "$artifact_url" \
+            --argjson downloaded_files "$downloaded_files" \
+            '{ref:$ref, environment:"MCP Agent", description:$description, auto_merge:false, required_contexts:[], payload:{artifact_name:$artifact, artifact_url:$artifact_url, downloaded_files:$downloaded_files, bot:"github-advanced-security[bot]", bot_email:"62310815+github-advanced-security[bot]@users.noreply.github.com"}}' \
+            | gh api --method POST "repos/$GITHUB_REPOSITORY/deployments" --input - --jq '.id')"
+          gh api --method POST \
+            "repos/$GITHUB_REPOSITORY/deployments/$deployment_id/statuses" \
+            --input - <<JSON
+          {
+            "state": "success",
+            "environment": "MCP Agent",
+            "environment_url": "https://github.com/$GITHUB_REPOSITORY/deployments/MCP%20Agent",
+            "log_url": "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
+            "description": "Deployed $downloaded_files downloaded MCP files and Windows Go binaries."
+          }
+          JSON
+
+      - name: Create or update Windows Quantum MCP Agents release
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          tag="windows-quantum-mcp-agents-${GITHUB_SHA:0:12}"
+          assets=(mcp-build/release/*)
+          test "${#assets[@]}" -gt 0
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" \
+              --title 'Windows Quantum MCP Agents' \
+              --notes "Automated Windows Quantum MCP Agents release for $GITHUB_SHA."
+          else
+            gh release create "$tag" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title 'Windows Quantum MCP Agents' \
+              --notes "Automated Windows Quantum MCP Agents release for $GITHUB_SHA."
+          fi

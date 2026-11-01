@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/schemas/review-output.schema.json",
+  "title": "Windows AGI Mesh Review Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "review_outcome",
+    "summary",
+    "risk_level",
+    "review_scope",
+    "repository_validation",
+    "build",
+    "tests",
+    "security",
+    "architecture",
+    "qsharp_review",
+    "benchmark_impact",
+    "release_ready",
+    "findings",
+    "quantum_operation_reviews"
+  ],
+  "properties": {
+    "version": { "type": "string", "minLength": 1 },
+    "review_outcome": {
+      "type": "string",
+      "enum": ["Approved", "ApprovedWithWarnings", "ChangesRequested"]
+    },
+    "summary": { "type": "string" },
+    "risk_level": {
+      "type": "string",
+      "enum": ["Low", "Medium", "High", "Critical"]
+    },
+    "review_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["qsharp_files", "benchmark_files", "docs_files", "github_files", "other_files"],
+      "properties": {
+        "qsharp_files": { "$ref": "#/$defs/stringArray" },
+        "benchmark_files": { "$ref": "#/$defs/stringArray" },
+        "docs_files": { "$ref": "#/$defs/stringArray" },
+        "github_files": { "$ref": "#/$defs/stringArray" },
+        "other_files": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "repository_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "missing_paths"],
+      "properties": {
+        "status": { "$ref": "#/$defs/passFail" },
+        "missing_paths": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "warnings"],
+      "properties": {
+        "status": { "$ref": "#/$defs/passFail" },
+        "warnings": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "tests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": { "status": { "$ref": "#/$defs/passFail" } }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": { "status": { "$ref": "#/$defs/passFail" } }
+    },
+    "architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": { "status": { "$ref": "#/$defs/passFail" } }
+    },
+    "qsharp_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["Pass", "Fail", "NotRun"] }
+      }
+    },
+    "benchmark_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["None", "Low", "Medium", "High", "NotApplicable"] }
+      }
+    },
+    "release_ready": { "type": "boolean" },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "quantum_operation_reviews": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  },
+  "$defs": {
+    "stringArray": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "passFail": {
+      "type": "string",
+      "enum": ["Pass", "Fail"]
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "severity", "category", "location", "rule", "issue", "recommendation", "why_it_matters"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "severity": { "enum": ["Info", "Low", "Medium", "High", "Critical"] },
+        "category": { "type": "string" },
+        "location": { "type": "string" },
+        "rule": { "type": "string" },
+        "issue": { "type": "string" },
+        "recommendation": { "type": "string" },
+        "why_it_matters": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,3 +1,7 @@
+// module: XboxQuantumXR
+// version: 0.1
+// author: Windows AGI Mesh
+
 circuit XboxQuantumXR {
   version = "0.1"
   kind = immersive_xr

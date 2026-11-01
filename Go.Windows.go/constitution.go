@@ -11,12 +11,12 @@ const (
 )
 
 type Constitution struct {
-	Version string
+	Version    string
 	Principles []Principle
 }
 
 type ConstitutionalLayer struct {
-	Name string
+	Name   string
 	Weight float64
 }
 

@@ -4,18 +4,24 @@ on:
   push:
     paths:
       - "modules/**/*.qs"
+      - ".github/workflows/modules-quality.yml"
 
   pull_request:
     paths:
       - "modules/**/*.qs"
+      - ".github/workflows/modules-quality.yml"
 
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   attestations: write
   id-token: write
+
+concurrency:
+  group: agimesh-modules-quality-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
 
@@ -38,11 +44,272 @@ jobs:
           - modules/XboxQuantumXR.qs
 
     runs-on: ${{ matrix.os }}
-          ✅ CycloneDX SBOM generated
 
-          ✅ SHA256 generated
+    steps:
 
-          ✅ Artifact attestation generated
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-          ✅ Package generated`
-            })
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Verify module exists
+        shell: bash
+        run: |
+
+          echo "Checking module..."
+
+          test -f "${{ matrix.module }}"
+
+          test -s "${{ matrix.module }}"
+
+          echo "Module found."
+
+      - name: Validate QS module metadata
+        shell: bash
+        run: |
+
+          FILE="${{ matrix.module }}"
+
+          if ! grep -Eq '^// module: ' "$FILE"; then
+            echo "Missing module declaration"
+            exit 1
+          fi
+
+          if ! grep -Eq '^[[:space:]]*version = "' "$FILE"; then
+            echo "Missing version metadata"
+            exit 1
+          fi
+
+          if ! grep -Eq '^// author: ' "$FILE"; then
+            echo "Missing author metadata"
+            exit 1
+          fi
+
+      - name: Validate forbidden tokens
+        shell: bash
+        run: |
+
+          FILE="${{ matrix.module }}"
+
+          if grep -q "TODO_ERROR" "$FILE"; then
+            echo "TODO_ERROR detected"
+            exit 1
+          fi
+
+          if grep -q "FIXME" "$FILE"; then
+            echo "FIXME detected"
+            exit 1
+          fi
+
+      - name: Validate QS structure
+        shell: bash
+        run: |
+
+          python3 << 'PY'
+          from pathlib import Path
+
+          path = Path("${{ matrix.module }}")
+
+          text = path.read_text(
+              encoding="utf-8",
+              errors="ignore"
+          )
+
+          if text.count("{") != text.count("}"):
+              raise SystemExit(
+                  f"Brace mismatch in {path}"
+              )
+
+          if text.count("(") != text.count(")"):
+              raise SystemExit(
+                  f"Parenthesis mismatch in {path}"
+              )
+
+          if text.count("[") != text.count("]"):
+              raise SystemExit(
+                  f"Bracket mismatch in {path}"
+              )
+
+          print("QS structural validation passed.")
+          PY
+
+      - name: Install Syft
+        uses: anchore/sbom-action/download-syft@v0
+
+      - name: Generate CycloneDX SBOM
+        shell: bash
+        run: |
+
+          mkdir -p sbom
+
+          syft . \
+            --output cyclonedx-json \
+            > sbom/agimesh-sbom.json
+
+      - name: Generate SHA256 Linux/macOS
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+
+          mkdir -p hash
+
+          if command -v sha256sum >/dev/null 2>&1; then
+            HASH_CMD="sha256sum"
+          else
+            HASH_CMD="shasum -a 256"
+          fi
+
+          $HASH_CMD \
+            "${{ matrix.module }}" \
+            > "hash/$(basename "${{ matrix.module }}").sha256"
+
+      - name: Generate SHA256 Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            hash
+
+          $file =
+            Get-Item "${{ matrix.module }}"
+
+          Get-FileHash `
+            $file.FullName `
+            -Algorithm SHA256 |
+            Format-List |
+            Out-File `
+            "hash/$($file.Name).sha256"
+
+      - name: Package module Linux/macOS
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+
+          mkdir -p dist
+
+          MODULE_NAME=$(basename "${{ matrix.module }}" .qs)
+
+          tar \
+            -czf \
+            "dist/${MODULE_NAME}-${{ matrix.os }}.tar.gz" \
+            "${{ matrix.module }}"
+
+      - name: Package module Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            dist
+
+          $ModuleName =
+            [System.IO.Path]::GetFileNameWithoutExtension(
+              "${{ matrix.module }}"
+            )
+
+          Compress-Archive `
+            -Path "${{ matrix.module }}" `
+            -DestinationPath `
+            "dist/$ModuleName-${{ matrix.os }}.zip" `
+            -Force
+
+      - name: Prepare artifact name
+        id: artifact_name
+        shell: bash
+        run: |
+          MODULE_NAME=$(basename "${{ matrix.module }}" .qs)
+          echo "module_name=${MODULE_NAME}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-${{ matrix.os }}-${{ steps.artifact_name.outputs.module_name }}
+          path: |
+            sbom/**
+            hash/**
+            dist/**
+
+      - name: Generate attestation Linux/macOS
+        if: runner.os != 'Windows'
+        uses: actions/attest@v4
+        with:
+          subject-path: dist/*.tar.gz
+
+      - name: Generate attestation Windows
+        if: runner.os == 'Windows'
+        uses: actions/attest@v4
+        with:
+          subject-path: dist/*.zip
+
+  create-quality-pr:
+
+    name: Create Quality Pull Request from existing branch
+
+    needs:
+      - validate-build
+
+    if: github.event_name != 'pull_request' && github.ref != 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+
+      - name: Create or reuse Pull Request as GitHub Actions Bot
+        uses: actions/github-script@v7
+        env:
+          HEAD_BRANCH: ${{ github.ref_name }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const head = process.env.HEAD_BRANCH;
+            const base = 'main';
+
+            if (!head || head === base) {
+              core.setFailed('A non-main correction branch is required to create the Pull Request.');
+              return;
+            }
+
+            const existing = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              base,
+              head: `${context.repo.owner}:${head}`
+            });
+
+            if (existing.data.length > 0) {
+              core.info(`Pull Request already exists: ${existing.data[0].html_url}`);
+              core.setOutput('pull_request_url', existing.data[0].html_url);
+              return;
+            }
+
+            const pull = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head,
+              base,
+              title: 'AGIMesh Modules Quality Automation',
+              body: `## Automated Quality Pipeline\n\nThis Pull Request was opened automatically by GitHub Actions Bot from the existing correction branch \`${head}\`.\n\n### Corrections\n\n- Added QS module, version, and author metadata.\n- Preserved QS structural validation.\n- Avoided creating a restricted auxiliary branch.\n- Kept artifact names safe for all operating systems.\n\n### Modules\n\n- DeepSpace.qs\n- EdgeAIApp.qs\n- MagneticMajorana.qs\n- Nemotron.qs\n- XboxQuantumXR.qs`
+            });
+
+            core.info(`Pull Request created: ${pull.data.html_url}`);
+            core.setOutput('pull_request_url', pull.data.html_url);
