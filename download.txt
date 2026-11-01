@@ -1,0 +1,2 @@
+3.6s 1 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+4.1s 2 [NbConvertApp] Writing 277856 bytes to __results__.html

@@ -1,0 +1,360 @@
+name: MZMWindowsSDK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  DOTNET_VERSION: 9.0.x
+  MZM_TOOL_VERSION: 0.3.0-ci.${{ github.run_number }}
+  SDK_PACKAGE_VERSION: 0.1.0-ci.${{ github.run_number }}
+  NUGET_FEED: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+
+concurrency:
+  group: mzm-windows-sdk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-package-release:
+    name: Build all files, subfiles and binary artifacts
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout complete repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            ${{ env.DOTNET_VERSION }}
+
+      - name: Materialize the 500-artifact English architecture scaffold
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/generate_500_artifacts.py
+          test "$(find mzm-windows-sdk -type f ! -name artifact-manifest.json | wc -l)" = "500"
+          test -s mzm-windows-sdk/artifact-manifest.json
+
+      - name: Create authenticated NuGet.Config
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/NuGet.Config" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+            </packageSources>
+          </configuration>
+          EOF
+          dotnet nuget add source "$NUGET_FEED" --name github \
+            --username "$GITHUB_ACTOR" --password "$GH_TOKEN" \
+            --store-password-in-clear-text --configfile "$RUNNER_TEMP/NuGet.Config"
+          dotnet nuget add source "https://api.nuget.org/v3/index.json" \
+            --name nuget.org --configfile "$RUNNER_TEMP/NuGet.Config"
+
+      - name: Pull and install MajoranaZenithSDK from GitHub Packages
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts "$RUNNER_TEMP/majorana-consumer" "$RUNNER_TEMP/nuget-cache"
+          cat > "$RUNNER_TEMP/majorana-consumer/MajoranaConsumer.csproj" <<'EOF'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup><TargetFramework>net9.0</TargetFramework></PropertyGroup>
+            <ItemGroup><PackageReference Include="MajoranaZenithSDK" Version="0.1.0-ci.*" /></ItemGroup>
+          </Project>
+          EOF
+          dotnet restore "$RUNNER_TEMP/majorana-consumer/MajoranaConsumer.csproj" \
+            --configfile "$RUNNER_TEMP/NuGet.Config" --packages "$RUNNER_TEMP/nuget-cache"
+          cp "$RUNNER_TEMP/nuget-cache/majoranazenithsdk"/*/*.nupkg \
+            "artifacts/MajoranaZenithSDK.downloaded.nupkg" 2>/dev/null || true
+          test -d "$RUNNER_TEMP/nuget-cache/majoranazenithsdk"
+
+      - name: Download all other repository NuGet packages
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          mkdir -p "$RUNNER_TEMP/package-downloads" "$RUNNER_TEMP/nuget-cache"
+          : > "$RUNNER_TEMP/package-downloads/download-report.txt"
+          mapfile -t package_ids < <(jq -r '.packages[].id' packaging/packages.json packaging/zenith60-packages.json 2>/dev/null | sort -u)
+          for id in "${package_ids[@]}"; do
+            [[ "$id" == "MajoranaZenithSDK" ]] && continue
+            project="$RUNNER_TEMP/package-downloads/${id}.csproj"
+            cat > "$project" <<'EOF'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup><TargetFramework>net9.0</TargetFramework></PropertyGroup>
+            <ItemGroup><PackageReference Include="PACKAGE_ID_PLACEHOLDER" Version="*-*" /></ItemGroup>
+          </Project>
+          EOF
+            sed -i "s/PACKAGE_ID_PLACEHOLDER/$id/" "$project"
+            if dotnet restore "$project" --configfile "$RUNNER_TEMP/NuGet.Config" \
+              --packages "$RUNNER_TEMP/nuget-cache" >> "$RUNNER_TEMP/package-downloads/download-report.txt" 2>&1; then
+              echo "OK $id" >> "$RUNNER_TEMP/package-downloads/download-report.txt"
+            else
+              echo "MISSING_OR_FAILED $id" >> "$RUNNER_TEMP/package-downloads/download-report.txt"
+              rm -f "$project"
+            fi
+          done
+          mkdir -p artifacts/MZMWindowsSDK
+          cp "$RUNNER_TEMP/package-downloads/download-report.txt" artifacts/MZMWindowsSDK/nuget-download-report.txt
+          tar -czf artifacts/MZMWindowsSDK/nuget-cache.tar.gz -C "$RUNNER_TEMP" nuget-cache
+
+      - name: Build and package MZM Hilbert DSL tool
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/MZMWindowsSDK/nuget
+          dotnet restore tools/MZM.Hilbert.DSL/MZM.Hilbert.DSL.csproj \
+            --configfile "$RUNNER_TEMP/NuGet.Config" -p:PackageVersion="$MZM_TOOL_VERSION"
+          dotnet pack tools/MZM.Hilbert.DSL/MZM.Hilbert.DSL.csproj \
+            --configuration Release --no-restore --output artifacts/MZMWindowsSDK/nuget \
+            -p:PackageVersion="$MZM_TOOL_VERSION" --nologo
+          test -s "artifacts/MZMWindowsSDK/nuget/MZM.Hilbert.DSL.${MZM_TOOL_VERSION}.nupkg"
+
+      - name: Install qmeshc in an isolated directory
+        working-directory: ${{ runner.temp }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet tool install --global MZM.Hilbert.DSL --version "$MZM_TOOL_VERSION" \
+            --add-source "$GITHUB_WORKSPACE/artifacts/MZMWindowsSDK/nuget" --ignore-failed-sources
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+          qmeshc --help
+
+      - name: Compile QMesh and build pipeline projects only
+        id: build_sdk
+        env:
+          NUGET_CONFIG: ${{ runner.temp }}/NuGet.Config
+        shell: bash
+        run: |
+          set -euo pipefail
+          qmeshc build qmesh/examples/AGIQuantum.qmesh --output artifacts/MZMWindowsSDK/qmesh
+          chmod +x scripts/build_all_binaries.sh
+          # Only projects created for this MZMWindowsSDK pipeline are built here.
+          # Historical repository projects are intentionally not part of this job.
+          scripts/build_all_binaries.sh artifacts/MZMWindowsSDK/binaries --strict \
+            quantum/VAQLearningNeural/VAQLearningNeural.csproj
+
+      - name: Build VA Q-learning Neural Quantum Polymorphism
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/MZMWindowsSDK/binaries/VAQLearningNeural
+          dotnet publish quantum/VAQLearningNeural/VAQLearningNeural.csproj \
+            --configuration Release \
+            --output artifacts/MZMWindowsSDK/binaries/VAQLearningNeural \
+            --nologo
+          test -s artifacts/MZMWindowsSDK/binaries/VAQLearningNeural/VAQLearningNeural.dll
+
+      - name: Upload build diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mzmwindows-sdk-build-diagnostics-${{ github.sha }}
+          path: |
+            artifacts/MZMWindowsSDK/binaries/build-report.txt
+            artifacts/MZMWindowsSDK/binaries/build-failures.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Create complete source, binary and SHA256 release assets
+        if: success()
+        shell: bash
+        env:
+          MZM_TOOL_VERSION: ${{ env.MZM_TOOL_VERSION }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/create_mzmwindows_release_assets.sh
+          # The script is idempotent and recreates the full payload directory.
+          scripts/create_mzmwindows_release_assets.sh artifacts/MZMWindowsSDK
+          test -s artifacts/MZMWindowsSDK/MZMWindowsSDK-source.tar.gz
+          test -s artifacts/MZMWindowsSDK/MZMWindowsSDK-binaries.tar.gz
+          test -s artifacts/MZMWindowsSDK/SHA256SUMS-source.txt
+          test -s artifacts/MZMWindowsSDK/SHA256SUMS.txt
+
+      - name: Build and publish MZMWindowsSDK base NuGet package
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/MZMWindowsSDK/nuget/sdk-package
+          dotnet restore packaging/MZMWindowsSDK/MZMWindowsSDK.csproj \
+            --configfile "$RUNNER_TEMP/NuGet.Config" -p:PackageVersion="$SDK_PACKAGE_VERSION"
+          dotnet pack packaging/MZMWindowsSDK/MZMWindowsSDK.csproj \
+            --configuration Release --no-restore --output artifacts/MZMWindowsSDK/nuget \
+            -p:PackageVersion="$SDK_PACKAGE_VERSION" --nologo
+          cp "artifacts/MZMWindowsSDK/nuget/MZMWindowsSDK.${SDK_PACKAGE_VERSION}.nupkg" \
+            artifacts/MZMWindowsSDK/nuget/sdk-package/
+          dotnet nuget push "artifacts/MZMWindowsSDK/nuget/MZMWindowsSDK.${SDK_PACKAGE_VERSION}.nupkg" \
+            --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
+
+      - name: Build and publish packages dependent on MZMWindowsSDK
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dotnet nuget add source "$GITHUB_WORKSPACE/artifacts/MZMWindowsSDK/nuget/sdk-package" \
+            --name mzm-local --configfile "$RUNNER_TEMP/NuGet.Config"
+          dotnet restore packaging/MZMWindowsSDK.Dependencies/MZMWindowsSDK.Dependencies.csproj \
+            --configfile "$RUNNER_TEMP/NuGet.Config" -p:PackageVersion="$SDK_PACKAGE_VERSION"
+          dotnet pack packaging/MZMWindowsSDK.Dependencies/MZMWindowsSDK.Dependencies.csproj \
+            --configuration Release --no-restore --output artifacts/MZMWindowsSDK/nuget \
+            -p:PackageVersion="$SDK_PACKAGE_VERSION" --nologo
+          dotnet nuget push "artifacts/MZMWindowsSDK/nuget/MZMWindowsSDK.Dependencies.${SDK_PACKAGE_VERSION}.nupkg" \
+            --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
+
+      - name: Refresh SHA256 manifests after all package uploads
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="artifacts/MZMWindowsSDK"
+          find "$out" -type f ! -name 'SHA256SUMS.txt' ! -name 'SHA256SUMS-source.txt' ! -name '*.sha256' -print0 \
+            | sort -z | xargs -0 sha256sum > "$out/SHA256SUMS.txt"
+          while IFS= read -r digest file; do
+            printf '%s  %s\n' "$digest" "$(basename "$file")" > "${file}.sha256"
+          done < "$out/SHA256SUMS.txt"
+          sha256sum -c "$out/SHA256SUMS.txt"
+
+      - name: Collect outputs from all previous steps for the Release
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          release_dir="artifacts/release-assets"
+          rm -rf "$release_dir"
+          mkdir -p "$release_dir"
+
+          # This archive contains the files produced by earlier workflow steps,
+          # not a self-referential release-assets directory.
+          find artifacts -type f ! -path 'artifacts/release-assets/*' -print0 \
+            | tar --null -czf "$release_dir/previous-step-outputs.tar.gz" --files-from=-
+
+          # Keep every project definition used by the repository build sweep.
+          find . -type f \( -name '*.csproj' -o -name '*.qsproj' \) \
+            ! -path './.git/*' ! -path './artifacts/*' -print0 \
+            | tar --null -czf "$release_dir/all-dotnet-project-files.tar.gz" --files-from=-
+
+          nuget_files=(artifacts/MZMWindowsSDK/nuget/*.nupkg)
+          if (( ${#nuget_files[@]} > 0 )); then
+            cp "${nuget_files[@]}" "$release_dir/"
+          fi
+
+          : > "$release_dir/SHA256SUMS.txt"
+          find "$release_dir" -type f ! -name 'SHA256SUMS.txt' ! -name '*.sha256' -print0 \
+            | sort -z | xargs -0 sha256sum > "$release_dir/SHA256SUMS.txt"
+          while IFS= read -r digest file; do
+            printf '%s  %s\n' "$digest" "$(basename "$file")" > "${file}.sha256"
+          done < "$release_dir/SHA256SUMS.txt"
+          sha256sum -c "$release_dir/SHA256SUMS.txt"
+          test -s "$release_dir/previous-step-outputs.tar.gz"
+          test -s "$release_dir/all-dotnet-project-files.tar.gz"
+
+      - name: Publish MZM Hilbert DSL NuGet package
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dotnet nuget push "artifacts/MZMWindowsSDK/nuget/MZM.Hilbert.DSL.${MZM_TOOL_VERSION}.nupkg" \
+            --source "$NUGET_FEED" --api-key "$GH_TOKEN" --skip-duplicate --no-symbols
+
+      - name: Upload complete MZMWindowsSDK artifact bundle
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MZMWindowsSDK-${{ github.sha }}
+          path: |
+            artifacts/MZMWindowsSDK/MZMWindowsSDK-source.tar.gz
+            artifacts/MZMWindowsSDK/MZMWindowsSDK-binaries.tar.gz
+            artifacts/MZMWindowsSDK/nuget-cache.tar.gz
+            artifacts/MZMWindowsSDK/nuget-download-report.txt
+            artifacts/MZMWindowsSDK/SHA256SUMS.txt
+            artifacts/MZMWindowsSDK/SHA256SUMS-source.txt
+            artifacts/MZMWindowsSDK/*.sha256
+            artifacts/MZMWindowsSDK/**/*.sha256
+            artifacts/MZMWindowsSDK/nuget/*.nupkg
+            artifacts/MZMWindowsSDK/binaries/build-report.txt
+            artifacts/MZMWindowsSDK/binaries/build-failures.txt
+            artifacts/release-assets/**
+            mzm-windows-sdk/**
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Create or update MZMWindowsSDK release as GitHub Actions Bot
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob globstar
+          short_sha="${GITHUB_SHA:0:12}"
+          tag="mzmwindows-sdk-${short_sha}"
+          release_date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          release_assets=(artifacts/release-assets/*)
+          if (( ${#release_assets[@]} == 0 )); then
+            echo "No outputs from previous workflow steps were collected" >&2
+            exit 1
+          fi
+          if [[ ! -s artifacts/release-assets/SHA256SUMS.txt ]]; then
+            echo "The previous-step output manifest is missing" >&2
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "$tag" "$GITHUB_SHA"
+          git push origin "refs/tags/$tag" --force
+          cat > release-notes.md <<EOF
+          # MZMWindowsSDK
+
+          Automated release date: ${release_date}
+          Source commit: ${GITHUB_SHA}
+          English architecture artifacts: 500
+          Tool package: MZM.Hilbert.DSL ${MZM_TOOL_VERSION}
+
+          This release contains the complete repository source snapshot, the generated 500-artifact English architecture scaffold, compatible CSharp and QSharp binary outputs, QMesh outputs, NuGet packages, and SHA256 manifests for release payloads.
+
+          SHA256 provides file integrity verification and is not encryption. Q# and QMesh are language/compiler components; they do not encrypt arbitrary release files. Use a dedicated signing or post-quantum cryptography service if confidentiality or authenticated encryption is required.
+          EOF
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" "${release_assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --title "MZMWindowsSDK" --notes-file release-notes.md
+          else
+            gh release create "$tag" "${release_assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "MZMWindowsSDK" --notes-file release-notes.md
+          fi
+
+      - name: Write MZMWindowsSDK summary
+        run: |
+          {
+            echo "## MZMWindowsSDK release"
+            echo
+            echo "- Release name: MZMWindowsSDK"
+            echo "- English architecture artifacts: 500"
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Tag: mzmwindows-sdk-${GITHUB_SHA:0:12}"
+            echo "- Release: https://github.com/${GITHUB_REPOSITORY}/releases/tag/mzmwindows-sdk-${GITHUB_SHA:0:12}"
+          } >> "$GITHUB_STEP_SUMMARY"

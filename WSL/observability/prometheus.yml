@@ -1,0 +1,163 @@
+# =============================================================================
+# Windows AGI Benchmark Lab — Prometheus Configuration
+# Copyright (c) 2026 Microsoft Corporation. All Rights Reserved.
+# =============================================================================
+
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+  scrape_timeout:      10s
+
+  external_labels:
+    project:     'windows-agi-benchmark'
+    vendor:      'microsoft'
+    environment: 'lab'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+      timeout: 10s
+
+# Load alerting rules
+rule_files:
+  - "alerting_rules.yml"
+
+# =============================================================================
+# Scrape Configurations
+# =============================================================================
+scrape_configs:
+
+  # ---------------------------------------------------------------------------
+  # Prometheus self-monitoring
+  # ---------------------------------------------------------------------------
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # ---------------------------------------------------------------------------
+  # Node Exporter — Host system metrics
+  # ---------------------------------------------------------------------------
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '([^:]+)(?::\d+)?'
+        replacement: '${1}'
+
+  # ---------------------------------------------------------------------------
+  # cAdvisor — Container metrics
+  # ---------------------------------------------------------------------------
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+    relabel_configs:
+      - source_labels: [container_label_com_microsoft_project]
+        target_label: project
+      - source_labels: [container_label_com_microsoft_component]
+        target_label: component
+
+  # ---------------------------------------------------------------------------
+  # AMD ROCm GPU Exporter
+  # ---------------------------------------------------------------------------
+  - job_name: 'amd-rocm'
+    static_configs:
+      - targets: ['rocm-exporter:9400']
+    metrics_path: /metrics
+    scrape_interval: 5s
+    scrape_timeout: 5s
+    relabel_configs:
+      - target_label: gpu_vendor
+        replacement: 'amd'
+
+  # ---------------------------------------------------------------------------
+  # NVIDIA GPU Exporter (DCGM)
+  # ---------------------------------------------------------------------------
+  - job_name: 'nvidia-dcgm'
+    static_configs:
+      - targets: ['nvidia-exporter:9400']
+    metrics_path: /metrics
+    scrape_interval: 5s
+    scrape_timeout: 5s
+    relabel_configs:
+      - target_label: gpu_vendor
+        replacement: 'nvidia'
+
+  # ---------------------------------------------------------------------------
+  # Ollama — LLM inference server
+  # ---------------------------------------------------------------------------
+  - job_name: 'ollama'
+    static_configs:
+      - targets: ['ollama:11434']
+    metrics_path: /metrics
+    scrape_interval: 10s
+    scrape_timeout: 10s
+
+  # ---------------------------------------------------------------------------
+  # AGI Agents Runtime
+  # ---------------------------------------------------------------------------
+  - job_name: 'agi-agents'
+    static_configs:
+      - targets: ['agents:8500']
+    metrics_path: /metrics
+    scrape_interval: 15s
+
+  # ---------------------------------------------------------------------------
+  # Benchmark Runner
+  # ---------------------------------------------------------------------------
+  - job_name: 'benchmark-runner'
+    static_configs:
+      - targets: ['benchmark:9500']
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # ---------------------------------------------------------------------------
+  # Redis
+  # ---------------------------------------------------------------------------
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # ---------------------------------------------------------------------------
+  # Qdrant Vector DB
+  # ---------------------------------------------------------------------------
+  - job_name: 'qdrant'
+    static_configs:
+      - targets: ['qdrant:6333']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # ---------------------------------------------------------------------------
+  # System Metrics Exporter (Python)
+  # ---------------------------------------------------------------------------
+  - job_name: 'system-metrics'
+    static_configs:
+      - targets: ['localhost:9402']
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # ---------------------------------------------------------------------------
+  # Alertmanager
+  # ---------------------------------------------------------------------------
+  - job_name: 'alertmanager'
+    static_configs:
+      - targets: ['alertmanager:9093']
+    scrape_interval: 30s
+
+  # ---------------------------------------------------------------------------
+  # Loki (log aggregation)
+  # ---------------------------------------------------------------------------
+  - job_name: 'loki'
+    static_configs:
+      - targets: ['loki:3100']
+    scrape_interval: 30s

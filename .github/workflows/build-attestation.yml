@@ -1,4 +1,4 @@
-name: Test, secure, build, attest, and deploy Docker release
+name: Test, secure
 
 on:
   release:
@@ -17,8 +17,7 @@ permissions: {}
 concurrency:
   group: docker-release-${{ github.event.release.tag_name || inputs.release_tag }}
   cancel-in-progress: false
-
-env:
+  env:
   REGISTRY: ghcr.io
   LOCAL_IMAGE: windows-agi-mesh:ci
   IMAGE_ARCHIVE: windows-agi-mesh-docker-image.tar
@@ -705,5 +704,5 @@ env:
     # Configure this environment with Required reviewers in:
     # Repository Settings > Environments > production
     environment:
-           name: production      
-          url: https://github.com/${{ github.repository
+      name: production
+      url: https://github.com/alexandrepedrosaai/Windows-AGI-Mesh

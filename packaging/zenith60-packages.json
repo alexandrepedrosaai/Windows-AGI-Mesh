@@ -1,0 +1,855 @@
+{
+  "schemaVersion": 1,
+  "rootPackage": "MajoranaZenithSDK",
+  "additionalPackages": 60,
+  "totalPublishedPackages": 61,
+  "combinationRule": "Each Group B package depends on the root and 19 Group A packages, omitting one Group A package in round-robin order.",
+  "packages": [
+    {
+      "number": 0,
+      "id": "MajoranaZenithSDK",
+      "group": "root",
+      "dependsOn": []
+    },
+    {
+      "number": 1,
+      "id": "Zenith.Agent.Runtime",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 2,
+      "id": "Zenith.Agent.Hosting",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 3,
+      "id": "Zenith.Agent.Registry",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 4,
+      "id": "Zenith.Agent.Orchestration",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 5,
+      "id": "Zenith.Agent.Lifecycle",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 6,
+      "id": "Zenith.Memory.Vectorization",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 7,
+      "id": "Zenith.Memory.Consolidation",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 8,
+      "id": "Zenith.Memory.ContextGraph",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 9,
+      "id": "Zenith.Memory.TemporalIndex",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 10,
+      "id": "Zenith.Memory.Compression",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 11,
+      "id": "Zenith.Storage.Checkpointing",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 12,
+      "id": "Zenith.Storage.Replication",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 13,
+      "id": "Zenith.Storage.Versioning",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 14,
+      "id": "Zenith.Storage.Archive",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 15,
+      "id": "Zenith.Storage.Snapshot",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 16,
+      "id": "Zenith.Reasoning.Symbolic",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 17,
+      "id": "Zenith.Reasoning.Causal",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 18,
+      "id": "Zenith.Reasoning.Hierarchical",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 19,
+      "id": "Zenith.Reasoning.GoalEngine",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 20,
+      "id": "Zenith.Reasoning.ConstraintSolver",
+      "group": "A",
+      "dependsOn": [
+        "MajoranaZenithSDK"
+      ]
+    },
+    {
+      "number": 21,
+      "id": "Zenith.Agent.Teamwork",
+      "group": "B",
+      "omitsGroupA": "Zenith.Agent.Runtime",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 22,
+      "id": "Zenith.Agent.Consensus",
+      "group": "B",
+      "omitsGroupA": "Zenith.Agent.Hosting",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 23,
+      "id": "Zenith.Agent.SocialGraph",
+      "group": "B",
+      "omitsGroupA": "Zenith.Agent.Registry",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 24,
+      "id": "Zenith.Agent.MissionPlanner",
+      "group": "B",
+      "omitsGroupA": "Zenith.Agent.Orchestration",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 25,
+      "id": "Zenith.Agent.TaskDelegation",
+      "group": "B",
+      "omitsGroupA": "Zenith.Agent.Lifecycle",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 26,
+      "id": "Zenith.Cognition.Reflection",
+      "group": "B",
+      "omitsGroupA": "Zenith.Memory.Vectorization",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 27,
+      "id": "Zenith.Cognition.SelfAssessment",
+      "group": "B",
+      "omitsGroupA": "Zenith.Memory.Consolidation",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 28,
+      "id": "Zenith.Cognition.MetaReasoning",
+      "group": "B",
+      "omitsGroupA": "Zenith.Memory.ContextGraph",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 29,
+      "id": "Zenith.Cognition.Uncertainty",
+      "group": "B",
+      "omitsGroupA": "Zenith.Memory.TemporalIndex",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 30,
+      "id": "Zenith.Cognition.HypothesisEngine",
+      "group": "B",
+      "omitsGroupA": "Zenith.Memory.Compression",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 31,
+      "id": "Zenith.Persistence.LocalFirst",
+      "group": "B",
+      "omitsGroupA": "Zenith.Storage.Checkpointing",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 32,
+      "id": "Zenith.Persistence.EdgeSync",
+      "group": "B",
+      "omitsGroupA": "Zenith.Storage.Replication",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 33,
+      "id": "Zenith.Persistence.MeshReplication",
+      "group": "B",
+      "omitsGroupA": "Zenith.Storage.Versioning",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 34,
+      "id": "Zenith.Persistence.QuantumAnchor",
+      "group": "B",
+      "omitsGroupA": "Zenith.Storage.Archive",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 35,
+      "id": "Zenith.Persistence.TimeTravel",
+      "group": "B",
+      "omitsGroupA": "Zenith.Storage.Snapshot",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 36,
+      "id": "Zenith.Edge.Autonomy",
+      "group": "B",
+      "omitsGroupA": "Zenith.Reasoning.Symbolic",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 37,
+      "id": "Zenith.Edge.Cluster",
+      "group": "B",
+      "omitsGroupA": "Zenith.Reasoning.Causal",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 38,
+      "id": "Zenith.Edge.Cooperation",
+      "group": "B",
+      "omitsGroupA": "Zenith.Reasoning.Hierarchical",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.GoalEngine",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 39,
+      "id": "Zenith.Edge.DeviceDiscovery",
+      "group": "B",
+      "omitsGroupA": "Zenith.Reasoning.GoalEngine",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.ConstraintSolver"
+      ]
+    },
+    {
+      "number": 40,
+      "id": "Zenith.Edge.MeshRouting",
+      "group": "B",
+      "omitsGroupA": "Zenith.Reasoning.ConstraintSolver",
+      "dependsOn": [
+        "MajoranaZenithSDK",
+        "Zenith.Agent.Runtime",
+        "Zenith.Agent.Hosting",
+        "Zenith.Agent.Registry",
+        "Zenith.Agent.Orchestration",
+        "Zenith.Agent.Lifecycle",
+        "Zenith.Memory.Vectorization",
+        "Zenith.Memory.Consolidation",
+        "Zenith.Memory.ContextGraph",
+        "Zenith.Memory.TemporalIndex",
+        "Zenith.Memory.Compression",
+        "Zenith.Storage.Checkpointing",
+        "Zenith.Storage.Replication",
+        "Zenith.Storage.Versioning",
+        "Zenith.Storage.Archive",
+        "Zenith.Storage.Snapshot",
+        "Zenith.Reasoning.Symbolic",
+        "Zenith.Reasoning.Causal",
+        "Zenith.Reasoning.Hierarchical",
+        "Zenith.Reasoning.GoalEngine"
+      ]
+    },
+    {
+      "number": 41,
+      "id": "Zenith.Benchmark.Reasoning",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 42,
+      "id": "Zenith.Benchmark.Memory",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 43,
+      "id": "Zenith.Benchmark.Agentic",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 44,
+      "id": "Zenith.Benchmark.Edge",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 45,
+      "id": "Zenith.Benchmark.Immersive",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 46,
+      "id": "Zenith.Dataset.Logic",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 47,
+      "id": "Zenith.Dataset.Causality",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 48,
+      "id": "Zenith.Dataset.Planning",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 49,
+      "id": "Zenith.Dataset.Memory",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 50,
+      "id": "Zenith.Dataset.Dialog",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 51,
+      "id": "Zenith.Toolkit.Visualizer",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 52,
+      "id": "Zenith.Toolkit.Telemetry",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 53,
+      "id": "Zenith.Toolkit.Diagnostics",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 54,
+      "id": "Zenith.Toolkit.Profiler",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 55,
+      "id": "Zenith.Toolkit.Validator",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 56,
+      "id": "Zenith.Research.Majorana",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 57,
+      "id": "Zenith.Research.QPersistence",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 58,
+      "id": "Zenith.Research.EdgeAGI",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 59,
+      "id": "Zenith.Research.LocalIntelligence",
+      "group": "C",
+      "dependsOn": []
+    },
+    {
+      "number": 60,
+      "id": "Zenith.Research.MeshTheory",
+      "group": "C",
+      "dependsOn": []
+    }
+  ]
+}

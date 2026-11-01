@@ -1,0 +1,20 @@
+# =============================================================================
+# Windows AGI Benchmark Lab — Grafana Dashboard Provisioning
+# Copyright (c) 2026 Microsoft Corporation. All Rights Reserved.
+# =============================================================================
+
+apiVersion: 1
+
+providers:
+  - name: AGI Benchmark Dashboards
+    orgId: 1
+    folder: Windows AGI Benchmark Lab
+    folderUid: agi-benchmark
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false
