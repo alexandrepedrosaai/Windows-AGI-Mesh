@@ -1,0 +1,8 @@
+// QMesh v0.2 example artifact 474.
+// Section: Examples.
+mesh Artifact474 {
+    quantum Circuit474 {
+        qubit q0;
+        H q0;
+    }
+}

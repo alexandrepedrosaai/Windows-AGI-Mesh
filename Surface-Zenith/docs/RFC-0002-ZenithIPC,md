@@ -1,0 +1,58 @@
+# RFC-0002: Zenith Interdomain Bus Protocol (ZIB)
+
+**Status:** Draft  
+**Version:** 0.3.1  
+**Authors:** Surface Zenith Architecture Team  
+**Date:** 2026-10-23
+
+---
+
+## Abstract
+
+This RFC defines the Zenith Interdomain Bus (ZIB) — the unified message-passing protocol replacing COM, Binder, Named Pipes, D-Bus, and RPC in the Surface Zenith OS.
+
+## Wire Format
+
+```
+Frame {
+    magic:       [u8; 4],   // "ZIB\x03"
+    version:     u8,        // 1
+flags:       u8,        // COMPRESSED | ENCRYPTED | FRAGMENTED | LAST_FRAG
+    payload_len: u32,       // big-endian
+    checksum:    u32,       // CRC32-like
+    sequence:    u64,       // per-session sequence number
+    reserved:    [u8; 4],
+    payload:     [u8],      // bincode-encoded ZMessage
+}
+```
+
+## Topic Contract
+
+All topics are strongly typed (no raw strings). Each topic has:
+- A defined payload schema
+- A default TTL
+- A QoS policy (AtMostOnce / AtLeastOnce / ExactlyOnce)
+- A priority weight
+
+## QoS Policies
+
+| Policy       | Delivery       | Ordering    | TTL      | Retries |
+|--------------|----------------|-------------|----------|---------|
+| BestEffort   | AtMostOnce     | Unordered   | 5s       | 0       |
+| Reliable     | AtLeastOnce    | PerSource   | 30s      | 3       |
+| ExactlyOnce  | ExactlyOnce    | GlobalOrder | ∞        | 10      |
+| RealTime     | AtMostOnce     | PerSource   | 100ms    | 0       |
+| Security     | ExactlyOnce    | GlobalOrder | ∞        | 5       |
+
+## Security
+
+Publishing to capability-required topics requires a valid CapabilityToken in the message header. The ZIB validates tokens before delivery.
+
+## Syscall Interface
+
+```
+zib_publish(session_id, topic_id, source_domain, payload, payload_len, ttl_ms) → i64
+zib_subscribe(topic_id, domain_id, out_sub_id) → i64
+zib_recv(sub_id, buf, buf_len, out_msg_len) → i64
+zib_send_directed(session_id, topic_id, source, target, payload, len) → i64
+```

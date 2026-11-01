@@ -1,0 +1,26 @@
+[package]
+name        = "zenith-runtime"
+version     = "0.1.0"
+edition     = "2021"
+description = "Surface Zenith Domain Runtimes — Android, Windows, AI, Quantum, RealTime, Cloud adapters"
+
+[dependencies]
+zenith-abi      = { path = "../zenith-abi" }
+zenith-ipc      = { path = "../zenith-ipc" }
+zenith-scheduler = { path = "../zenith-scheduler" }
+tokio           = { workspace = true }
+serde           = { workspace = true }
+serde_json      = { workspace = true }
+uuid            = { workspace = true }
+tracing         = { workspace = true }
+parking_lot     = { workspace = true }
+dashmap         = { workspace = true }
+async-trait     = { workspace = true }
+thiserror       = { workspace = true }
+bytes           = { workspace = true }
+rand            = { workspace = true }
+futures         = { workspace = true }
+
+[dev-dependencies]
+tokio       = { workspace = true }
+criterion   = { workspace = true }

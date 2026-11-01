@@ -1,0 +1,24 @@
+[package]
+name        = "zenith-scheduler"
+version     = "0.1.0"
+edition     = "2021"
+description = "Surface Zenith Intent Scheduler (ZIS) — intent-based workload orchestration"
+
+[dependencies]
+zenith-abi  = { path = "../zenith-abi" }
+zenith-ipc  = { path = "../zenith-ipc" }
+tokio       = { workspace = true }
+serde       = { workspace = true }
+serde_json  = { workspace = true }
+uuid        = { workspace = true }
+tracing     = { workspace = true }
+dashmap     = { workspace = true }
+parking_lot = { workspace = true }
+futures     = { workspace = true }
+rayon       = { workspace = true }
+rand        = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+criterion   = { workspace = true }
+tokio       = { workspace = true }

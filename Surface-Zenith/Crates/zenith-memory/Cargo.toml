@@ -1,0 +1,22 @@
+[package]
+name        = "zenith-memory"
+version     = "0.1.0"
+edition     = "2021"
+description = "Surface Zenith Shared Memory Fabric — UMO management, CoW, dirty tracking, page migration"
+
+[dependencies]
+zenith-abi  = { path = "../zenith-abi" }
+serde       = { workspace = true }
+serde_json  = { workspace = true }
+bincode     = { workspace = true }
+uuid        = { workspace = true }
+tracing     = { workspace = true }
+parking_lot = { workspace = true }
+dashmap     = { workspace = true }
+sha2        = { workspace = true }
+bytes       = { workspace = true }
+thiserror   = { workspace = true }
+rand        = { workspace = true }
+
+[dev-dependencies]
+criterion   = { workspace = true }

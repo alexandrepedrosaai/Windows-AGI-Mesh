@@ -1,3 +1,7 @@
+// module: EdgeAIApp
+// version: 0.1
+// author: Windows AGI Mesh
+
 circuit EdgeAIApp {
   version = "0.1"
   kind = sovereign_edge_intelligence

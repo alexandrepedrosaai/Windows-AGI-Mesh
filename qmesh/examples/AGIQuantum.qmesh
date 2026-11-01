@@ -1,0 +1,11 @@
+import "quantum/core";
+import "mesh/memory";
+
+mesh AGIQuantum {
+    quantum BellPair {
+        qubit q0;
+        qubit q1;
+        H q0;
+        CNOT q0,q1;
+    }
+}

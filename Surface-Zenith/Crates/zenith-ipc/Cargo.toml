@@ -1,0 +1,24 @@
+[package]
+name        = "zenith-ipc"
+version     = "0.3.1"
+edition     = "2021"
+description = "Surface Zenith Interdomain Bus (ZIB) — typed IPC with QoS, validation, and topic contracts"
+
+[dependencies]
+zenith-abi      = { path = "../zenith-abi" }
+tokio           = { workspace = true }
+serde           = { workspace = true }
+serde_json      = { workspace = true }
+bincode         = { workspace = true }
+thiserror       = { workspace = true }
+uuid            = { workspace = true }
+tracing         = { workspace = true }
+bytes           = { workspace = true }
+dashmap         = { workspace = true }
+parking_lot     = { workspace = true }
+crossbeam-channel = { workspace = true }
+futures         = { workspace = true }
+
+[dev-dependencies]
+tokio           = { workspace = true }
+criterion       = { workspace = true }
