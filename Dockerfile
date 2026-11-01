@@ -38,4 +38,4 @@ LABEL org.opencontainers.image.workflow="Topo-Majorana-Quibits CI CD"
 USER appuser
 
 # Comando padrão: rodar o projeto Q#
-CMD ["dotnet", "run", "--project", "MajoranaStarship.qsproj", "-c", "Release"]
+CMD ["dotnet", "bin/Release/net8.0/MajoranaStarship.dll"]
