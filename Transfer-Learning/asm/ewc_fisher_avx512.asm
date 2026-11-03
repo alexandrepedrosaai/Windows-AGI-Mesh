@@ -275,7 +275,7 @@ fisher_normalize:
     jz      .norm_done
 
     movsd   xmm2, [r12]
-    divsd   xmm2, xmm0      ; xmm0 still has N as scalar
+divsd   xmm2, xmm1      ; xmm1 still contains N as scalar
     movsd   [r12], xmm2
 
     add     r12, 8
