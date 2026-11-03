@@ -647,10 +647,15 @@ gradient_decompress_topk:
     mov     r15, rcx        ; output dense
     ; r8 = N
 
-    ; Zero output dense vector
-    mov     rdi, r15
-    mov     rsi, r8
-    call    fisher_reset_accumulator    ; reuse zero-fill
+    ; Zero output dense vector without depending on the EWC module
+    xor     rbx, rbx
+.decomp_zero_loop:
+    cmp     rbx, r8
+    jge     .decomp_zero_done
+    mov     qword [r15 + rbx*8], 0
+    inc     rbx
+    jmp     .decomp_zero_loop
+.decomp_zero_done:
 
     ; Fill in sparse values
     xor     rbx, rbx
