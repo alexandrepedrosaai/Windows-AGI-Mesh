@@ -985,9 +985,15 @@ gradient_compute_sparsity:
     jmp     .sparsity_loop
 
 .sparsity_done:
+    test    rbx, rbx
+    jz      .sparsity_empty
     cvtsi2sd    xmm0, rcx
     cvtsi2sd    xmm1, rbx
     divsd   xmm0, xmm1      ; sparsity = zeros / total
+    jmp     .sparsity_return
+.sparsity_empty:
+    xorpd   xmm0, xmm0
+.sparsity_return:
 
     pop     r12
     pop     rbx
