@@ -341,6 +341,13 @@ gradient_quantize_8bit:
     jmp     .quant8_max_loop
 .quant8_max_done:
     ; scale = 127.0 / max_abs
+    xorpd   xmm0, xmm0
+    ucomisd xmm15, xmm0
+    jne     .quant8_nonzero_scale
+    mov     rax, 0x3FF0000000000000
+    movq    xmm15, rax
+    jmp     .quant8_have_scale
+.quant8_nonzero_scale:
     mov     rax, 0x405FC00000000000  ; 127.0
     movq    xmm0, rax
     divsd   xmm0, xmm15
