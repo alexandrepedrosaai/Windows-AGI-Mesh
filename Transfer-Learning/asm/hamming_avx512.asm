@@ -564,8 +564,7 @@ hamming_nearest_cluster:
 
     call    hamming_distance_avx512
 
-    cmp     rax, r15
-    jge     .nearest_next
+    jae     .nearest_next
 
     mov     r15, rax        ; update best distance
     mov     rbx, r8         ; update best index
