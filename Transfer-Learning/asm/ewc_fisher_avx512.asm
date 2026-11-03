@@ -274,6 +274,7 @@ fisher_normalize:
     test    rbx, rbx
     jz      .norm_done
 
+    movsd   xmm2, [r12]
     divsd   xmm2, xmm1      ; xmm1 still contains the broadcast N
     movsd   [r12], xmm2
 
