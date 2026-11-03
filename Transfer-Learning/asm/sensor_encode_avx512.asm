@@ -415,9 +415,8 @@ sensor_quantize_adc:
     mov     rcx, 1
     shl     rcx, cl         ; 1 << rbx (using cl)
     ; Note: need to use rbx as shift count
-    push    rcx
+    mov     r8, 1
     mov     rcx, rbx
-    pop     r8
     shl     r8, cl
     or      rax, r8
     jmp     .quantize_next
