@@ -275,7 +275,8 @@ return IntAsDouble(raw) / IntAsDouble(maxBits);
             }
             set sorted w/= j + 1 <- key;
         }
-        let idx = Ceiling(percentile * IntAsDouble(n - 1));
+Fact(percentile >= 0.0 and percentile <= 1.0, "Percentile must be between 0.0 and 1.0");
+let idx = Ceiling(percentile * IntAsDouble(n - 1));
         return sorted[idx];
     }
 
