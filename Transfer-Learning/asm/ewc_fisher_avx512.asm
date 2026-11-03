@@ -351,7 +351,7 @@ fisher_apply_ewc:
     movsd   xmm1, [r12]
     subsd   xmm1, [r13]         ; delta
     mulsd   xmm1, [r14]         ; F * delta
-    mulsd   xmm1, xmm0          ; lambda * F * delta
+    mulsd   xmm1, xmm15          ; lambda * F * delta
     movsd   [r15], xmm1
 
     add     r12, 8
