@@ -427,9 +427,9 @@ hamming_matrix_avx512:
     mov     rdi, [r12 + rbx*8]
     mov     rsi, [r12 + rbp*8]
 
-    ; Use 512-bit version for speed (assumes length >= 8)
+    ; Use the 512-bit version only for exactly 8 words
     cmp     r14, 8
-    jl      .matrix_scalar
+    jne     .matrix_scalar
 
     call    hamming_distance_avx512
     jmp     .matrix_store
