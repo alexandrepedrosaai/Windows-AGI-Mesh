@@ -1021,8 +1021,9 @@ gradient_pack_sparse:
 ; gradient_unpack_sparse
 ; Unpack sparse binary format back to (values, indices)
 ; Input:  rdi = packed buffer (uint8*), rsi = output values (double*)
-;         rdx = output indices (uint32*)
-; Output: rax = K (number of elements unpacked)
+;         rdx = output indices (uint32*), rcx = input length in bytes
+;         r8  = output capacity (max number of elements)
+; Output: rax = K (number of elements unpacked), or 0 on invalid packet
 ; =============================================================================
 gradient_unpack_sparse:
     push    rbx
@@ -1032,11 +1033,28 @@ gradient_unpack_sparse:
     mov     r12, rsi        ; output values
     mov     r13, rdx        ; output indices
 
+    ; Validate minimum header size
+    cmp     rcx, 4
+    jb      .unpack_invalid
+
     ; Read count
     mov     eax, [rdi]
     mov     rbx, rax
-    add     rdi, 4
 
+    ; Validate count <= output capacity
+    cmp     rbx, r8
+    ja      .unpack_invalid
+
+    ; Validate packet size: 4 + count*12 <= input_len
+    mov     rax, rbx
+    imul    rax, 12
+    jc      .unpack_invalid
+    add     rax, 4
+    jc      .unpack_invalid
+    cmp     rax, rcx
+    ja      .unpack_invalid
+
+    add     rdi, 4
     xor     rcx, rcx
 
 .unpack_loop:
@@ -1058,7 +1076,12 @@ gradient_unpack_sparse:
 
 .unpack_done:
     mov     rax, rbx
+    jmp     .unpack_exit
 
+.unpack_invalid:
+    xor     rax, rax
+
+.unpack_exit:
     pop     r13
     pop     r12
     pop     rbx
