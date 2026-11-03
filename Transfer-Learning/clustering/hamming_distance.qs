@@ -595,7 +595,7 @@ set results w/= i <- NearestCentroidWithDistance(samples[i], centroids);
             for s in samples {
                 set sum += s[wordIdx];
             }
-            set centroid w/= wordIdx <- sum / n;
+set centroid w/= wordIdx <- Round(IntAsDouble(sum) / IntAsDouble(n));
         }
         return centroid;
     }
