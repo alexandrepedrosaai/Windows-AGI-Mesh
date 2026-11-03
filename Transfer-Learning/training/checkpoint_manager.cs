@@ -122,14 +122,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent0(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent0>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent0>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent0 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -1640,14 +1638,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent1(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent1>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent1>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent1 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -3158,14 +3154,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent2(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent2>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent2>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent2 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -4676,14 +4670,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent3(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent3>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent3>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent3 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -6194,14 +6186,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent4(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent4>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent4>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent4 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -7712,14 +7702,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent5(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent5>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent5>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent5 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -9230,14 +9218,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent6(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent6>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent6>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent6 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -10748,14 +10734,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent7(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent7>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent7>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent7 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -12266,14 +12250,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent8(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent8>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent8>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent8 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -13784,14 +13766,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent9(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent9>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent9>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent9 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -15302,14 +15282,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent10(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent10>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent10>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent10 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -16820,14 +16798,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent11(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent11>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent11>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent11 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -18338,14 +18314,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent12(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent12>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent12>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent12 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -19856,14 +19830,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent13(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent13>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent13>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent13 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -21374,14 +21346,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent14(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent14>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent14>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent14 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -22892,14 +22862,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent15(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent15>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent15>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent15 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -24410,14 +24378,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent16(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent16>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent16>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent16 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -25928,14 +25894,12 @@ namespace SiameseTwinAI.Training.Checkpoint
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public checkpoint_managerComponent17(checkpoint_managerConfig? config = null, ILogger<checkpoint_managerComponent17>? logger = null)
         {
             _config = config ?? new checkpoint_managerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<checkpoint_managerComponent17>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("checkpoint_managerComponent17 initialized (NodeId={NodeId})", _config.NodeId);
         }
 

@@ -122,14 +122,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent0(priority_samplerConfig? config = null, ILogger<priority_samplerComponent0>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent0>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent0 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -1640,14 +1638,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent1(priority_samplerConfig? config = null, ILogger<priority_samplerComponent1>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent1>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent1 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -3158,14 +3154,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent2(priority_samplerConfig? config = null, ILogger<priority_samplerComponent2>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent2>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent2 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -4676,14 +4670,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent3(priority_samplerConfig? config = null, ILogger<priority_samplerComponent3>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent3>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent3 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -6194,14 +6186,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent4(priority_samplerConfig? config = null, ILogger<priority_samplerComponent4>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent4>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent4 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -7712,14 +7702,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent5(priority_samplerConfig? config = null, ILogger<priority_samplerComponent5>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent5>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent5 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -9230,14 +9218,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent6(priority_samplerConfig? config = null, ILogger<priority_samplerComponent6>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent6>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent6 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -10748,14 +10734,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent7(priority_samplerConfig? config = null, ILogger<priority_samplerComponent7>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent7>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent7 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -12266,14 +12250,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent8(priority_samplerConfig? config = null, ILogger<priority_samplerComponent8>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent8>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent8 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -13784,14 +13766,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent9(priority_samplerConfig? config = null, ILogger<priority_samplerComponent9>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent9>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent9 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -15302,14 +15282,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent10(priority_samplerConfig? config = null, ILogger<priority_samplerComponent10>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent10>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent10 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -16820,14 +16798,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent11(priority_samplerConfig? config = null, ILogger<priority_samplerComponent11>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent11>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent11 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -18338,14 +18314,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent12(priority_samplerConfig? config = null, ILogger<priority_samplerComponent12>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent12>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent12 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -19856,14 +19830,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent13(priority_samplerConfig? config = null, ILogger<priority_samplerComponent13>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent13>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent13 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -21374,14 +21346,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent14(priority_samplerConfig? config = null, ILogger<priority_samplerComponent14>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent14>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent14 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -22892,14 +22862,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent15(priority_samplerConfig? config = null, ILogger<priority_samplerComponent15>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent15>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent15 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -24410,14 +24378,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent16(priority_samplerConfig? config = null, ILogger<priority_samplerComponent16>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent16>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent16 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -25928,14 +25894,12 @@ namespace SiameseTwinAI.Replay.Sampler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public priority_samplerComponent17(priority_samplerConfig? config = null, ILogger<priority_samplerComponent17>? logger = null)
         {
             _config = config ?? new priority_samplerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<priority_samplerComponent17>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("priority_samplerComponent17 initialized (NodeId={NodeId})", _config.NodeId);
         }
 

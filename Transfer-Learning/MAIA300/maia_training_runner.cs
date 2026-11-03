@@ -122,14 +122,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent0(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent0>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent0>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent0 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -1640,14 +1638,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent1(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent1>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent1>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent1 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -3158,14 +3154,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent2(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent2>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent2>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent2 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -4676,14 +4670,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent3(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent3>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent3>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent3 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -6194,14 +6186,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent4(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent4>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent4>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent4 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -7712,14 +7702,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent5(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent5>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent5>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent5 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -9230,14 +9218,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent6(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent6>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent6>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent6 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -10748,14 +10734,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent7(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent7>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent7>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent7 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -12266,14 +12250,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent8(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent8>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent8>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent8 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -13784,14 +13766,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent9(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent9>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent9>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent9 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -15302,14 +15282,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent10(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent10>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent10>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent10 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -16820,14 +16798,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent11(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent11>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent11>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent11 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -18338,14 +18314,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent12(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent12>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent12>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent12 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -19856,14 +19830,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent13(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent13>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent13>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent13 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -21374,14 +21346,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent14(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent14>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent14>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent14 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -22892,14 +22862,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent15(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent15>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent15>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent15 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -24410,14 +24378,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent16(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent16>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent16>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent16 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -25928,14 +25894,12 @@ namespace SiameseTwinAI.MAIA300.Training
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_training_runnerComponent17(maia_training_runnerConfig? config = null, ILogger<maia_training_runnerComponent17>? logger = null)
         {
             _config = config ?? new maia_training_runnerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_training_runnerComponent17>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_training_runnerComponent17 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
