@@ -1,4 +1,4 @@
-TRANSFER-LEARNING/
+Transfer-Learning/
 ├── docs/                    ← Arquitetura + Protocolo WT-MAIA/1.0
 ├── asm/                     ← AVX-512 (Hamming, Fisher, Gradientes)
 ├── WebTransporte/
