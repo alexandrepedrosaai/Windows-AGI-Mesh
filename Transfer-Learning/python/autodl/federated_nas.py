@@ -523,9 +523,10 @@ class FederatedNASLocalNode:
 
     def run_local_search(self) -> List[CandidateArchitecture]:
         """Run local NAS for configured number of generations."""
-        for _ in range(self.config.n_local_generations):
+        for generation in range(self.config.n_local_generations):
             self._local_search.evaluate_population()
-            self._local_search.evolve()
+            if generation < self.config.n_local_generations - 1:
+                self._local_search.evolve()
 
         self._local_population = self._local_search._population
         return self._local_search.get_top_k(self.config.architectures_per_round)
