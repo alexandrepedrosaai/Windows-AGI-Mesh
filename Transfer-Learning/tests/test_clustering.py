@@ -263,7 +263,7 @@ class SimpleClusterManager:
             self.clusters[best_idx].update(sample, best_dist, loss)
 
         self.total_samples += 1
-        return (best_idx if not is_novel else self.next_id - 1), is_novel
+        return (best_idx if (not is_novel or len(self.clusters) >= self.max_clusters) else self.next_id - 1), is_novel
 
     def novelty_rate(self) -> float:
         return self.total_novel / max(1, self.total_samples)
