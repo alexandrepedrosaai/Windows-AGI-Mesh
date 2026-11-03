@@ -969,8 +969,8 @@ fisher_online_update:
     movsd   xmm2, [r12]
     movsd   xmm3, [r13]
     mulsd   xmm3, xmm3              ; g^2
-    mulsd   xmm2, xmm1              ; (1-alpha)*F
-    mulsd   xmm3, xmm0              ; alpha*g^2
+    mulsd   xmm2, xmm15              ; (1-alpha)*F
+    mulsd   xmm3, xmm14              ; alpha*g^2
     addsd   xmm2, xmm3
     movsd   [r12], xmm2
 
