@@ -382,7 +382,7 @@ sensor_normalize_phase:
     xorpd   xmm3, xmm3
     comisd  xmm0, xmm3
     jae     .phase_nonnegative
-    addsd   xmm0, [phase_scale]
+    addsd   xmm0, xmm1
 .phase_nonnegative:
     ret
 
