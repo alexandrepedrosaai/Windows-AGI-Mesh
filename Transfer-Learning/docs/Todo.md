@@ -28,5 +28,5 @@ Transfer-Learning/
     ├── maui/                ← .NET MAUI (C#)
     ├── qsharp/              ← Q# (XDNA 2 + Steane + VQE)
     ├── powershell/          ← PowerShell 7.4+
-    ├── tests/               ← Python (64 testes ✅)
+    ├── tests/               ← Python (planejado; contagem a definir)
     └── docs/                ← Specs AMD oficiais
