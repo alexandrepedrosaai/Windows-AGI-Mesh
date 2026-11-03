@@ -168,8 +168,8 @@ return IntAsDouble(raw) / IntAsDouble(maxBits);
         centroids : Int[][],
         k : Int
     ) : Int[] {
-        let n = Length(centroids);
-        let actualK = MinI(k, n);
+Fact(k >= 0, "k must be nonnegative");
+let actualK = MinI(k, n);
         mutable distances = HammingDistancesToCentroids(sample, centroids);
         mutable indices = new Int[actualK];
 
