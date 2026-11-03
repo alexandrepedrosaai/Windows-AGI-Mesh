@@ -90,7 +90,7 @@ fisher_reset_accumulator:
     cmp     rbx, 8
     jl      .reset_scalar
 
-    vmovdqa64   [rdi], zmm0
+    vmovdqu64   [rdi], zmm0
     add     rdi, 64
     sub     rbx, 8
     jmp     .reset_loop
