@@ -531,7 +531,7 @@ namespace SiameseTwinAI.Clustering {
     ) : (Int, Int)[] {
         mutable results = new (Int, Int)[Length(samples)];
         for i in 0 .. Length(samples) - 1 {
-            set results w/= i <- NearestCentroidWithDistance(samples[i], centroids[i]);
+set results w/= i <- NearestCentroidWithDistance(samples[i], centroids);
         }
         return results;
     }
