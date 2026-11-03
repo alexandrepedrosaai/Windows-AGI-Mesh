@@ -22,7 +22,7 @@ grad_clip_threshold:    dq 0x4014000000000000   ; 5.0
 
 ; Small epsilon for numerical stability
 align 8
-fisher_epsilon:         dq 0x3EE0000000000000   ; ~1e-7
+fisher_epsilon:         dq 0x3E7AD7F29ABCAF48   ; 1e-7
 
 ; Normalization constant (1/N)
 align 8
