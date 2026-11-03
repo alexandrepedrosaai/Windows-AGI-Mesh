@@ -376,9 +376,11 @@ sensor_normalize_phase:
     subsd   xmm0, xmm2
     mulsd   xmm0, xmm1
 
-    ; Ensure non-negative
     xorpd   xmm3, xmm3
-    maxsd   xmm0, xmm3
+    comisd  xmm0, xmm3
+    jae     .phase_nonnegative
+    addsd   xmm0, [phase_scale]
+.phase_nonnegative:
     ret
 
 ; =============================================================================
