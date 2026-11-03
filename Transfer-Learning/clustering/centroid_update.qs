@@ -410,6 +410,7 @@ namespace SiameseTwinAI.Clustering {
         cluster : ReplayCluster,
         maxCapacity : Int
     ) : Double {
+        Fact(maxCapacity > 0, "Max capacity must be positive");
         return IntAsDouble(cluster::Samples) / IntAsDouble(maxCapacity);
     }
 
