@@ -232,6 +232,21 @@ gradient_topk_select:
     mov     r15, rcx        ; output values
     mov     rbp, r8         ; output indices
 
+    ; Validate and bound N/K for fixed scratch buffers (8192 doubles)
+    test    r13, r13
+    jle     .topk_return_zero
+    cmp     r13, 8192
+    jle     .topk_n_bounded
+    mov     r13, 8192
+
+.topk_n_bounded:
+    test    r14, r14
+    jle     .topk_return_zero
+    cmp     r14, r13
+    jle     .topk_k_bounded
+    mov     r14, r13
+
+.topk_k_bounded:
     ; Step 1: Compute absolute values into magnitude_buffer
     mov     rdi, r12
     lea     rsi, [magnitude_buffer]
@@ -269,6 +284,9 @@ gradient_topk_select:
     jge     .topk_select_done
 
 .topk_skip:
+
+.topk_return_zero:
+    xor     rax, rax
     inc     rbx
     jmp     .topk_select_loop
 
