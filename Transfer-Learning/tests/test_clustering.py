@@ -19,7 +19,7 @@ from collections import defaultdict
 
 def hamming_distance_64(a: int, b: int) -> int:
     """Compute Hamming distance between two 64-bit integers."""
-    x = a ^ b
+    x = (a ^ b) & ((1 << 64) - 1)
     count = 0
     while x:
         count += 1
