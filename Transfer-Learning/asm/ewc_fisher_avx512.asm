@@ -427,7 +427,7 @@ fisher_compute_penalty:
     ; Add to zmm14 lane 0
     vextractf64x2   xmm2, zmm14, 0
     addsd   xmm2, xmm1
-    ; Put back (simplified: just accumulate in xmm2)
+    movsd   xmm14, xmm2
     add     r12, 8
     add     r13, 8
     add     r14, 8
