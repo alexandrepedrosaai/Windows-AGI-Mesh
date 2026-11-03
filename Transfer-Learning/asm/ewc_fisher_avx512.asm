@@ -1103,7 +1103,7 @@ fisher_compute_batch:
     imul    rdi, 8
     add     rdi, r12
 
-    mov     rsi, r13        ; Fisher accumulator
+    mov     rdi, r13        ; Fisher accumulator
     mov     rdx, r15        ; P
     movsd   xmm0, [grad_temp_buffer]
 
