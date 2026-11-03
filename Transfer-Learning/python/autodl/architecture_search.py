@@ -317,8 +317,10 @@ class CandidateArchitecture:
         if self.output_dim <= 0:
             return False
         # Check transformer head divisibility
-        for layer in self.transformer_layers:
-            if layer.d_model % layer.n_heads != 0:
+for layer in self.transformer_layers:
+            if (layer.n_heads <= 0 or
+                    layer.d_model != self.embedding_dim or
+                    layer.d_model % layer.n_heads != 0):
                 return False
         return True
 
