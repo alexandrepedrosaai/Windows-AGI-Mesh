@@ -64,8 +64,13 @@ class FederatedNASConfig:
             'aggregation_strategy': self.aggregation_strategy,
             'privacy_noise_std': self.privacy_noise_std,
             'min_nodes_for_aggregation': self.min_nodes_for_aggregation,
+            'sync_interval_rounds': self.sync_interval_rounds,
+            'elite_fraction': self.elite_fraction,
+            'mutation_rate': self.mutation_rate,
+            'crossover_rate': self.crossover_rate,
             'enable_differential_privacy': self.enable_differential_privacy,
             'dp_epsilon': self.dp_epsilon,
+            'dp_delta': self.dp_delta,
             'max_arch_params': self.max_arch_params,
             'target_latency_ms': self.target_latency_ms,
         }
