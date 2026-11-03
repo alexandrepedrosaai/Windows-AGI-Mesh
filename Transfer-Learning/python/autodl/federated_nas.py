@@ -723,8 +723,9 @@ class FederatedNAS:
         self._current_round += 1
 
         if self.verbose:
-            logger.info(f"Round {round_id} complete: "
-                        f"best={round_stats['global_best_score']:.4f if round_stats['global_best_score'] else 'N/A'} "
+            best = round_stats['global_best_score']
+            best_text = f"{best:.4f}" if best is not None else "N/A"
+            logger.info(f"Round {round_id} complete: best={best_text} "
                         f"pool={round_stats['global_pool_size']}")
 
         return round_stats
