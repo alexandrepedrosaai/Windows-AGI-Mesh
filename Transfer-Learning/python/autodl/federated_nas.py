@@ -443,8 +443,9 @@ class FederatedNASAggregator:
             all_archs.extend(contrib.architectures)
 
         # Sort by score and return top-k
-        all_archs.sort(key=lambda a: a.score)
-        return all_archs[:self.config.architectures_per_round]
+        selected = all_archs[:self.config.architectures_per_round]
+        self.global_pool.add_batch(selected, "aggregator")
+        return selected
 
     def _ensemble_aggregation(
         self,
