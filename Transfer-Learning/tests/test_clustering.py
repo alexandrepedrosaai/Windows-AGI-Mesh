@@ -784,7 +784,7 @@ class TestEWC(unittest.TestCase):
         # Simulate task B training with EWC
         theta_ewc = list(theta_star_a)  # Start from task A optimum
         lambda_val = 400.0
-        lr = 0.01
+        lr = 0.001
         for _ in range(100):
             task_b_grad = [rng.gauss(0, 0.1) for _ in range(n_params)]
             ewc_grad = [lambda_val * f * (t - ts)
