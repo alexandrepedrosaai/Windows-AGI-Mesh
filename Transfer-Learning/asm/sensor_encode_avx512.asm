@@ -135,7 +135,9 @@ sensor_encode_sample:
     ; Encode coherence to 16-bit fixed point
     ; coherence_fixed = (uint16)(coherence * 65535.0)
     movsd   xmm2, xmm0
-    mulsd   xmm2, [phase_scale]     ; scale by 1.0 (placeholder)
+    mov     rax, 0x40EFFFE000000000  ; 65535.0 as double
+    movq    xmm4, rax
+    mulsd   xmm2, xmm4
     cvttsd2si   eax, xmm2
     and     eax, 0xFFFF
     mov     rbx, rax                ; coherence_fixed
