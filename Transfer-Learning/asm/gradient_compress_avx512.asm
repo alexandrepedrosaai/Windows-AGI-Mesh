@@ -1219,8 +1219,10 @@ gradient_random_sparsify:
     jge     .random_done
 
     ; LCG random: seed = seed * 6364136223846793005 + 1442695040888963407
-    imul    rbx, 0x5851F42D4C957F2D
-    add     rbx, 0x14057B7EF767814F
+    mov     r10, 0x5851F42D4C957F2D
+    imul    rbx, r10
+    mov     r10, 0x14057B7EF767814F
+    add     rbx, r10
 
     ; Convert to [0.0, 1.0)
     mov     rdx, rbx
