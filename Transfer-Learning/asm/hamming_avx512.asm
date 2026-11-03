@@ -662,7 +662,7 @@ hamming_distance_u8_array:
     vpshufb     zmm6, zmm31, zmm5
 
     ; Sum low + high nibble popcounts
-    vpaddq      zmm7, zmm4, zmm6
+    vpaddb      zmm7, zmm4, zmm6
 
     ; Accumulate byte-level popcounts into 64-bit accumulators
     ; Use VPSADBW against zero to sum bytes within 64-bit groups
