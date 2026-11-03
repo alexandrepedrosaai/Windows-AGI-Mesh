@@ -22,7 +22,7 @@ grad_clip_threshold:    dq 0x4014000000000000   ; 5.0
 
 ; Small epsilon for numerical stability
 align 8
-fisher_epsilon:         dq 0x3E7AD7F29ABCAF48   ; ~1e-7
+
 
 ; Normalization constant (1/N)
 align 8
@@ -90,7 +90,7 @@ fisher_reset_accumulator:
     cmp     rbx, 8
     jl      .reset_scalar
 
-    vmovdqu64   [rdi], zmm0
+
     add     rdi, 64
     sub     rbx, 8
     jmp     .reset_loop
@@ -275,7 +275,7 @@ fisher_normalize:
     jz      .norm_done
 
     movsd   xmm2, [r12]
-    divsd   xmm2, xmm1      ; xmm1 still contains the broadcast N
+
     movsd   [r12], xmm2
 
     add     r12, 8
@@ -351,7 +351,7 @@ fisher_apply_ewc:
     movsd   xmm1, [r12]
     subsd   xmm1, [r13]         ; delta
     mulsd   xmm1, [r14]         ; F * delta
-    mulsd   xmm1, xmm15          ; lambda * F * delta
+
     movsd   [r15], xmm1
 
     add     r12, 8
@@ -426,9 +426,7 @@ fisher_compute_penalty:
     mulsd   xmm1, xmm1
     mulsd   xmm1, [r14]
     ; Add to zmm14 lane 0
-    vextractf64x2   xmm2, zmm14, 0
-    addsd   xmm2, xmm1
-    movsd   xmm14, xmm2
+
     add     r12, 8
     add     r13, 8
     add     r14, 8
@@ -442,7 +440,7 @@ fisher_compute_penalty:
     vextractf128    xmm2, ymm1, 1
     vaddpd          xmm3, xmm2, xmm1
     vhaddpd         xmm4, xmm3, xmm3
-    ; lambda/2 was already applied when initializing xmm15 above
+
     movsd   xmm0, xmm4
 
     pop     r14
@@ -556,8 +554,7 @@ fisher_l2_norm:
     movsd   xmm0, [r12]
     mulsd   xmm0, xmm0
     vextractf64x2   xmm1, zmm14, 0
-    vaddsd          xmm1, xmm1, xmm0
-    vinsertf64x2    zmm14, zmm14, xmm1, 0
+
 
     add     r12, 8
     dec     rbx
@@ -968,8 +965,7 @@ fisher_online_update:
     movsd   xmm2, [r12]
     movsd   xmm3, [r13]
     mulsd   xmm3, xmm3              ; g^2
-    mulsd   xmm2, xmm15              ; (1-alpha)*F
-    mulsd   xmm3, xmm14              ; alpha*g^2
+
     addsd   xmm2, xmm3
     movsd   [r12], xmm2
 
@@ -1103,11 +1099,7 @@ fisher_compute_batch:
     imul    rdi, 8
     add     rdi, r12
 
-    mov     rsi, rdi        ; gradient row
-    mov     rdi, r13        ; Fisher accumulator
-    movsd   xmm0, [grad_temp_buffer]
 
-    call    fisher_online_update
 
     inc     rbx
     jmp     .batch_fisher_loop
