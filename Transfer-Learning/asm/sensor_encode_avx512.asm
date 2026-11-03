@@ -125,8 +125,12 @@ sensor_encode_sample:
     ; r8 = timestamp, r9 = output
 
     ; Validate coherence [0.0, 1.0]
-    ucomisd xmm0, [coherence_threshold]
+    xorpd   xmm2, xmm2
+    ucomisd xmm0, xmm2
     jb      .coherence_low
+    movsd   xmm2, [phase_scale]
+    ucomisd xmm0, xmm2
+    ja      .coherence_low
 
     ; Encode coherence to 16-bit fixed point
     ; coherence_fixed = (uint16)(coherence * 65535.0)
