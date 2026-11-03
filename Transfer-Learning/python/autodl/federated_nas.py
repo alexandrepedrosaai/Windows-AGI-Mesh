@@ -154,8 +154,8 @@ class ArchitecturePrivacyMechanism:
 
     def _gaussian_noise_std(self) -> float:
         """Compute Gaussian noise std for (epsilon, delta)-DP."""
-        if self.epsilon <= 0 or self.delta <= 0:
-            return 0.0
+if self.epsilon <= 0 or not 0 < self.delta < 1:
+            raise ValueError("epsilon must be > 0 and delta must be in (0, 1)")
         c = math.sqrt(2 * math.log(1.25 / self.delta))
         return c * self.sensitivity / self.epsilon
 
