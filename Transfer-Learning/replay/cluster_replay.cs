@@ -122,14 +122,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent0(cluster_replayConfig? config = null, ILogger<cluster_replayComponent0>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent0>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent0 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -1640,14 +1638,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent1(cluster_replayConfig? config = null, ILogger<cluster_replayComponent1>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent1>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent1 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -3158,14 +3154,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent2(cluster_replayConfig? config = null, ILogger<cluster_replayComponent2>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent2>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent2 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -4676,14 +4670,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent3(cluster_replayConfig? config = null, ILogger<cluster_replayComponent3>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent3>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent3 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -6194,14 +6186,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent4(cluster_replayConfig? config = null, ILogger<cluster_replayComponent4>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent4>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent4 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -7712,14 +7702,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent5(cluster_replayConfig? config = null, ILogger<cluster_replayComponent5>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent5>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent5 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -9230,14 +9218,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent6(cluster_replayConfig? config = null, ILogger<cluster_replayComponent6>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent6>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent6 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -10748,14 +10734,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent7(cluster_replayConfig? config = null, ILogger<cluster_replayComponent7>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent7>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent7 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -12266,14 +12250,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent8(cluster_replayConfig? config = null, ILogger<cluster_replayComponent8>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent8>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent8 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -13784,14 +13766,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent9(cluster_replayConfig? config = null, ILogger<cluster_replayComponent9>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent9>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent9 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -15302,14 +15282,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent10(cluster_replayConfig? config = null, ILogger<cluster_replayComponent10>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent10>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent10 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -16820,14 +16798,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent11(cluster_replayConfig? config = null, ILogger<cluster_replayComponent11>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent11>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent11 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -18338,14 +18314,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent12(cluster_replayConfig? config = null, ILogger<cluster_replayComponent12>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent12>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent12 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -19856,14 +19830,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent13(cluster_replayConfig? config = null, ILogger<cluster_replayComponent13>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent13>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent13 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -21374,14 +21346,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent14(cluster_replayConfig? config = null, ILogger<cluster_replayComponent14>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent14>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent14 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -22892,14 +22862,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent15(cluster_replayConfig? config = null, ILogger<cluster_replayComponent15>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent15>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent15 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -24410,14 +24378,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent16(cluster_replayConfig? config = null, ILogger<cluster_replayComponent16>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent16>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent16 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -25928,14 +25894,12 @@ namespace SiameseTwinAI.Replay.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public cluster_replayComponent17(cluster_replayConfig? config = null, ILogger<cluster_replayComponent17>? logger = null)
         {
             _config = config ?? new cluster_replayConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<cluster_replayComponent17>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("cluster_replayComponent17 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
