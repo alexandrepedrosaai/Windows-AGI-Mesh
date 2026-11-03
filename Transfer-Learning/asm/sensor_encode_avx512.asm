@@ -658,10 +658,10 @@ sensor_validate_sample:
 ; Output: rax = Hamming distance between samples
 ; =============================================================================
 sensor_encode_differential:
-    vmovdqa64   zmm0, [rdi]
-    vmovdqa64   zmm1, [rsi]
+    vmovdqu64   zmm0, [rdi]
+    vmovdqu64   zmm1, [rsi]
     vpxorq      zmm2, zmm0, zmm1
-    vmovdqa64   [rdx], zmm2
+    vmovdqu64   [rdx], zmm2
 
     ; Compute Hamming distance of delta
     vpopcntq    zmm3, zmm2
