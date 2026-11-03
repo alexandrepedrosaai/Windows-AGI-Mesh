@@ -146,8 +146,10 @@ sensor_encode_sample:
     ; phase_norm = phase / (2*pi), then to uint16
     movsd   xmm3, xmm1
     divsd   xmm3, [two_pi]
+    mov     rax, 0x40EFFFE000000000
+    movq    xmm4, rax
+    mulsd   xmm3, xmm4
     cvttsd2si   eax, xmm3
-    and     eax, 0xFFFF
     shl     rax, 16
     or      rbx, rax                ; pack coherence | (phase << 16)
 
