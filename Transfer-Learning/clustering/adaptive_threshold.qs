@@ -221,10 +221,14 @@ namespace SiameseTwinAI.Clustering {
             config::MinThreshold,
             MinI(config::MaxThreshold, Ceiling(dema))
         );
+        mutable history = state::DistanceHistory + [newDistance];
+        if Length(history) > config::WindowSize {
+            set history = history[Length(history) - config::WindowSize .. Length(history) - 1];
+        }
         let newState = ThresholdState(
             newThreshold,
             state::NoveltyHistory,
-            state::DistanceHistory + [newDistance],
+            history,
             state::ErrorIntegral,
             state::LastError,
             state::UpdateCount + 1,
