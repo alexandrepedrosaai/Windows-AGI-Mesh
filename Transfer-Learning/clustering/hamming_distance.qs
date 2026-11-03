@@ -231,8 +231,8 @@ let actualK = MinI(k, n);
         vectorLength : Int
     ) : Double {
         let raw = NoveltyScore(sample, centroids);
-        let maxBits = vectorLength * 64;
-        return IntAsDouble(raw) / IntAsDouble(maxBits);
+Fact(vectorLength == Length(sample) and vectorLength > 0, "Vector length must match non-empty sample");
+let maxBits = vectorLength * 64;
     }
 
     // =========================================================================
