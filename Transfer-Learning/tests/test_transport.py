@@ -54,7 +54,12 @@ class WTMAIAFrame:
         if len(data) < 28:
             raise ValueError(f"Frame too short: {len(data)}")
         version, stream_id, flags, seq, _, timestamp, payload_len, crc = struct.unpack('>BBHIIQII', data[:28])
+        if payload_len > len(data) - 28:
+            raise ValueError(f"Truncated payload: expected {payload_len}, got {len(data) - 28}")
         payload = data[28:28 + payload_len]
+        import zlib
+        if zlib.crc32(payload) & 0xFFFFFFFF != crc:
+            raise ValueError("CRC mismatch")
         return cls(version=version, stream_id=stream_id, flags=flags,
                    sequence_number=seq, timestamp=timestamp, payload=payload)
 
