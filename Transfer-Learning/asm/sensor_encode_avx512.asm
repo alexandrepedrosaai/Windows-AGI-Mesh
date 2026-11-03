@@ -182,7 +182,8 @@ sensor_encode_sample:
     jge     .encode_done
 
     ; Mix previous word with index
-    mov     rdx, [r9 + (rcx-1)*8]
+    lea     rax, [rcx - 1]
+    mov     rdx, [r9 + rax*8]
     xor     rdx, rcx
     imul    rdx, [sensor_id_mult]
     xor     rdx, r8
