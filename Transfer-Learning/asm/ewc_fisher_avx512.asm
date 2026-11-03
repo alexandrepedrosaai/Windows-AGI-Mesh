@@ -442,8 +442,7 @@ fisher_compute_penalty:
     vextractf128    xmm2, ymm1, 1
     vaddpd          xmm3, xmm2, xmm1
     vhaddpd         xmm4, xmm3, xmm3
-    ; Multiply by lambda/2
-    mulsd   xmm4, xmm15     ; xmm15 lane 0 = lambda/2
+    ; lambda/2 was already applied when initializing xmm15 above
     movsd   xmm0, xmm4
 
     pop     r14
