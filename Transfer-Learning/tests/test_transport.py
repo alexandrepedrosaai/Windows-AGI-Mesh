@@ -415,7 +415,7 @@ class TestCongestionControl(unittest.TestCase):
         initial_cwnd = state.cwnd
 
         for _ in range(10):
-            state = cubic_on_ack(state, mss, time.time())
+            state = cubic_on_ack(state, int(state.cwnd * mss), time.time())
 
         # Should have grown significantly
         self.assertGreater(state.cwnd, initial_cwnd * 5)
