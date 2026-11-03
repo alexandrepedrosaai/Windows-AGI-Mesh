@@ -99,8 +99,8 @@ hamming_simd_init:
     bt      ebx, 30
     jnc     .no_avx512
 
-    ; Check bit 14 of EBX (AVX-512VPOPCNTDQ)
-    bt      ebx, 14
+    ; Check bit 14 of ECX (AVX-512VPOPCNTDQ)
+    bt      ecx, 14
     jnc     .no_vpopcnt
 
     ; Zero all ZMM registers to avoid AVX-512 transition penalty
