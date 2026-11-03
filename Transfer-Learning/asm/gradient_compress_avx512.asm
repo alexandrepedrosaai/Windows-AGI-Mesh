@@ -641,9 +641,12 @@ gradient_decompress_topk:
     jge     .decomp_done
 
     mov     ecx, [r13 + rbx*4]     ; index
-    movsd   xmm0, [r12 + rbx*8]   ; value
+    cmp     rcx, r8                 ; validate index < N
+    jae     .decomp_skip_store      ; skip invalid/out-of-range index
+    movsd   xmm0, [r12 + rbx*8]     ; value
     movsd   [r15 + rcx*8], xmm0
 
+.decomp_skip_store:
     inc     rbx
     jmp     .decomp_loop
 
