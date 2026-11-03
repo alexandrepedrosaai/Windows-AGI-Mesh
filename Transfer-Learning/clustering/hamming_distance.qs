@@ -133,8 +133,8 @@ return IntAsDouble(raw) / IntAsDouble(maxBits);
         sample : Int[],
         centroids : Int[][]
     ) : Int {
-        mutable bestIdx = 0;
-        mutable bestDist = HammingDistance(sample, centroids[0]);
+Fact(Length(centroids) > 0, "At least one centroid is required");
+mutable bestIdx = 0;
         for i in 1 .. Length(centroids) - 1 {
             let d = HammingDistance(sample, centroids[i]);
             if d < bestDist {
