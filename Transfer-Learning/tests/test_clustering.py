@@ -452,7 +452,7 @@ class TestAdaptiveThreshold(unittest.TestCase):
             integral += error
             derivative = error - last_error
             pid_output = kp * error + ki * integral + kd * derivative
-            threshold = max(4, min(64, threshold + int(pid_output)))
+            threshold = max(4, min(64, threshold + round(pid_output)))
             last_error = error
 
         # Threshold should have increased (harder to be novel)
