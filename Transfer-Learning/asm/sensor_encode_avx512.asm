@@ -408,8 +408,7 @@ sensor_quantize_adc:
     jge     .quantize_done
 
     mov     rcx, [rdx + rbx*8]
-    cmp     r12, rcx
-    jl      .quantize_zero
+    jb      .quantize_zero
 
     ; ADC >= threshold: set bit
     mov     rcx, 1
