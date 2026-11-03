@@ -378,6 +378,7 @@ namespace SiameseTwinAI.Clustering {
         if Length(driftHistory) == 0 {
             return 0.0;
         }
+        Fact(windowSize > 0, "Window size must be positive");
         let window = MinI(windowSize, Length(driftHistory));
         let start = Length(driftHistory) - window;
         mutable sum = 0;
