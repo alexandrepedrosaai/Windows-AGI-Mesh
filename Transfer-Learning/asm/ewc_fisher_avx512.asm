@@ -557,8 +557,8 @@ fisher_l2_norm:
     movsd   xmm0, [r12]
     mulsd   xmm0, xmm0
     vextractf64x2   xmm1, zmm14, 0
-    addsd   xmm1, xmm0
-    ; simplified: just use xmm1 for scalar remainder
+    vaddsd          xmm1, xmm1, xmm0
+    vinsertf64x2    zmm14, zmm14, xmm1, 0
 
     add     r12, 8
     dec     rbx
