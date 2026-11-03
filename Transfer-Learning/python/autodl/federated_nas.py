@@ -651,10 +651,15 @@ class FederatedNAS:
             compute_budget=compute_budget,
         )
 
+node_seed = int.from_bytes(
+            hashlib.sha256(node_id.encode("utf-8")).digest()[:4],
+            "big"
+        ) % (2**31)
+
         privacy_mechanism = ArchitecturePrivacyMechanism(
             epsilon=self.config.dp_epsilon,
             delta=self.config.dp_delta,
-            seed=hash(node_id) % 2**31
+            seed=node_seed
         ) if self.config.enable_differential_privacy else None
 
         node = FederatedNASLocalNode(
@@ -663,7 +668,7 @@ class FederatedNAS:
             search_space=self.search_space,
             evaluator=self.evaluator,
             privacy_mechanism=privacy_mechanism,
-            seed=hash(node_id) % 2**31,
+            seed=node_seed,
         )
         node.initialize()
 
