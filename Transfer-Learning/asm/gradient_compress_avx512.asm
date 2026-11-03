@@ -1222,9 +1222,7 @@ gradient_random_sparsify:
     or      rdx, 0x3FF0000000000000  ; set exponent to 1023
     movq    xmm0, rdx
     subsd   xmm0, [broadcast_one + 0]
-    mov     r8, 0x3FF0000000000000
-    movq    xmm1, r8
-    subsd   xmm0, xmm1
+    ; xmm0 is already normalized to [0.0, 1.0); no second subtraction is needed
     ; xmm0 now in [0.0, 1.0) approximately
 
     ; Compare with keep_probability
