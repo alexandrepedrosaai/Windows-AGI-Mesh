@@ -663,7 +663,8 @@ class ArchitectureSearch:
 
         elif mutation_type == 'modify_output':
             mutated.output_dim = self.rng.choice(self.search_space.output_dims)
-
+            if mutated.output_layers:
+                mutated.output_layers[-1].out_features = mutated.output_dim
         elif mutation_type == 'modify_training':
             mutated.learning_rate = 10 ** self.rng.uniform(-5, -2)
             mutated.weight_decay = 10 ** self.rng.uniform(-6, -2)
