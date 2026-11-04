@@ -146,7 +146,7 @@ namespace SiameseTwinAI.MAIA300 {
 
     function EWCLatencyMs(nParams : Int) : Double {
         let qa = QuantumSpeedup(MinI(NQuantumUnits(), nParams / 1000));
-        return IntAsDouble(nParams) / (1e9 * qa);
+        return IntAsDouble(nParams) / (1e9 * qa) * 1000.0;
     }
 
     // =========================================================================
