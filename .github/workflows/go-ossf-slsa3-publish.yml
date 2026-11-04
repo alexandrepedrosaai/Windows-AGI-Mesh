@@ -52,7 +52,7 @@ jobs:
                 existing = await github.rest.repos.getCommit({
                   owner,
                   repo,
-                  ref: `refs/tags/${tag}`
+                  ref: tag
                 });
               } catch (error) {
                 if (error.status !== 404) throw error;
