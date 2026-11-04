@@ -17,14 +17,77 @@ env:
   IMAGE_TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
 
 jobs:
-  # 256 parallel cache lanes for the Q# stage (GitHub Actions matrix maximum).
-  qsharp-cache:
-    name: ZenithUI QSharp Cache ${{ matrix.shard }}
+  # Topological Majorana Zero Modes fast path: build and publish ZenithUI first.
+  # A successful self-build skips the 256 Q# cache lanes and the legacy publish job.
+  # If it fails, the existing cache-and-publish pipeline is used as fallback.
+  majorana-zero-modes:
+    name: Majorana Zero Modes — ZenithUI polymorphic build and publish
     if: >-
       (github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success') &&
       (github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.head_repository.full_name ==
+      github.repository && github.event.workflow_run.head_branch == 'main'))
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Login GHCR with GitHub Actions Bot token
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker-container
+      - name: Build and publish ZenithUI (Majorana fast path)
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+      - name: Pull published ZenithUI container
+        run: |
+          set -euo pipefail
+          image_ref="${IMAGE}:${IMAGE_TAG}"
+          docker pull "$image_ref"
+          docker image inspect "$image_ref" >/dev/null
+      - name: Run VA Q-learning neural polymorphic reconstruction
+        run: |
+          set -euo pipefail
+          mkdir -p docker-metadata
+          image_ref="${IMAGE}:${IMAGE_TAG}"
+          docker run --rm "$image_ref" \
+            dotnet /opt/vaql/VAQLearningNeural.dll --reconstruct \
+            | tee docker-metadata/va-qlearning-reconstruction.txt
+      - name: Export image metadata
+        run: |
+          set -euo pipefail
+          mkdir -p docker-metadata
+          printf '%s\n' "${IMAGE}:${IMAGE_TAG}" > docker-metadata/image.txt
+      - name: Upload image metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: zenithui-image-metadata-${{ env.IMAGE_TAG }}
+          path: docker-metadata/
+
+  # 256 parallel cache lanes for the Q# stage (GitHub Actions matrix maximum).
+  qsharp-cache:
+    name: ZenithUI QSharp Cache ${{ matrix.shard }}
+    needs: [majorana-zero-modes]
+    if: >-
+      always() &&
+      needs.majorana-zero-modes.result == 'failure' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name ==
       github.repository && github.event.workflow_run.head_branch == 'main'))
     runs-on: ubuntu-24.04
     strategy:
@@ -52,11 +115,13 @@ jobs:
 
   neural-cache:
     name: ZenithUI VA Q-learning Neural Cache
+    needs: [majorana-zero-modes]
     if: >-
+      always() &&
+      needs.majorana-zero-modes.result == 'failure' &&
       (github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success') &&
-      (github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.head_repository.full_name ==
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name ==
       github.repository && github.event.workflow_run.head_branch == 'main'))
     runs-on: ubuntu-24.04
     steps:
@@ -80,8 +145,10 @@ jobs:
 
   docker-publish:
     name: Build And Push ZenithUI
-    needs: [qsharp-cache, neural-cache]
+    needs: [majorana-zero-modes, qsharp-cache, neural-cache]
     if: >-
+      always() &&
+      needs.majorana-zero-modes.result == 'failure' &&
       needs.qsharp-cache.result == 'success' &&
       needs.neural-cache.result == 'success' &&
       (github.event_name == 'workflow_dispatch' ||
