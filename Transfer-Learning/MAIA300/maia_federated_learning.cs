@@ -122,14 +122,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent0(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent0>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent0>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent0 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -1640,14 +1638,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent1(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent1>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent1>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent1 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -3158,14 +3154,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent2(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent2>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent2>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent2 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -4676,14 +4670,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent3(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent3>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent3>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent3 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -6194,14 +6186,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent4(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent4>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent4>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent4 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -7712,14 +7702,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent5(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent5>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent5>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent5 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -9230,14 +9218,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent6(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent6>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent6>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent6 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -10748,14 +10734,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent7(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent7>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent7>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent7 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -12266,14 +12250,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent8(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent8>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent8>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent8 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -13784,14 +13766,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent9(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent9>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent9>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent9 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -15302,14 +15282,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent10(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent10>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent10>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent10 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -16820,14 +16798,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent11(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent11>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent11>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent11 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -18338,14 +18314,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent12(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent12>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent12>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent12 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -19856,14 +19830,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent13(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent13>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent13>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent13 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -21374,14 +21346,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent14(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent14>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent14>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent14 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -22892,14 +22862,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent15(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent15>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent15>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent15 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -24410,14 +24378,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent16(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent16>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent16>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent16 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -25928,14 +25894,12 @@ namespace SiameseTwinAI.MAIA300.Federated
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_federated_learningComponent17(maia_federated_learningConfig? config = null, ILogger<maia_federated_learningComponent17>? logger = null)
         {
             _config = config ?? new maia_federated_learningConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_federated_learningComponent17>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_federated_learningComponent17 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
