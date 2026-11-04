@@ -432,7 +432,7 @@ namespace SiameseTwinAI.WebTransport {
         );
     }
 
-    function CompleteConnection(
+    operation CompleteConnection(
         mux : MultiplexerState,
         sessionId : String,
         nodeId : String,
