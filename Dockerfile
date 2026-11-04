@@ -2,6 +2,20 @@
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS qsharp-build
 WORKDIR /src
+
+# Microsoft.Quantum.Sdk/0.28 launches a net6.0 build helper. Keep the
+# repository-required SDK 9 and add the compatible .NET 6 runtime alongside it.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh \
+    && bash /tmp/dotnet-install.sh \
+        --runtime dotnet \
+        --version 6.0.36 \
+        --install-dir /usr/share/dotnet \
+        --skip-non-versioned-files \
+    && rm /tmp/dotnet-install.sh
+
 COPY . .
 
 # MajoranaStarship.qsproj uses Microsoft.Quantum.Sdk/0.28 and targets net8.0.
