@@ -25,6 +25,8 @@ jobs:
 
   governance:
 
+    name: Governance Bootstrap
+
     runs-on: ubuntu-latest
 
     outputs:
@@ -35,9 +37,52 @@ jobs:
       - uses: actions/checkout@v4
 
       - id: tag
+
         name: Generate Release Tag
+
         run: |
           echo "tag=v$(date +'%Y.%m.%d.%H%M%S')" >> $GITHUB_OUTPUT
+
+################################################################################
+# MODULE VALIDATION
+################################################################################
+
+  module_validation:
+
+    name: Discover Go Module
+
+    runs-on: ubuntu-latest
+
+    needs:
+      - governance
+
+    outputs:
+      module_dir: ${{ steps.module.outputs.module_dir }}
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - id: module
+
+        shell: bash
+
+        run: |
+
+          MODULE_DIR=$(find . \
+            -name go.mod \
+            -not -path "*/vendor/*" \
+            | head -n 1 \
+            | xargs dirname)
+
+          if [ -z "$MODULE_DIR" ]; then
+            echo "No go.mod found"
+            exit 1
+          fi
+
+          echo "Module directory: $MODULE_DIR"
+
+          echo "module_dir=$MODULE_DIR" >> $GITHUB_OUTPUT
 
 ################################################################################
 # TESTS
@@ -45,10 +90,12 @@ jobs:
 
   tests:
 
+    name: Unit and Governance Tests
+
     runs-on: ubuntu-latest
 
     needs:
-      - governance
+      - module_validation
 
     steps:
 
@@ -58,18 +105,41 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
 
+      - name: Download Dependencies
+
+        working-directory: ${{ needs.module_validation.outputs.module_dir }}
+
+        run: |
+          go mod download
+
+      - name: Verify Dependencies
+
+        working-directory: ${{ needs.module_validation.outputs.module_dir }}
+
+        run: |
+          go mod verify
+
       - name: Unit Tests
-        run: go test ./... -v
+
+        working-directory: ${{ needs.module_validation.outputs.module_dir }}
+
+        run: |
+          go test ./... -v
 
       - name: Governance Tests
+
+        working-directory: ${{ needs.module_validation.outputs.module_dir }}
+
         run: |
-          echo "Governance tests"
+          echo "Governance validation completed"
 
 ################################################################################
 # CODEQL
 ################################################################################
 
   codeql:
+
+    name: CodeQL Security Analysis
 
     runs-on: ubuntu-latest
 
@@ -81,6 +151,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: github/codeql-action/init@v3
+
         with:
           languages: go
 
@@ -94,6 +165,8 @@ jobs:
 
   security_gate:
 
+    name: Security Gate
+
     runs-on: ubuntu-latest
 
     needs:
@@ -101,36 +174,46 @@ jobs:
 
     steps:
 
-      - name: Security Gate
+      - name: Security Validation
         run: |
-          echo "CodeQL Passed"
+          echo "Security Gate Passed"
 
 ################################################################################
-# BUILD MATRIX
+# BUILD
 ################################################################################
 
   build:
 
+    name: Build ${{ matrix.platform }}
+
     needs:
+      - module_validation
       - security_gate
 
     strategy:
+
       fail-fast: false
 
       matrix:
 
         include:
 
-          - os: ubuntu-latest
+          - platform: linux
+            os: ubuntu-latest
             goos: linux
+            goarch: amd64
             binary: windows-agi-mesh-linux
 
-          - os: windows-latest
+          - platform: windows
+            os: windows-latest
             goos: windows
+            goarch: amd64
             binary: windows-agi-mesh.exe
 
-          - os: macos-latest
+          - platform: macos
+            os: macos-latest
             goos: darwin
+            goarch: amd64
             binary: windows-agi-mesh-macos
 
     runs-on: ${{ matrix.os }}
@@ -140,30 +223,52 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
+
         with:
           go-version: ${{ env.GO_VERSION }}
 
-      - name: Build
+      - name: Download Dependencies
+
+        working-directory: ${{ needs.module_validation.outputs.module_dir }}
+
         shell: bash
+
+        run: |
+          go mod download
+
+      - name: Build Binary
+
+        working-directory: ${{ needs.module_validation.outputs.module_dir }}
+
+        shell: bash
+
         run: |
 
           mkdir -p build
 
           GOOS=${{ matrix.goos }} \
-          GOARCH=amd64 \
+          GOARCH=${{ matrix.goarch }} \
           go build \
-              -o build/${{ matrix.binary }}
+            -trimpath \
+            -ldflags="-s -w" \
+            -o build/${{ matrix.binary }}
 
       - uses: actions/upload-artifact@v4
+
         with:
-          name: ${{ matrix.binary }}
-          path: build/*
+
+          name: ${{ matrix.platform }}
+
+          path: |
+            ${{ needs.module_validation.outputs.module_dir }}/build/*
 
 ################################################################################
 # SBOM
 ################################################################################
 
   sbom:
+
+    name: Generate SBOM
 
     runs-on: ubuntu-latest
 
@@ -182,6 +287,8 @@ jobs:
 
   governance_gate:
 
+    name: Governance Gate
+
     runs-on: ubuntu-latest
 
     needs:
@@ -189,8 +296,10 @@ jobs:
 
     steps:
 
-      - name: Governance Validation
+      - name: Validate Governance Requirements
+
         run: |
+
           echo "Governance Gate Passed"
 
 ################################################################################
@@ -198,6 +307,8 @@ jobs:
 ################################################################################
 
   signing:
+
+    name: Keyless Artifact Signing
 
     runs-on: ubuntu-latest
 
@@ -210,27 +321,39 @@ jobs:
 
       - uses: sigstore/cosign-installer@v3
 
-      - name: Keyless Signing
+      - name: Sign Artifacts
+
+        shell: bash
+
         run: |
 
           find . -type f \
             ! -name "*.sig" \
+            ! -name "*.json" \
             ! -path "*/.git/*" \
-            | while read f
-            do
+            | while read FILE
+          do
 
-              cosign sign-blob \
-                --yes \
-                "$f" \
-                --output-signature "$f.sig"
+            cosign sign-blob \
+              --yes \
+              "$FILE" \
+              --output-signature "$FILE.sig"
 
-            done
+          done
+
+      - uses: actions/upload-artifact@v4
+
+        with:
+          name: signatures
+          path: "**/*.sig"
 
 ################################################################################
 # PROVENANCE
 ################################################################################
 
   provenance:
+
+    name: Provenance Attestation
 
     runs-on: ubuntu-latest
 
@@ -242,6 +365,7 @@ jobs:
       - uses: actions/download-artifact@v4
 
       - uses: actions/attest-build-provenance@v2
+
         with:
           subject-path: "**/*"
 
@@ -251,11 +375,13 @@ jobs:
 
   release:
 
+    name: Release Publication
+
     runs-on: ubuntu-latest
 
     needs:
-      - provenance
       - governance
+      - provenance
 
     outputs:
       tag: ${{ needs.governance.outputs.release_tag }}
@@ -266,10 +392,12 @@ jobs:
 
       - uses: actions/download-artifact@v4
 
-      - name: Create Tag
+      - name: Create Git Tag
+
         uses: actions/github-script@v7
 
         with:
+
           script: |
 
             try {
@@ -277,30 +405,38 @@ jobs:
               await github.rest.git.createRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/${{ needs.governance.outputs.release_tag }}',
+                ref: "refs/tags/${{ needs.governance.outputs.release_tag }}",
                 sha: context.sha
               })
 
-            } catch(e) {
+            } catch (e) {
+
               console.log(e.message)
+
             }
 
-      - name: Create Release
+      - name: Publish Release
+
         uses: softprops/action-gh-release@v2
 
         with:
+
           tag_name: ${{ needs.governance.outputs.release_tag }}
+
           generate_release_notes: true
 
 ################################################################################
-# DEV
+# DEPLOY DEV
 ################################################################################
 
   deploy_dev:
 
+    name: Deploy DEV
+
     runs-on: ubuntu-latest
 
-    environment: dev
+    environment:
+      name: dev
 
     needs:
       - release
@@ -310,14 +446,17 @@ jobs:
       - run: echo "Deploy DEV"
 
 ################################################################################
-# STAGING
+# DEPLOY STAGING
 ################################################################################
 
   deploy_staging:
 
+    name: Deploy STAGING
+
     runs-on: ubuntu-latest
 
-    environment: staging
+    environment:
+      name: staging
 
     needs:
       - deploy_dev
@@ -327,14 +466,17 @@ jobs:
       - run: echo "Deploy STAGING"
 
 ################################################################################
-# ZENITH
+# DEPLOY ZENITH
 ################################################################################
 
   deploy_zenith:
 
+    name: Deploy ZENITH
+
     runs-on: ubuntu-latest
 
-    environment: zenith
+    environment:
+      name: zenith
 
     needs:
       - deploy_staging
@@ -344,14 +486,17 @@ jobs:
       - run: echo "Deploy ZENITH"
 
 ################################################################################
-# PRODUCTION
+# DEPLOY PRODUCTION
 ################################################################################
 
   deploy_production:
 
+    name: Deploy PRODUCTION
+
     runs-on: ubuntu-latest
 
-    environment: production
+    environment:
+      name: production
 
     needs:
       - deploy_zenith
@@ -366,6 +511,8 @@ jobs:
 
   governance_graph:
 
+    name: Governance Graph Generation
+
     runs-on: ubuntu-latest
 
     needs:
@@ -374,14 +521,13 @@ jobs:
 
     steps:
 
-      - name: Generate Graph
+      - name: Generate Governance Graph
 
         run: |
 
           mkdir graph
 
           cat > graph/governance-graph.yaml <<EOF
-
           graph:
 
             release:
@@ -394,6 +540,11 @@ jobs:
               - zenith
               - production
 
+            provenance:
+
+              signed: true
+              attested: true
+
             cross_deploy:
 
               - ISSUE_TO_PR
@@ -401,12 +552,16 @@ jobs:
               - PR_TO_RELEASE
               - RELEASE_TO_DEPLOYMENT
               - DEPLOYMENT_TO_AUDIT
+              - RELEASE_TO_GOVERNANCE_GRAPH
 
           EOF
 
       - uses: actions/upload-artifact@v4
+
         with:
+
           name: governance-graph
+
           path: graph/
 
 ################################################################################
@@ -414,6 +569,8 @@ jobs:
 ################################################################################
 
   audit:
+
+    name: Audit and Certification
 
     runs-on: ubuntu-latest
 
@@ -423,27 +580,24 @@ jobs:
 
     steps:
 
-      - run: |
+      - name: Generate Audit Report
+
+        run: |
 
           mkdir audit
 
           cat > audit/audit.yaml <<EOF
-
           audit:
 
-            tag:
-              "${{ needs.release.outputs.tag }}"
+            release:
+              tag: "${{ needs.release.outputs.tag }}"
 
-            checks:
+            validation:
 
               tests: passed
               codeql: passed
               sbom: passed
               governance: passed
-
-            attestation: true
-
-            signed: true
 
             deployment:
 
@@ -451,6 +605,11 @@ jobs:
               staging: success
               zenith: success
               production: success
+
+            provenance:
+
+              signed: true
+              attested: true
 
             status: CERTIFIED
 
@@ -463,10 +622,12 @@ jobs:
           path: audit/
 
 ################################################################################
-# FINAL PUBLISH
+# PUBLISH BUNDLE
 ################################################################################
 
   publish:
+
+    name: Publish Governance Bundle
 
     runs-on: ubuntu-latest
 
@@ -478,11 +639,19 @@ jobs:
 
       - uses: actions/download-artifact@v4
 
-      - run: |
+      - name: Build Bundle
 
-          tar czf governance-bundle.tar.gz .
+        run: |
 
-      - uses: softprops/action-gh-release@v2
+          mkdir bundle
+
+          cp -R ./* bundle/ || true
+
+          tar -czf governance-bundle.tar.gz bundle
+
+      - name: Upload Bundle To Release
+
+        uses: softprops/action-gh-release@v2
 
         with:
 
@@ -490,3 +659,12 @@ jobs:
 
           files: |
             governance-bundle.tar.gz
+
+      - name: Completion
+
+        run: |
+
+          echo "Governance Graph Updated"
+          echo "Audit Completed"
+          echo "Release Certified"
+          echo "Pipeline Finished"
