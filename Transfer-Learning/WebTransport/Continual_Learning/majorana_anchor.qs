@@ -376,6 +376,9 @@ namespace SiameseTwinAI.ContinualLearning {
         errorSyndrome : Int[]
     ) : MajoranaAnchor {
         // Simplified: reduce error rate after correction
+        if Length(errorSyndrome) == 0 {
+            return anchor;
+        }
         let correctedErrorRate = anchor::ErrorRate * 0.1;
         let correctedFidelity = MinD(1.0, anchor::Fidelity + 0.05);
 
