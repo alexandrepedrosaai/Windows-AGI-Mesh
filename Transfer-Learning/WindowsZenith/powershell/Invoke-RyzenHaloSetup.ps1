@@ -171,7 +171,7 @@ function Get-SystemInfo {
     # Detect AMD GPU (Windows: via WMI)
     if ($IsWindows) {
         try {
-            $gpus = Get-WmiObject -Class Win32_VideoController |
+            $gpus = Get-CimInstance -ClassName Win32_VideoController |
                     Where-Object { $_.Name -match 'AMD|Radeon|ATI' } |
                     Select-Object Name, AdapterRAM, DriverVersion
             $info.GpuDevices = $gpus
