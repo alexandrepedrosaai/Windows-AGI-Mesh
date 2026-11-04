@@ -1,0 +1,201 @@
+<!-- ============================================================================
+     MainWindow.xaml
+     WinUI 3 — Windows App SDK 1.6+ — Windows Zenith AGI Dashboard
+     AMD Ryzen AI Max+ 395 (Strix Halo) — Real-time monitoring UI
+     Compile: dotnet build -c Release -r win-x64 (Windows App SDK 1.6)
+     ============================================================================ -->
+
+<Window
+    x:Class="WindowsZenith.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:WindowsZenith"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    mc:Ignorable="d"
+    Title="Windows Zenith — AMD Ryzen AI Max+ 395 AGI Mesh">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop Kind="BaseAlt"/>
+    </Window.SystemBackdrop>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ================================================================
+             Title Bar (custom, Mica backdrop)
+             ================================================================ -->
+        <Grid Grid.Row="0" Height="48" Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- AMD Logo + Title -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal"
+                        VerticalAlignment="Center" Margin="16,0">
+                <FontIcon Glyph="&#xE950;" FontSize="20"
+                          Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"/>
+                <TextBlock Text="Windows Zenith" FontSize="14" FontWeight="SemiBold"
+                           VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <TextBlock Text="AMD Ryzen AI Max+ 395" FontSize="11"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           VerticalAlignment="Center" Margin="8,0,0,0"/>
+            </StackPanel>
+
+            <!-- Hardware Status Badges -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                <Border Background="{ThemeResource AccentAAFillColorDefaultBrush}"
+                        CornerRadius="4" Padding="8,2">
+                    <TextBlock x:Name="GpuStatusBadge" Text="GPU: 40 CUs RDNA 3.5"
+                               FontSize="11" Foreground="White"/>
+                </Border>
+                <Border Background="#FF6B35" CornerRadius="4" Padding="8,2">
+                    <TextBlock x:Name="MemBadge" Text="UMA: 128 GB @ 256 GB/s"
+                               FontSize="11" Foreground="White"/>
+                </Border>
+                <Border Background="#2D7D46" CornerRadius="4" Padding="8,2">
+                    <TextBlock x:Name="NpuBadge" Text="NPU: XDNA 2 — 50 TOPS"
+                               FontSize="11" Foreground="White"/>
+                </Border>
+                <Border Background="#5B4FCF" CornerRadius="4" Padding="8,2">
+                    <TextBlock x:Name="FP16Badge" Text="FP16: 60 TFLOPS"
+                               FontSize="11" Foreground="White"/>
+                </Border>
+            </StackPanel>
+
+            <!-- Connection Status -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal"
+                        VerticalAlignment="Center" Margin="16,0" Spacing="8">
+                <Ellipse x:Name="ConnectionDot" Width="8" Height="8"
+                         Fill="#2D7D46" VerticalAlignment="Center"/>
+                <TextBlock x:Name="ConnectionStatus" Text="WT-MAIA/1.0 Connected"
+                           FontSize="11" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ================================================================
+             Main Content — NavigationView
+             ================================================================ -->
+        <NavigationView Grid.Row="1"
+                        x:Name="NavView"
+                        IsBackButtonVisible="Collapsed"
+                        IsPaneToggleButtonVisible="True"
+                        PaneDisplayMode="Left"
+                        OpenPaneLength="220"
+                        SelectionChanged="NavView_SelectionChanged">
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem Tag="dashboard" Icon="Home"
+                                    Content="Dashboard"/>
+                <NavigationViewItem Tag="gpu" Content="GPU Monitor">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE7F4;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="clustering" Content="Clustering">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8FD;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="ewc" Content="EWC / Fisher">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="replay" Content="Replay Buffer">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8EE;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="transport" Content="WebTransport">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE968;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="maia" Content="MAIA-300">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE950;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="automl" Content="AutoML">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D5;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="qsharp" Content="Q# Quantum">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE7C3;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="powershell" Content="PowerShell">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE756;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem Tag="settings" Icon="Setting" Content="Settings"/>
+                <NavigationViewItem Tag="logs" Content="Logs">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9F9;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
+
+            <!-- ============================================================
+                 Page Content Frame
+                 ============================================================ -->
+            <Frame x:Name="ContentFrame"/>
+        </NavigationView>
+
+        <!-- ================================================================
+             Status Bar
+             ================================================================ -->
+        <Grid Grid.Row="2" Height="28"
+              Background="{ThemeResource LayerFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+              BorderThickness="0,1,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" x:Name="StatusMessage"
+                       Text="Ready — AMD Ryzen AI Max+ 395 (Strix Halo)"
+                       FontSize="11" VerticalAlignment="Center" Margin="12,0"/>
+
+            <TextBlock Grid.Column="1" x:Name="GpuUtil"
+                       Text="GPU: 0%" FontSize="11"
+                       VerticalAlignment="Center" Margin="8,0"/>
+
+            <TextBlock Grid.Column="2" x:Name="MemUtil"
+                       Text="UMA: 0/128 GB" FontSize="11"
+                       VerticalAlignment="Center" Margin="8,0"/>
+
+            <TextBlock Grid.Column="3" x:Name="NpuUtil"
+                       Text="NPU: 0 TOPS" FontSize="11"
+                       VerticalAlignment="Center" Margin="8,0"/>
+
+            <TextBlock Grid.Column="4" x:Name="StepCounter"
+                       Text="Step: 0" FontSize="11"
+                       VerticalAlignment="Center" Margin="8,0"/>
+
+            <TextBlock Grid.Column="5" x:Name="ClockDisplay"
+                       Text="00:00:00" FontSize="11"
+                       VerticalAlignment="Center" Margin="8,0,12,0"/>
+        </Grid>
+    </Grid>
+</Window>
