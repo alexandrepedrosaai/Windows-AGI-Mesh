@@ -1,4 +1,4 @@
-name: CI-CD 03.2 ZenithUI Docker Build Push
+name: CI-CD 03 ZenithUI Dockers Build Push
 
 on:
   workflow_run:
@@ -594,4 +594,4 @@ jobs:
             dist/SHA256SUMS
             dist/SHA256SUMS.sigstore.json
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 30000
