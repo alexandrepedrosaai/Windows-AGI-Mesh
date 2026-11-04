@@ -54,8 +54,8 @@ namespace SiameseTwinAI.Clustering {
     /// Compute normalized Hamming distance in [0.0, 1.0]
     function NormalizedHammingDistance(a : Int[], b : Int[]) : Double {
         let raw = HammingDistance(a, b);
+Fact(Length(a) > 0, "Hash vectors must not be empty");
         let maxBits = Length(a) * 64;
-        return IntAsDouble(raw) / IntAsDouble(maxBits);
     }
 
     /// Compute Hamming distance between two byte arrays
