@@ -15,6 +15,7 @@ param(
     [string]$Action = 'All',
 
     [Parameter()]
+    [ValidatePattern('^\d+\.\d+\.\d+$')]
     [string]$RocmVersion = '7.1.0',
 
     [Parameter()]
