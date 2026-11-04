@@ -281,7 +281,7 @@ namespace SiameseTwinAI.WebTransport {
 
     function HasScope(token : AuthToken, scope : Int) : Bool {
         for s in token::Scopes {
-            if s == scope { return true; }
+            if s == scope or s == ScopeAdmin() { return true; }
         }
         return false;
     }
