@@ -64,14 +64,7 @@ jobs:
           image_ref="${IMAGE}:${IMAGE_TAG}"
           docker pull "$image_ref"
           docker image inspect "$image_ref" >/dev/null
-      - name: Run VA Q-learning neural polymorphic reconstruction
-        run: |
-          set -euo pipefail
-          mkdir -p docker-metadata
-          image_ref="${IMAGE}:${IMAGE_TAG}"
-          docker run --rm "$image_ref" \
-            dotnet /opt/vaql/VAQLearningNeural.dll --reconstruct \
-            | tee docker-metadata/va-qlearning-reconstruction.txt
+      
       - name: Export image metadata
         run: |
           set -euo pipefail
@@ -460,14 +453,7 @@ jobs:
           image_ref="${IMAGE}:${IMAGE_TAG}"
           docker pull "$image_ref"
           docker image inspect "$image_ref" >/dev/null
-      - name: Run VA Q-learning neural polymorphic reconstruction
-        run: |
-          set -euo pipefail
-          mkdir -p docker-metadata
-          image_ref="${IMAGE}:${IMAGE_TAG}"
-          docker run --rm "$image_ref" \
-            dotnet /opt/vaql/VAQLearningNeural.dll --reconstruct \
-            | tee docker-metadata/va-qlearning-reconstruction.txt
+ 
       - name: Export image metadata
         run: |
           mkdir -p docker-metadata
