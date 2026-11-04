@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   packages: write
+  actions: write
 
 env:
   # OCI image names are case-sensitive and must be lowercase.
@@ -44,6 +45,9 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:latest
             ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+          # Reuse SDK, NuGet restore, and compilation layers between runs.
+          cache-from: type=gha,scope=zenithui
+          cache-to: type=gha,mode=max,scope=zenithui
       - name: Pull published ZenithUI container
         run: |
           set -euo pipefail
