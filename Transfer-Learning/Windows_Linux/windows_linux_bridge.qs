@@ -212,9 +212,10 @@ namespace SiameseTwinAI.WindowsLinux {
                     FlagReliable() ||| FlagCompressed()
                 );
                 set totalSynced += 1;
+                Message($"[Bridge] Gradient synced: layer={layer} dp={packet::DPApplied} sparsity={packet::Sparsity}");
+            } else {
+                Message($"[Bridge] Gradient blocked: layer={layer}");
             }
-
-            Message($"[Bridge] Gradient synced: layer={layer} dp={packet::DPApplied} sparsity={packet::Sparsity}");
         }
 
         return BridgeState(
