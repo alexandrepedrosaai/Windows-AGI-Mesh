@@ -287,15 +287,16 @@ namespace WindowsZenith.MAUI
                 sourcePath, "-o", outputPath
             };
 
-            var psi = new ProcessStartInfo
-            {
-                FileName  = "hipcc",
-                Arguments = string.Join(" ", args),
-                RedirectStandardOutput = true,
-                RedirectStandardError  = true,
-                UseShellExecute = false,
-                CreateNoWindow  = true,
-            };
+var psi = new ProcessStartInfo
+{
+    FileName = "hipcc",
+    RedirectStandardOutput = true,
+    RedirectStandardError = true,
+    UseShellExecute = false,
+    CreateNoWindow = true,
+};
+foreach (var arg in args)
+    psi.ArgumentList.Add(arg);
 
             try
             {
