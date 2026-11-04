@@ -273,9 +273,11 @@ namespace SiameseTwinAI.WebTransport {
             return false;
         }
         let stream = session::Streams[streamId];
-        return stream::IsOpen and
+        return session::IsConnected and
+               frameSize >= 0 and
+               stream::IsOpen and
                frameSize <= stream::MaxFrameSize and
-               frameSize <= stream::FlowWindow;
+               frameSize <= stream::FlowWindow
     }
 
     function UpdateFlowWindow(
