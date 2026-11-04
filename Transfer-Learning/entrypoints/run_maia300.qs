@@ -162,7 +162,7 @@ namespace SiameseTwinAI.Entrypoints {
     }
 
     function ComputeFisherLatency(nParams : Int, nSamples : Int) : Double {
-        let qaFactor = ComputeQuantumSpeedup(MinI(MAIANQuantumUnits(), nParams / 100));
+let qaFactor = ComputeQuantumSpeedup(MaxI(1, MinI(MAIANQuantumUnits(), nParams / 100)));
         return IntAsDouble(nParams) * IntAsDouble(nSamples) / (1e10 * qaFactor);  // seconds
     }
 
