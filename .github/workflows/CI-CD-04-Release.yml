@@ -2,7 +2,7 @@ name: CI-CD 04 Release
 
 on:
   workflow_run:
-    workflows: ["CI-CD 03 Docker Build Push"]
+    workflows: ["CI-CD 03 ZenithUI Docker Build Pushing"]
     types: [completed]
   workflow_dispatch:
 
