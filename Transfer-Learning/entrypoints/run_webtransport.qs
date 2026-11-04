@@ -418,10 +418,7 @@ namespace SiameseTwinAI.Entrypoints {
     // =========================================================================
 
     operation LogNetworkStats(mesh : MeshNetworkState, config : WTDemoConfig) : Unit {
-        let durationMs = mesh::Step;
-        let throughputMbps = if durationMs > 0 {
-            IntAsDouble(mesh::TotalBytesTransferred) * 8.0 / IntAsDouble(durationMs) / 1000.0
-        } else { 0.0 };
+let durationMs = mesh::Step * 1000;
 
         Message("\n╔══════════════════════════════════════════════════════════════╗");
         Message("║              WT-MAIA/1.0 Network Statistics                  ║");
