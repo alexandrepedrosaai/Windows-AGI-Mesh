@@ -164,7 +164,7 @@ namespace SiameseTwinAI.Entrypoints {
         set hash w/= 0 <- sensorId ^^^ (cohFixed <<< 16) ^^^ (phaseFixed <<< 32);
         set hash w/= 1 <- adc ^^^ (timestamp &&& 0xFFFFFFFF);
         set hash w/= 2 <- (sensorId * 1664525 + 1013904223) &&& 0x7FFFFFFF;
-        set hash w/= 3 <- (hash[2] * 6364136223846793005 + 1442695040888963407) &&& 0x7FFFFFFF;
+set hash w/= 3 <- (hash[2] * 1664525 + 1013904223) &&& 0x7FFFFFFF;
         set hash w/= 4 <- hash[0] ^^^ hash[1] ^^^ hash[2];
         set hash w/= 5 <- hash[1] ^^^ hash[3] ^^^ (adc <<< 16);
         set hash w/= 6 <- hash[4] ^^^ (timestamp >>> 16);
