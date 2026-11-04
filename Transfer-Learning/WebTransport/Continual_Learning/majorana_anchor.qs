@@ -329,7 +329,7 @@ namespace SiameseTwinAI.ContinualLearning {
                     set dist += diff * diff;
                 }
                 // Weight by alignment (higher alignment = stronger anchor)
-                set totalPenalty += anchor::Alignment * dist;
+                set totalPenalty += MaxD(0.0, anchor::Alignment) * dist;
                 set nActive += 1;
             }
         }
