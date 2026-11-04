@@ -296,7 +296,7 @@ namespace SiameseTwinAI.ContinualLearning {
 
         // Detect decoherence events
         let decoherenceEvents = state::DecoherenceEvents +
-            (if meanFidelity < state::Config::FidelityTarget { 1 } else { 0 });
+            (if nActive > 0 and meanFidelity < state::Config::FidelityTarget { 1 } else { 0 });
 
         return AnchorSystemState(
             state::Config, updatedAnchors,
