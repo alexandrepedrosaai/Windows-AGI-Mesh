@@ -122,14 +122,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent0(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent0>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent0>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent0 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -1640,14 +1638,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent1(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent1>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent1>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent1 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -3158,14 +3154,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent2(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent2>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent2>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent2 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -4676,14 +4670,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent3(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent3>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent3>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent3 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -6194,14 +6186,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent4(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent4>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent4>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent4 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -7712,14 +7702,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent5(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent5>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent5>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent5 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -9230,14 +9218,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent6(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent6>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent6>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent6 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -10748,14 +10734,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent7(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent7>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent7>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent7 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -12266,14 +12250,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent8(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent8>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent8>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent8 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -13784,14 +13766,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent9(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent9>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent9>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent9 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -15302,14 +15282,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent10(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent10>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent10>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent10 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -16820,14 +16798,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent11(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent11>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent11>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent11 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -18338,14 +18314,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent12(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent12>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent12>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent12 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -19856,14 +19830,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent13(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent13>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent13>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent13 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -21374,14 +21346,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent14(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent14>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent14>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent14 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -22892,14 +22862,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent15(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent15>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent15>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent15 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -24410,14 +24378,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent16(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent16>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent16>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent16 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -25928,14 +25894,12 @@ namespace SiameseTwinAI.MAIA300.Cluster
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_cluster_optimizerComponent17(maia_cluster_optimizerConfig? config = null, ILogger<maia_cluster_optimizerComponent17>? logger = null)
         {
             _config = config ?? new maia_cluster_optimizerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_cluster_optimizerComponent17>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_cluster_optimizerComponent17 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
