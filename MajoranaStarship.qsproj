@@ -2,5 +2,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
+  <ItemGroup>
+    <QSharpCompile Include="majorana_phase_shift.qs" />
+  </ItemGroup>
 </Project>
