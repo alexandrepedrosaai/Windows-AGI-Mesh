@@ -28,10 +28,7 @@ param(
     [switch]$UseWSL2,
 
     [Parameter()]
-    [switch]$SkipRocmInstall,
-
-    [Parameter()]
-    [switch]$Verbose
+    [switch]$SkipRocmInstall
 )
 
 Set-StrictMode -Version Latest
