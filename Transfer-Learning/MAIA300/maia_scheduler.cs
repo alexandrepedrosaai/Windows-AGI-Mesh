@@ -122,14 +122,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent0(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent0>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent0>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent0 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -1640,14 +1638,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent1(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent1>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent1>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent1 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -3158,14 +3154,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent2(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent2>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent2>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent2 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -4676,14 +4670,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent3(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent3>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent3>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent3 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -6194,14 +6186,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent4(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent4>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent4>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent4 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -7712,14 +7702,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent5(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent5>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent5>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent5 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -9230,14 +9218,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent6(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent6>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent6>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent6 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -10748,14 +10734,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent7(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent7>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent7>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent7 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -12266,14 +12250,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent8(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent8>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent8>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent8 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -13784,14 +13766,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent9(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent9>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent9>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent9 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -15302,14 +15282,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent10(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent10>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent10>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent10 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -16820,14 +16798,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent11(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent11>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent11>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent11 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -18338,14 +18314,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent12(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent12>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent12>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent12 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -19856,14 +19830,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent13(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent13>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent13>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent13 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -21374,14 +21346,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent14(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent14>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent14>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent14 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -22892,14 +22862,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent15(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent15>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent15>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent15 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -24410,14 +24378,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent16(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent16>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent16>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent16 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
@@ -25928,14 +25894,12 @@ namespace SiameseTwinAI.MAIA300.Scheduler
         private readonly List<double[]> _history = new();
         private long _step;
         private bool _disposed;
-        private readonly Random _rng;
         private readonly CancellationTokenSource _cts = new();
 
         public maia_schedulerComponent17(maia_schedulerConfig? config = null, ILogger<maia_schedulerComponent17>? logger = null)
         {
             _config = config ?? new maia_schedulerConfig();
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<maia_schedulerComponent17>.Instance;
-            _rng = new Random(_config.Seed);
             _logger.LogInformation("maia_schedulerComponent17 initialized (NodeId={NodeId})", _config.NodeId);
         }
 
