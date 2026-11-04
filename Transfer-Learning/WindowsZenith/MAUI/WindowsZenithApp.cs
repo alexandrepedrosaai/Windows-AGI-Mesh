@@ -299,8 +299,11 @@ namespace WindowsZenith.MAUI
 
             try
             {
-                using var proc = Process.Start(psi)!;
-                await proc.WaitForExitAsync(ct);
+using var proc = Process.Start(psi)!;
+var stdoutTask = proc.StandardOutput.ReadToEndAsync(ct);
+var stderrTask = proc.StandardError.ReadToEndAsync(ct);
+await proc.WaitForExitAsync(ct);
+await Task.WhenAll(stdoutTask, stderrTask);
                 bool success = proc.ExitCode == 0;
                 _logger.LogInformation("HIP compile {Path}: {Status}",
                     sourcePath, success ? "OK" : "FAILED");
