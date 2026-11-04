@@ -217,7 +217,7 @@ namespace WindowsZenith.MAUI
                 // System
                 TotalPowerWatts     = 35f + gpuUtil * 0.85f,
                 SystemTempCelsius   = 48f + gpuUtil * 0.32f,
-                UptimeSeconds       = _step,
+                UptimeSeconds       = _step / 5,
 
                 // Pipeline
                 PipelineStep        = _step,
