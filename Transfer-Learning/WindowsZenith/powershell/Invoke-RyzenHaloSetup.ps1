@@ -261,7 +261,9 @@ echo 'export HSA_OVERRIDE_GFX_VERSION=11.5.1' >> ~/.bashrc  # gfx1151 override
 echo "ROCm $Version installed successfully"
 hipcc --version
 "@
-            $wslScript | wsl bash -s
+            if ($PSCmdlet.ShouldProcess('WSL2', 'Install ROCm')) {
+                $wslScript | wsl bash -s
+            }
         } else {
             # ROCm for Windows (native)
             Write-ZenithLog 'Downloading ROCm for Windows installer...' 'INFO'
