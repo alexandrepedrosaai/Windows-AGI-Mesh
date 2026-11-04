@@ -248,10 +248,10 @@ namespace SiameseTwinAI.Clustering {
         mutable allocations = new Int[Length(clusters)];
         mutable allocated = 0;
         for i in 0 .. Length(clusters) - 1 {
-            let share = if totalPriority > 0.0 {
+let share = if totalPriority > 0.0 {
                 Ceiling(clusters[i]::Priority / totalPriority * IntAsDouble(batchSize))
             } else {
-                batchSize / Length(clusters)
+                batchSize / Length(clusters) + (if i < batchSize % Length(clusters) { 1 } else { 0 })
             };
             set allocations w/= i <- share;
             set allocated += share;
