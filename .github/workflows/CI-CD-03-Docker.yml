@@ -17,10 +17,9 @@ env:
   IMAGE_TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
 
 jobs:
-  # Matrix entries are the supported GitHub Actions equivalent of parallel steps.
-  # Each branch warms a separate BuildKit cache for one Docker build stage.
-  docker-build-cache:
-    name: ZenithUI Cache ${{ matrix.name }}
+  # Five parallel cache lanes for the Q# stage.
+  qsharp-cache:
+    name: ZenithUI QSharp Cache ${{ matrix.shard }}
     if: >-
       (github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success') &&
@@ -32,12 +31,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: QSharp
-            target: qsharp-build
-            cache_scope: zenithui-qsharp
-          - name: VA-QLearning-Neural
-            target: neural-build
-            cache_scope: zenithui-neural
+          - shard: 1
+            cache_scope: zenithui-qsharp-1
+          - shard: 2
+            cache_scope: zenithui-qsharp-2
+          - shard: 3
+            cache_scope: zenithui-qsharp-3
+          - shard: 4
+            cache_scope: zenithui-qsharp-4
+          - shard: 5
+            cache_scope: zenithui-qsharp-5
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -47,21 +50,50 @@ jobs:
         uses: docker/setup-buildx-action@v4
         with:
           driver: docker-container
-      - name: Build ${{ matrix.name }} stage and cache it
+      - name: Build QSharp stage shard ${{ matrix.shard }} and cache it
         uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
-          target: ${{ matrix.target }}
+          target: qsharp-build
           push: false
           cache-from: type=gha,scope=${{ matrix.cache_scope }}
           cache-to: type=gha,mode=max,scope=${{ matrix.cache_scope }}
 
+  neural-cache:
+    name: ZenithUI VA Q-learning Neural Cache
+    if: >-
+      (github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success') &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.head_repository.full_name ==
+      github.repository && github.event.workflow_run.head_branch == 'main'))
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker-container
+      - name: Build VA Q-learning Neural stage and cache it
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          target: neural-build
+          push: false
+          cache-from: type=gha,scope=zenithui-neural
+          cache-to: type=gha,mode=max,scope=zenithui-neural
+
   docker-publish:
     name: Build And Push ZenithUI
-    needs: docker-build-cache
+    needs: [qsharp-cache, neural-cache]
     if: >-
-      needs.docker-build-cache.result == 'success' &&
+      needs.qsharp-cache.result == 'success' &&
+      needs.neural-cache.result == 'success' &&
       (github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.head_repository.full_name ==
@@ -91,9 +123,13 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:latest
             ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
-          # Consume both parallel stage caches and publish a final-image cache.
+          # Consume all five Q# caches, the neural cache, and the final-image cache.
           cache-from: |
-            type=gha,scope=zenithui-qsharp
+            type=gha,scope=zenithui-qsharp-1
+            type=gha,scope=zenithui-qsharp-2
+            type=gha,scope=zenithui-qsharp-3
+            type=gha,scope=zenithui-qsharp-4
+            type=gha,scope=zenithui-qsharp-5
             type=gha,scope=zenithui-neural
             type=gha,scope=zenithui-final
           cache-to: type=gha,mode=max,scope=zenithui-final
