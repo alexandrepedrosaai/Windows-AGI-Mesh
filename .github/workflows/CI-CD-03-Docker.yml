@@ -17,8 +17,10 @@ env:
   IMAGE_TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
 
 jobs:
-  docker-build:
-    name: ZenithUI Docker Build And Push
+  # Matrix entries are the supported GitHub Actions equivalent of parallel steps.
+  # Each branch warms a separate BuildKit cache for one Docker build stage.
+  docker-build-cache:
+    name: ZenithUI Cache ${{ matrix.name }}
     if: >-
       (github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success') &&
@@ -26,8 +28,48 @@ jobs:
       (github.event.workflow_run.head_repository.full_name ==
       github.repository && github.event.workflow_run.head_branch == 'main'))
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: QSharp
+            target: qsharp-build
+            cache_scope: zenithui-qsharp
+          - name: VA-QLearning-Neural
+            target: neural-build
+            cache_scope: zenithui-neural
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker-container
+      - name: Build ${{ matrix.name }} stage and cache it
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          target: ${{ matrix.target }}
+          push: false
+          cache-from: type=gha,scope=${{ matrix.cache_scope }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.cache_scope }}
+
+  docker-publish:
+    name: Build And Push ZenithUI
+    needs: docker-build-cache
+    if: >-
+      needs.docker-build-cache.result == 'success' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name ==
+      github.repository && github.event.workflow_run.head_branch == 'main'))
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - name: Login GHCR with GitHub Actions Bot token
@@ -49,9 +91,12 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:latest
             ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
-          # Reuse SDK, NuGet restore, and compilation layers between runs.
-          cache-from: type=gha,scope=zenithui
-          cache-to: type=gha,mode=max,scope=zenithui
+          # Consume both parallel stage caches and publish a final-image cache.
+          cache-from: |
+            type=gha,scope=zenithui-qsharp
+            type=gha,scope=zenithui-neural
+            type=gha,scope=zenithui-final
+          cache-to: type=gha,mode=max,scope=zenithui-final
       - name: Pull published ZenithUI container
         run: |
           set -euo pipefail
