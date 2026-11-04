@@ -560,7 +560,7 @@ namespace WindowsZenith
             var psi = new ProcessStartInfo
             {
                 FileName  = "pwsh.exe",
-                Arguments = $"-NoProfile -Command \"{command}\"",
+ArgumentList = { "-NoProfile", "-Command", command },
                 RedirectStandardOutput = true,
                 RedirectStandardError  = true,
                 UseShellExecute = false,
