@@ -398,7 +398,7 @@ namespace SiameseTwinAI.ContinualLearning {
     ) : Bool {
         return anchor::Fidelity < config::FidelityTarget or
                anchor::ErrorRate > config::ErrorRateMax or
-               anchor::Coherence < config::CoherenceTarget
+               anchor::QuantumState::Coherence < config::CoherenceTarget
     }
 
     // =========================================================================
