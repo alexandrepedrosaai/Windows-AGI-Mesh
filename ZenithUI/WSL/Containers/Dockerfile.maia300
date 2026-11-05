@@ -1,0 +1,16 @@
+# ZenithUI container orchestration container.
+# Microsoft Edge AI surface: WebGPU, WebNN, WebTransport, and WebXR.
+FROM ubuntu:24.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates python3 curl \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /opt/zenithui
+COPY Transfer-Learning /opt/zenithui/Transfer-Learning
+COPY ZenithUI /opt/zenithui/ZenithUI
+RUN python3 -m compileall -q /opt/zenithui/Transfer-Learning/python || true
+ENV ZENITH_CLUSTER_COUNT=8
+ENV ZENITH_ARRAY_WIDTH=128
+EXPOSE 8080
+LABEL org.opencontainers.image.title="zenithui"
+LABEL org.opencontainers.image.description="container orchestration with cluster arrays and Edge AI protocols"
+CMD ["python3", "-c", "print('ZenithUI Edge AI container ready')"]
