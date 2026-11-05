@@ -1,0 +1,7 @@
+FROM python:3.12-slim
+WORKDIR /app
+COPY benchmark/Agents /app/agents
+COPY benchmark /app/benchmark
+ENV PYTHONUNBUFFERED=1 EDGE_PROTOCOLS=WebGPU,WebNN,WebTransport,WebXR
+RUN python -m compileall -q /app/agents /app/benchmark
+ENTRYPOINT ["python", "/app/agents/Orchestrator.py"]
