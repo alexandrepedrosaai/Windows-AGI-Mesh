@@ -45,10 +45,14 @@ jobs:
     steps:
       - name: Print workflow inputs
         shell: bash
+        env:
+          EXECUTION_ENVIRONMENT: ${{ inputs.environment }}
+          LOG_LEVEL: ${{ inputs.logLevel }}
+          REQUESTED_TAG: ${{ inputs.tag }}
         run: |
-          echo "Environment : ${{ inputs.environment }}"
-          echo "Log Level   : ${{ inputs.logLevel }}"
-          echo "Requested Tag: ${{ inputs.tag }}"
+          printf 'Environment : %s\n' "$EXECUTION_ENVIRONMENT"
+          printf 'Log Level   : %s\n' "$LOG_LEVEL"
+          printf 'Requested Tag: %s\n' "$REQUESTED_TAG"
 
   mirror:
     name: Mirror images to GHCR
