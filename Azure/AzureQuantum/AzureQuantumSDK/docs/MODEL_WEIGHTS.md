@@ -4,11 +4,11 @@
 
 | Component | Parameters | Size (BF16) | Size (INT4) |
 |---|---|---|---|
-| Embedding | 131,072 x 4,096 | 1.0 GB | 0.25 GB |
+| Embedding | ~0.54B (131,072 x 4,096) | ~1.1 GB | ~0.27 GB |
 | Attention (36 layers) | ~2.4B | 4.8 GB | 1.2 GB |
 | FFN (36 layers) | ~2.5B | 5.0 GB | 1.25 GB |
 | Norms + LM head | ~0.1B | 0.2 GB | 0.05 GB |
-| **Total** | **~5B** | **~10 GB** | **~2.5 GB** |
+| **Total** | **~5.54B** | **~11.1 GB** | **~2.8 GB** |
 
 ## Sharding (8 shards)
 
