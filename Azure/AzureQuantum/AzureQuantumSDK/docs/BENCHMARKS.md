@@ -8,10 +8,10 @@
 | case_02 | 2 | 200 | simulator | [0.3, 0.7] |
 | case_03 | 4 | 500 | simulator | [0.3, 0.7] |
 | case_04 | 8 | 1000 | simulator | [0.3, 0.7] |
-| case_05 | 4 | 100 | majorana-1 | [0.3, 0.7] |
-| case_06 | 4 | 100 | quantinuum.helios | [0.3, 0.7] |
+| case_05 | 4 | 100 | microsoft.majorana-1 | [0.3, 0.7] |
+| case_06 | 4 | 100 | quantinuum.qpu.helios-1 | [0.3, 0.7] |
 | case_07 | 4 | 100 | ibm.nighthawk-r2 | [0.3, 0.7] |
-| case_08 | 4 | 100 | ionq.forte-1 | [0.3, 0.7] |
+| case_08 | 4 | 100 | ionq.qpu.forte-1 | [0.3, 0.7] |
 | case_09 | 2 | 50 | aqt.pine | [0.3, 0.7] |
 | case_10 | 4 | 200 | simulator | [0.4, 0.6] |
 | case_11 | 6 | 500 | simulator | [0.3, 0.7] |
