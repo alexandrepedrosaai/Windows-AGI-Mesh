@@ -19,8 +19,8 @@ def main():
         d = json.loads(f.read_text())
         try:
             backend = QuantumBackend(d.get("backend", "microsoft.simulator.full-state"))
-        except ValueError:
-            backend = QuantumBackend.SIMULATOR_FULL_STATE
+        except ValueError as exc:
+            raise ValueError(f"Unsupported backend in {f}: {d.get('backend')!r}") from exc
         cases.append(BenchmarkCase(
             case_id=d["case_id"], case_name=d["case_name"],
             qubit_count=d["qubit_count"], ancilla_count=d.get("ancilla_count", 0),
