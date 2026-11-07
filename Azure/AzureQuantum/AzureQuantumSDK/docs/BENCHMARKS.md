@@ -13,7 +13,7 @@
 | case_07 | 4 | 100 | ibm.nighthawk-r2 | [0.3, 0.7] |
 | case_08 | 4 | 100 | ionq.qpu.forte-1 | [0.3, 0.7] |
 | case_09 | 2 | 50 | aqt.pine | [0.3, 0.7] |
-| case_10 | 4 | 200 | simulator | [0.4, 0.6] |
+| case_10 | 4 | 200 | simulator | [0.3, 0.7] |
 | case_11 | 6 | 500 | simulator | [0.3, 0.7] |
 | case_12 | 4 | 100 | majorana-1 (QEC d=3) | [0.3, 0.7] |
 | case_13 | 8 | 1000 | simulator | [0.3, 0.7] |
