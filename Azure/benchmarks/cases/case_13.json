@@ -9,7 +9,7 @@
   "threshold": 0.5,
   "expected_mean_lo": 0.3,
   "expected_mean_hi": 0.7,
-  "backend": "microsoft.simulator.full-state",
+  "backend": "microsoft.simulator.fullstate",
   "timeout_seconds": 300,
   "tags": [
     "automated",
