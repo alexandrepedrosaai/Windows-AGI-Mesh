@@ -9,7 +9,7 @@
   "threshold": 0.5,
   "expected_mean_lo": 0.3,
   "expected_mean_hi": 0.7,
-  "backend": "quantinuum.helios",
+  "backend": "quantinuum.qpu.helios-1",
   "timeout_seconds": 300,
   "tags": [
     "automated",
