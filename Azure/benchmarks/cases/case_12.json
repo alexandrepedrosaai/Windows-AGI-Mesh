@@ -1,0 +1,18 @@
+{
+  "case_id": "case_12",
+  "case_name": "Benchmark Case 12",
+  "qubit_count": 4,
+  "ancilla_count": 2,
+  "theta_z": 1.2,
+  "theta_y": 0.6,
+  "shot_count": 100,
+  "threshold": 0.5,
+  "expected_mean_lo": 0.3,
+  "expected_mean_hi": 0.7,
+  "backend": "microsoft.majorana-1",
+  "timeout_seconds": 300,
+  "tags": [
+    "automated",
+    "qubits-4"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "case_id": "case_08",
+  "case_name": "Benchmark Case 08",
+  "qubit_count": 4,
+  "ancilla_count": 2,
+  "theta_z": 0.8,
+  "theta_y": 0.4,
+  "shot_count": 100,
+  "threshold": 0.5,
+  "expected_mean_lo": 0.3,
+  "expected_mean_hi": 0.7,
+  "backend": "ionq.qpu.forte-1",
+  "timeout_seconds": 300,
+  "tags": [
+    "automated",
+    "qubits-4"
+  ]
+}

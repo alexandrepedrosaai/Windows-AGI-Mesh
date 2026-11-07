@@ -1,0 +1,18 @@
+{
+  "case_id": "case_15",
+  "case_name": "Benchmark Case 15",
+  "qubit_count": 4,
+  "ancilla_count": 2,
+  "theta_z": 1.5,
+  "theta_y": 0.75,
+  "shot_count": 100,
+  "threshold": 0.5,
+  "expected_mean_lo": 0.3,
+  "expected_mean_hi": 0.7,
+  "backend": "rigetti.ankaa-9q-3",
+  "timeout_seconds": 300,
+  "tags": [
+    "automated",
+    "qubits-4"
+  ]
+}
