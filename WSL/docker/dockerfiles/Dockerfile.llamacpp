@@ -1,0 +1,6 @@
+FROM python:3.12-slim
+WORKDIR /app
+COPY benchmark /app/benchmark
+RUN pip install --no-cache-dir requests psutil
+ENV INFERENCE_BACKEND=llama.cpp
+CMD ["python", "/app/benchmark/benchmark_llamacpp.py"]

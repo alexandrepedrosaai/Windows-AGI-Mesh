@@ -87,6 +87,7 @@ services:
     container_name: agi-qdrant
     <<: [*default-restart, *common-labels]
     logging: *default-logging
+    ports:
       - "127.0.0.1:6333:6333"
       - "127.0.0.1:6334:6334"
     environment:

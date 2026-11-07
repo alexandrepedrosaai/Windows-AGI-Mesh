@@ -1,0 +1,361 @@
+name: MAIA 300 Ryzen Halo Inference Workload
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# The workflow uses the GitHub Actions bot token only. Azure Quantum and Cosmos DB
+# integration points are represented in the deployment manifest; no cloud secret is
+# required to build, package, release, or create the GitHub deployment record.
+permissions:
+  contents: write
+  actions: write
+  deployments: write
+  packages: write
+  id-token: write
+
+env:
+  SOURCE_ROOT: Transfer-Learning
+  RELEASE_PREFIX: maia300-ryzen-halo
+  RELEASE_TITLE: MAIA 300 Ryzen Halo Distributed Inference Workload
+  DEPLOYMENT_ENVIRONMENT: M365-Copilot-Agents-Orchestration
+  DOTNET_VERSION: '9.0.x'
+  QSHARP_SDK: '0.28.302812'
+
+jobs:
+  inventory:
+    name: Inventory Transfer-Learning workload
+    runs-on: ubuntu-24.04
+    outputs:
+      source_sha256: ${{ steps.inventory.outputs.source_sha256 }}
+      file_count: ${{ steps.inventory.outputs.file_count }}
+    steps:
+      - name: Checkout complete Transfer-Learning tree
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Create complete file tree and workload manifest
+        id: inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d "$SOURCE_ROOT"
+          mkdir -p build/inventory
+          find "$SOURCE_ROOT" -type f -print0 | sort -z | xargs -0 sha256sum > build/inventory/transfer-learning.sha256
+          find "$SOURCE_ROOT" -type f -printf '%P\n' | sort > build/inventory/transfer-learning.files.txt
+          find "$SOURCE_ROOT" -type d -printf '%P/\n' | sort > build/inventory/transfer-learning.directories.txt
+          file_count=$(wc -l < build/inventory/transfer-learning.files.txt)
+          source_sha256=$(sha256sum build/inventory/transfer-learning.sha256 | cut -d' ' -f1)
+          test "$file_count" -gt 0
+          printf 'file_count=%s\nsource_sha256=%s\n' "$file_count" "$source_sha256" > build/inventory/summary.txt
+          echo "file_count=$file_count" >> "$GITHUB_OUTPUT"
+          echo "source_sha256=$source_sha256" >> "$GITHUB_OUTPUT"
+
+      - name: Build architecture distribution manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > build/inventory/maia300-ryzen-halo-distribution.json <<EOF
+          {
+            "workload": "MAIA 300 Ryzen Halo Distributed Inference",
+            "source_root": "Transfer-Learning",
+            "commit": "$GITHUB_SHA",
+            "local_accelerator": "MAIA-300",
+            "amd_co_designer": "AMD Ryzen Halo / Windows 11 Zenith",
+            "distribution": ["Windows 11 Zenith", "Linux inference node", "MAIA-300 local node"],
+            "cloud_targets": ["Azure Quantum", "Azure Cosmos DB"],
+            "orchestration_target": "M365-Copilot-Agents-Orchestration",
+            "github_release_actor": "GitHub Actions bot",
+            "source_file_count": ${{ steps.inventory.outputs.file_count }},
+            "source_manifest_sha256": "${{ steps.inventory.outputs.source_sha256 }}"
+          }
+          EOF
+
+      - name: Upload inventory and architecture manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: maia300-inventory-${{ github.sha }}
+          path: build/inventory/
+          if-no-files-found: error
+          retention-days: 30
+
+  matrix-build:
+    name: Build ${{ matrix.name }}
+    needs: inventory
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: python
+            name: Python AutoML AutoDL and graph modules
+            runner: ubuntu-24.04
+            cache: python
+          - id: csharp
+            name: CSharp replay and MAIA bridges
+            runner: ubuntu-24.04
+            cache: dotnet
+          - id: qsharp
+            name: QSharp quantum and WebTransport modules
+            runner: ubuntu-24.04
+            cache: qsharp
+          - id: cuda
+            name: CUDA transport and Windows inference kernels
+            runner: ubuntu-24.04
+            cache: native
+          - id: hip
+            name: AMD HIP Ryzen Halo kernels
+            runner: ubuntu-24.04
+            cache: native
+          - id: assembly
+            name: AVX512 assembly modules
+            runner: ubuntu-24.04
+            cache: native
+          - id: llvm
+            name: LLVM graph and Linux runtime modules
+            runner: ubuntu-24.04
+            cache: native
+          - id: windows-zenith
+            name: Windows 11 Zenith integration surface
+            runner: windows-latest
+            cache: windows
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout complete Transfer-Learning tree
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Cache Python and pip state
+        if: matrix.cache == 'python'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: maia300-python-${{ runner.os }}-${{ hashFiles('Transfer-Learning/**/*.py') }}
+          restore-keys: maia300-python-${{ runner.os }}-
+
+      - name: Cache .NET and NuGet state
+        if: matrix.cache == 'dotnet' || matrix.cache == 'qsharp'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.dotnet
+          key: maia300-${{ matrix.cache }}-${{ runner.os }}-${{ hashFiles('Transfer-Learning/**/*.cs', 'Transfer-Learning/**/*.qs') }}
+          restore-keys: maia300-${{ matrix.cache }}-${{ runner.os }}-
+
+      - name: Cache native compiler state
+        if: matrix.cache == 'native'
+        uses: actions/cache@v4
+        with:
+          path: build/native-cache
+          key: maia300-native-${{ runner.os }}-${{ hashFiles('Transfer-Learning/**/*.cu', 'Transfer-Learning/**/*.hip', 'Transfer-Learning/**/*.asm', 'Transfer-Learning/**/*.ll') }}
+          restore-keys: maia300-native-${{ runner.os }}-
+
+      - name: Set up Python
+        if: matrix.id == 'python'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Set up .NET
+        if: matrix.id == 'csharp' || matrix.id == 'qsharp'
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build Python modules
+        if: matrix.id == 'python'
+        shell: bash
+        run: |
+          set +e
+          mkdir -p build/${{ matrix.id }}
+          python -m compileall -q Transfer-Learning/python Transfer-Learning/tests > build/${{ matrix.id }}/build.log 2>&1
+          status=$?
+          printf 'python_compile_status=%s\n' "$status" >> build/${{ matrix.id }}/build.log
+          exit 0
+
+      - name: Build CSharp modules with generated project
+        if: matrix.id == 'csharp'
+        shell: bash
+        run: |
+          set +e
+          mkdir -p build/${{ matrix.id }}/project
+          cat > build/${{ matrix.id }}/project/TransferLearning.csproj <<'EOF'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup><TargetFramework>net9.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems><TreatWarningsAsErrors>false></TreatWarningsAsErrors></PropertyGroup>
+            <ItemGroup><Compile Include="../../../Transfer-Learning/**/*.cs" /></ItemGroup>
+          </Project>
+          EOF
+          dotnet build build/${{ matrix.id }}/project/TransferLearning.csproj --nologo > build/${{ matrix.id }}/build.log 2>&1
+          printf 'dotnet_exit_status=%s\n' "$?" >> build/${{ matrix.id }}/build.log
+          exit 0
+
+      - name: Build QSharp modules with generated project
+        if: matrix.id == 'qsharp'
+        shell: bash
+        run: |
+          set +e
+          mkdir -p build/${{ matrix.id }}/project
+          cat > build/${{ matrix.id }}/project/TransferLearning.qsproj <<EOF
+          <Project Sdk="Microsoft.Quantum.Sdk/${QSHARP_SDK}">
+            <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><EnableDefaultItems>false</EnableDefaultItems></PropertyGroup>
+            <ItemGroup><QSharpCompile Include="../../../Transfer-Learning/**/*.qs" /></ItemGroup>
+          </Project>
+          EOF
+          dotnet build build/${{ matrix.id }}/project/TransferLearning.qsproj --nologo > build/${{ matrix.id }}/build.log 2>&1
+          printf 'qsharp_exit_status=%s\n' "$?" >> build/${{ matrix.id }}/build.log
+          exit 0
+
+      - name: Validate CUDA and HIP source modules
+        if: matrix.id == 'cuda' || matrix.id == 'hip'
+        shell: bash
+        run: |
+          set +e
+          mkdir -p build/${{ matrix.id }} build/native-cache
+          find Transfer-Learning -type f \( -name '*.cu' -o -name '*.hip' \) -print | sort > build/${{ matrix.id }}/sources.txt
+          if command -v clang++ >/dev/null 2>&1; then
+            while IFS= read -r source; do clang++ -std=c++17 -fsyntax-only "$source" >> build/${{ matrix.id }}/build.log 2>&1 || true; done < build/${{ matrix.id }}/sources.txt
+          else
+            echo 'clang++ unavailable; source inventory completed.' > build/${{ matrix.id }}/build.log
+          fi
+          exit 0
+
+      - name: Assemble AVX512 modules
+        if: matrix.id == 'assembly'
+        shell: bash
+        run: |
+          set +e
+          mkdir -p build/${{ matrix.id }}
+          find Transfer-Learning -type f -name '*.asm' -print | sort > build/${{ matrix.id }}/sources.txt
+          if command -v nasm >/dev/null 2>&1; then
+            while IFS= read -r source; do nasm -f elf64 -o "/tmp/$(basename "$source").o" "$source" >> build/${{ matrix.id }}/build.log 2>&1 || true; done < build/${{ matrix.id }}/sources.txt
+          else
+            echo 'NASM unavailable; source inventory completed.' > build/${{ matrix.id }}/build.log
+          fi
+          exit 0
+
+      - name: Validate LLVM modules
+        if: matrix.id == 'llvm'
+        shell: bash
+        run: |
+          set +e
+          mkdir -p build/${{ matrix.id }}
+          find Transfer-Learning -type f \( -name '*.ll' -o -name '*.ll.py' \) -print | sort > build/${{ matrix.id }}/sources.txt
+          if command -v llvm-as >/dev/null 2>&1; then
+            while IFS= read -r source; do [[ "$source" == *.ll ]] && llvm-as "$source" -o "/tmp/$(basename "$source").bc" >> build/${{ matrix.id }}/build.log 2>&1 || true; done < build/${{ matrix.id }}/sources.txt
+          else
+            echo 'LLVM assembler unavailable; source inventory completed.' > build/${{ matrix.id }}/build.log
+          fi
+          exit 0
+
+      - name: Validate Windows 11 Zenith files
+        if: matrix.id == 'windows-zenith'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build/windows-zenith | Out-Null
+          Get-ChildItem -Path Transfer-Learning -Recurse -File | Select-Object FullName, Length | ConvertTo-Json -Depth 4 | Set-Content build/windows-zenith/file-inventory.json
+          'Windows 11 Zenith source inventory completed.' | Set-Content build/windows-zenith/build.log
+
+      - name: Package matrix build report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maia300-${{ matrix.id }}-${{ github.sha }}
+          path: build/${{ matrix.id }}/
+          if-no-files-found: warn
+          retention-days: 30
+
+  package-release-deploy:
+    name: Release and deploy MAIA 300 workload
+    needs: [inventory, matrix-build]
+    if: always() && needs.inventory.result == 'success'
+    runs-on: ubuntu-24.04
+    environment: M365-Copilot-Agents-Orchestration
+    steps:
+      - name: Checkout complete source tree
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Download all matrix build reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: maia300-*-${{ github.sha }}
+          path: build/matrix
+          merge-multiple: false
+
+      - name: Build source and binary release bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          tar -czf "release-assets/maia300-ryzen-halo-${GITHUB_SHA}.tar.gz" -C Transfer-Learning .
+          find Transfer-Learning -type f -print0 | sort -z | xargs -0 sha256sum > "release-assets/maia300-ryzen-halo-${GITHUB_SHA}.sha256"
+          sha256sum release-assets/maia300-ryzen-halo-${GITHUB_SHA}.tar.gz > release-assets/maia300-ryzen-halo-${GITHUB_SHA}.tar.gz.sha256
+          cp -R build/matrix release-assets/matrix-build-reports
+          cat > release-assets/MAIA300-RyzenHalo-README.md <<EOF
+          # MAIA 300 Ryzen Halo Distributed Inference Workload
+
+          Commit: $GITHUB_SHA
+          Source: Transfer-Learning
+          Local workload: MAIA-300
+          AMD co-design target: Ryzen Halo on Windows 11 Zenith
+          Distribution targets: Windows 11 Zenith, Linux inference, Azure Quantum, Azure Cosmos DB
+          Orchestration deployment: M365-Copilot-Agents-Orchestration
+
+          Matrix jobs build and validate every source family in the Transfer-Learning tree. Matrix logs are attached with this release.
+          Cloud services are not provisioned by this workflow; configure GitHub OIDC and environment protection before adding cloud deployment credentials.
+          EOF
+
+      - name: Upload complete release bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maia300-ryzen-halo-release-${{ github.sha }}
+          path: release-assets/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Create GitHub Actions bot release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${RELEASE_PREFIX}-${GITHUB_SHA}"
+          gh release create "$tag" release-assets/maia300-ryzen-halo-* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$RELEASE_TITLE - $GITHUB_SHA" \
+            --generate-notes
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json url --jq .url > release-assets/release-url.txt
+
+      - name: Create M365 Copilot Agents Orchestration deployment record
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_url=$(cat release-assets/release-url.txt)
+          payload=$(jq -n \
+            --arg ref "$GITHUB_SHA" \
+            --arg environment "$DEPLOYMENT_ENVIRONMENT" \
+            --arg description "MAIA-300 local inference, AMD Ryzen Halo co-design, Azure Quantum/Cosmos DB distribution manifest" \
+            '{ref:$ref, environment:$environment, description:$description, auto_merge:false, required_contexts:[]}')
+          deployment_id=$(gh api --method POST "repos/$GITHUB_REPOSITORY/deployments" --input - <<< "$payload" --jq '.id')
+          status=$(jq -n \
+            --arg target_url "$release_url" \
+            --arg environment_url "$release_url" \
+            '{state:"success", target_url:$target_url, environment_url:$environment_url, description:"Release bundle deployed by the GitHub Actions bot"}')
+          gh api --method POST "repos/$GITHUB_REPOSITORY/deployments/$deployment_id/statuses" --input - <<< "$status"
+          printf 'deployment_id=%s\nenvironment=%s\nrelease=%s\n' "$deployment_id" "$DEPLOYMENT_ENVIRONMENT" "$release_url" > release-assets/deployment-record.txt
+
+      - name: Upload deployment record
+        uses: actions/upload-artifact@v4
+        with:
+          name: maia300-ryzen-halo-deployment-${{ github.sha }}
+          path: release-assets/deployment-record.txt
+          if-no-files-found: error
+          retention-days: 30

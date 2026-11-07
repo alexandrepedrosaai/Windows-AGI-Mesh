@@ -667,6 +667,7 @@ def benchmark_sysbench(cpu_info: dict[str, Any]) -> list[CPUResult]:
 # ---------------------------------------------------------------------------
 def main() -> int:
     """Run CPU benchmarks."""
+    global BENCHMARK_DURATION_SEC
     parser = argparse.ArgumentParser(description="CPU Benchmark — Microsoft AGI Lab")
     parser.add_argument("--output", default="benchmark/reports/cpu_results.json")
     parser.add_argument("--duration", type=float, default=BENCHMARK_DURATION_SEC)
@@ -676,7 +677,6 @@ def main() -> int:
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    global BENCHMARK_DURATION_SEC
     BENCHMARK_DURATION_SEC = args.duration
 
     cpu_info = _get_cpu_info()
