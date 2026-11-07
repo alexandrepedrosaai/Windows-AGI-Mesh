@@ -1,0 +1,18 @@
+{
+  "case_id": "case_02",
+  "case_name": "Benchmark Case 02",
+  "qubit_count": 2,
+  "ancilla_count": 0,
+  "theta_z": 0.2,
+  "theta_y": 0.1,
+  "shot_count": 200,
+  "threshold": 0.5,
+  "expected_mean_lo": 0.3,
+  "expected_mean_hi": 0.7,
+  "backend": "microsoft.simulator.full-state",
+  "timeout_seconds": 300,
+  "tags": [
+    "automated",
+    "qubits-2"
+  ]
+}
