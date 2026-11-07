@@ -87,7 +87,7 @@ class QuantumWalkM05:
         with self._lock:
             self._call_count += 1
         try:
-result = None
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
