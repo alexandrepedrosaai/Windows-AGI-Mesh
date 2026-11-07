@@ -9,7 +9,7 @@
   "threshold": 0.5,
   "expected_mean_lo": 0.3,
   "expected_mean_hi": 0.7,
-  "backend": "ionq.forte-1",
+  "backend": "ionq.qpu.forte-1",
   "timeout_seconds": 300,
   "tags": [
     "automated",
