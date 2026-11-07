@@ -1,0 +1,83 @@
+{
+  "model_name": "windows-agi-mesh-5b",
+  "version": "1.0.0",
+  "total_params": 5000000000,
+  "num_shards": 8,
+  "quantization": "hybrid-q4-bf16",
+  "architecture": "transformer-gqa-moe-quantum",
+  "training_tokens": 15000000000000,
+  "shards": [
+    {
+      "shard_id": 0,
+      "layer_start": 0,
+      "layer_end": 4,
+      "size_gb_bf16": 1.25,
+      "size_gb_int4": 0.312,
+      "storage_url": "https://agimesh.blob.core.windows.net/weights/shard_00.bin",
+      "checksum": "sha256:placeholder"
+    },
+    {
+      "shard_id": 1,
+      "layer_start": 4,
+      "layer_end": 8,
+      "size_gb_bf16": 1.25,
+      "size_gb_int4": 0.312,
+      "storage_url": "https://agimesh.blob.core.windows.net/weights/shard_01.bin",
+      "checksum": "sha256:placeholder"
+    },
+    {
+      "shard_id": 2,
+      "layer_start": 8,
+      "layer_end": 12,
+      "size_gb_bf16": 1.25,
+      "size_gb_int4": 0.312,
+      "storage_url": "https://agimesh.blob.core.windows.net/weights/shard_02.bin",
+      "checksum": "sha256:placeholder"
+    },
+    {
+      "shard_id": 3,
+      "layer_start": 12,
+      "layer_end": 16,
+      "size_gb_bf16": 1.25,
+      "size_gb_int4": 0.312,
+      "storage_url": "https://agimesh.blob.core.windows.net/weights/shard_03.bin",
+      "checksum": "sha256:placeholder"
+    },
+    {
+      "shard_id": 4,
+      "layer_start": 16,
+      "layer_end": 20,
+      "size_gb_bf16": 1.25,
+      "size_gb_int4": 0.312,
+      "storage_url": "https://agimesh.blob.core.windows.net/weights/shard_04.bin",
+      "checksum": "sha256:placeholder"
+    },
+    {
+      "shard_id": 5,
+      "layer_start": 20,
+      "layer_end": 24,
+      "size_gb_bf16": 1.25,
+      "size_gb_int4": 0.312,
+      "storage_url": "https://agimesh.blob.core.windows.net/weights/shard_05.bin",
+      "checksum": "sha256:placeholder"
+    },
+    {
+      "shard_id": 6,
+      "layer_start": 24,
+      "layer_end": 28,
+      "size_gb_bf16": 1.25,
+      "size_gb_int4": 0.312,
+      "storage_url": "https://agimesh.blob.core.windows.net/weights/shard_06.bin",
+      "checksum": "sha256:placeholder"
+    },
+    {
+      "shard_id": 7,
+      "layer_start": 28,
+      "layer_end": 32,
+      "size_gb_bf16": 1.25,
+      "size_gb_int4": 0.312,
+      "storage_url": "https://agimesh.blob.core.windows.net/weights/shard_07.bin",
+      "checksum": "sha256:placeholder"
+    }
+  ]
+}
