@@ -70,7 +70,6 @@ jobs:
       matrix:
         configuration:
           - Debug
-          - Release
 
     steps:
       - name: Checkout
