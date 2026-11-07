@@ -22,9 +22,10 @@
 
 ## Running
 
-```bash
+cd Azure
 python benchmarks/run_all.py
-python -m src.python.cli benchmark --cases-dir benchmarks/cases --parallel
+cd AzureQuantum
+python -m src.python.cli benchmark --cases-dir ../benchmarks/cases --parallel
 ```
 
 ## Performance Targets
