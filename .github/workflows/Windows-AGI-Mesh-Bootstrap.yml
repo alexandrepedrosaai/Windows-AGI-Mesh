@@ -46,9 +46,15 @@ jobs:
 
       - name: Determine tag
         id: tag
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+            if [[ ! "$INPUT_TAG" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]; then
+              echo "Invalid Docker tag" >&2
+              exit 1
+            fi
+            printf 'tag=%s\n' "$INPUT_TAG" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.event_name }}" = "pull_request" ]; then
             echo "tag=pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
           else
