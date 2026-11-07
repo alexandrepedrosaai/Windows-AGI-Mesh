@@ -11,7 +11,7 @@ on:
       - main
     paths:
       - 'packages/iceberg-replication/**'
-      - '.github/workflows/build-bootstrap.yml'
+      - '.github/workflows/Windows-AGI-Mesh-Bootstrap.yml'
   workflow_dispatch:
     inputs:
       tag:
