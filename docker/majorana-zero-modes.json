@@ -1,0 +1,9 @@
+{
+  "name": "Majorana Zero Modes",
+  "topological": true,
+  "self_conjugate": true,
+  "antiparticle_identity": "self",
+  "polymorphic_build": true,
+  "role": "ZenithUI preflight build selector",
+  "scientific_scope": "Build metadata only; this file does not claim experimental observation of physical Majorana particles."
+}
