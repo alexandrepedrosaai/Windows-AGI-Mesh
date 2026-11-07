@@ -1,0 +1,29 @@
+# Windows-AGI-Mesh-QuantumSDK development requirements
+# Python 3.10+ required
+
+# Testing
+pytest>=8.0
+pytest-asyncio>=0.23
+pytest-cov>=5.0
+pytest-xdist>=3.5
+
+# Code quality
+black>=24.0
+ruff>=0.4
+mypy>=1.10
+pre-commit>=3.7
+
+# Azure Quantum (optional)
+# qdk[azure]>=1.0
+
+# Qt GUI (optional)
+# PyQt6>=6.7
+
+# Data processing
+numpy>=1.26
+scipy>=1.13
+
+# Utilities
+tqdm>=4.66
+rich>=13.7
+click>=8.1

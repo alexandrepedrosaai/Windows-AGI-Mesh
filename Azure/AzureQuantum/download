@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Model weights
+models/weights/*.bin
+models/weights/*.safetensors
+models/weights/*.pt
+!models/weights/example.manifest.json
+
+# Benchmark results
+benchmarks/results/*.json
+!benchmarks/results/.gitkeep
+
+# Logs
+*.log
