@@ -20,7 +20,7 @@
 ## Hardware Pipeline
 
 ### Prefill: MAIA 300
-- 4-shard tensor parallel, FP8 compute
+- 8-shard tensor parallel, FP8 compute
 - 288 GB HBM4 KV-cache per chiplet
 - Flash attention + speculative decoding (5 draft tokens)
 
