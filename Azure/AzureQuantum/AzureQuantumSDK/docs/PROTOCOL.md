@@ -5,7 +5,7 @@
 All CLI commands output JSON:
 
 ```json
-{"ok": true, "result": {...}}
+{"ok": true, "result": {}}
 {"ok": false, "error": "message"}
 ```
 
