@@ -40,6 +40,7 @@ jobs:
   print-tag:
     runs-on: ubuntu-latest
     if: ${{ inputs.print_tags }}
+    permissions: {}
 
     steps:
       - name: Print workflow inputs
