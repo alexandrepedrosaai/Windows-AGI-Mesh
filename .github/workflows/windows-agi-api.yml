@@ -95,8 +95,15 @@ jobs:
           echo "resolved_target=${{ steps.tag.outputs.target_branch }}"
           echo "tags=${{ steps.tag.outputs.tags }}"
 
+      - name: Verify adapted Iceberg API sources
+        run: |
+          set -euo pipefail
+          test -f packages/api/app/Dockerfile
+          test -f packages/api/package.json
+          test -f packages/api/app/iceberg-index.js
+
       - name: Build image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./packages/api/app/Dockerfile

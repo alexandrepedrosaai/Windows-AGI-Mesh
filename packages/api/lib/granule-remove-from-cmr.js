@@ -1,0 +1,126 @@
+const { CMR } = require('@cumulus/cmr-client');
+const log = require('@cumulus/common/log');
+const {
+  createRejectableTransaction,
+  GranulePgModel,
+  CollectionPgModel,
+} = require('@cumulus/db');
+const cmrjsCmrUtils = require('@cumulus/cmrjs/cmr-utils');
+const { constructCollectionId } = require('@cumulus/message/Collections');
+const { GranuleNotPublished } = require('@cumulus/errors');
+
+/**
+ * @typedef {import('@cumulus/db').PostgresCollection} PostgresCollection
+ * @typedef {import('@cumulus/db').PostgresGranuleRecord} PostgresGranuleRecord
+ * @typedef {import('knex').Knex} Knex
+ *
+ * @typedef {(
+ *   granule: unknown,
+ *   collectionId: string,
+ *   collectionCmrProvider: string
+ * ) => Promise<void>} RemoveGranuleFromCmrFn
+ */
+
+/**
+ * Remove granule record from CMR
+ *
+ * @param {Object} granule - A postgres granule record
+ * @param {string} collectionId - The CMR collection 'id' for the granule to be removed
+ * @param {string} collectionCmrProvider - The CMR provider to be used in delete operation
+ * @throws {GranuleNotPublished|Error}
+ * @private
+ */
+const _removeGranuleFromCmr = async (granule, collectionId, collectionCmrProvider) => {
+  let metadata;
+  log.info(`granules.removeGranuleFromCmrByGranule granule_id: ${granule.granule_id}, collection_id: ${collectionId}`);
+  if (!granule.published || !granule.cmr_link) {
+    log.warn(`Granule ${granule.granule_id} in Collection ${collectionId} is not published to CMR, so cannot be removed from CMR`);
+    return;
+  }
+
+  const cmrSettings = await cmrjsCmrUtils.getCmrSettings({ provider: collectionCmrProvider });
+  const cmr = CMR.getInstance(cmrSettings);
+  try {
+    metadata = await cmr.getGranuleMetadata(granule.cmr_link);
+  } catch (error) {
+    if (error instanceof GranuleNotPublished) {
+      log.warn(`Granule ${granule.granule_id} in Collection ${collectionId} does not have a CMR link, so its metadata cannot be retrieved`);
+      return;
+    }
+    throw error;
+  }
+
+  // Use granule UR to delete from CMR
+  if (metadata) {
+    await cmr.deleteGranule(metadata.title, collectionCmrProvider);
+  }
+};
+
+/**
+ * Remove granule record from CMR and update Postgres + Dynamo granules
+ *
+ * @param {Object} params
+ * @param {Knex} params.knex - DB client
+ * @param {PostgresGranuleRecord} params.pgGranuleRecord - A Postgres granule record
+ * @param {PostgresCollection} [params.pgCollection] - A Postgres Collection record
+ * @param {GranulePgModel} [params.granulePgModel=new GranulePgModel()]
+ *  - Instance of granules model for PostgreSQL
+ * @param {RemoveGranuleFromCmrFn} [params.removeGranuleFromCmrFunction]
+ *  - passed in function used for test mocking
+ * @returns {Promise<{pgGranule: unknown}>}
+ *  - Updated postgres granule
+ */
+const unpublishGranule = async ({
+  knex,
+  pgGranuleRecord,
+  pgCollection,
+  granulePgModel = new GranulePgModel(),
+  removeGranuleFromCmrFunction = _removeGranuleFromCmr,
+}) => {
+  /** @type {string} */
+  let resolvedPgCollection = pgCollection;
+  let collectionCmrProvider;
+  if (pgCollection) {
+    collectionCmrProvider = pgCollection.cmr_provider;
+  } else {
+    resolvedPgCollection = await new CollectionPgModel().get(
+      knex, { cumulus_id: pgGranuleRecord.collection_cumulus_id }
+    );
+    collectionCmrProvider = resolvedPgCollection.cmr_provider;
+  }
+  const collectionId = constructCollectionId(
+    resolvedPgCollection.name,
+    resolvedPgCollection.version
+  );
+
+  // If we cannot find a Postgres Collection or Postgres Granule,
+  // don't update the Postgres Granule, continue to update the Dynamo granule
+  const pgGranuleCumulusId = pgGranuleRecord.cumulus_id;
+  return await createRejectableTransaction(knex, async (trx) => {
+    const [pgGranule] = await granulePgModel.update(
+      trx,
+      {
+        cumulus_id: pgGranuleCumulusId,
+      },
+      {
+        published: false,
+        // using `undefined` would result in Knex ignoring this binding
+        // for the update. also, `undefined` is not a valid SQL value, it
+        // should be `null` instead
+        cmr_link: trx.raw('DEFAULT'),
+      },
+      ['*']
+    );
+
+    await removeGranuleFromCmrFunction(
+      pgGranuleRecord,
+      collectionId,
+      collectionCmrProvider
+    );
+    return { pgGranule };
+  });
+};
+
+module.exports = {
+  unpublishGranule,
+};
