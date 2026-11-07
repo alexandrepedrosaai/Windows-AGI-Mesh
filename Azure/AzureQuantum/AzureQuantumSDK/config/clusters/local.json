@@ -1,0 +1,23 @@
+{
+  "topology_id": "local-dev-001",
+  "description": "Local development cluster",
+  "nodes": [
+    {
+      "node_id": "local-gpu-00",
+      "hostname": "localhost",
+      "ip_address": "127.0.0.1",
+      "gpu_count": 1,
+      "maia_300_count": 0,
+      "fpga_count": 0,
+      "quantum_enabled": false,
+      "photonic_enabled": false,
+      "region": "local",
+      "role": "coordinator"
+    }
+  ],
+  "tensor_parallel": 1,
+  "pipeline_parallel": 1,
+  "data_parallel": 1,
+  "communication_backend": "gloo",
+  "photonic_links": []
+}
