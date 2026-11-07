@@ -55,7 +55,7 @@ class QuantumAnnealingM14Config:
 
     def to_dict(self) -> Dict[str, Any]: return asdict(self)
     def to_json(self) -> str: return json.dumps(self.to_dict(), indent=2)
-    def checksum(self) -> str: return hashlib.md5(self.to_json().encode()).hexdigest()
+    def checksum(self) -> str: return hashlib.sha256(self.to_json().encode()).hexdigest()
 
 class QuantumAnnealingM14:
     """
