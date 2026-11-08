@@ -10,6 +10,7 @@ on:
       release_tag:
         description: Existing GitHub Release tag, for example v1.0.0
         required: true
+        default: v1.632.0
         type: string
 
 permissions: {}
@@ -35,6 +36,32 @@ jobs:
       contents: read
 
     steps:
+      - name: Validate release tag exists before checkout
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${RELEASE_TAG}" ]; then
+            echo "::error::A release tag is required."
+            exit 1
+          fi
+
+          if [[ ! "${RELEASE_TAG}" =~ ^[A-Za-z0-9._-]+$ ]]; then
+            echo "::error::The release tag contains unsupported characters: ${RELEASE_TAG}"
+            exit 1
+          fi
+
+          if ! gh api \
+            --header 'Accept: application/vnd.github+json' \
+            "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}" \
+            --jq '.object.sha' >/dev/null; then
+            echo "::error::The tag '${RELEASE_TAG}' does not exist in ${GITHUB_REPOSITORY}."
+            echo "::notice::Choose an existing tag, such as v1.632.0, or create the tag before dispatching this workflow."
+            exit 1
+          fi
+
       - name: Check out release source
         uses: actions/checkout@v4
         with:
