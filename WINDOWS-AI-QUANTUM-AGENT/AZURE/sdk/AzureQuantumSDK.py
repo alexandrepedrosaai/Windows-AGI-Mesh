@@ -1,3 +1,4 @@
+"""
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║  WINDOWS AI — PIPELINE RUNNER PRINCIPAL                                      ║
 ║  Arquivo: 10_pipeline_runner/pipeline.py                                    ║

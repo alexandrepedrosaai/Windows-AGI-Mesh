@@ -87,7 +87,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -109,7 +109,8 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (data=args[0] if args else []; return [v*0.99 for v in data] if data else [])
+            data = args[0] if args else []
+            result = [v*0.99 for v in data] if data else []
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -131,7 +132,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -153,7 +154,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -175,7 +176,8 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (data=args[0] if args else []; return data)
+            data = args[0] if args else []
+            result = data
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -197,7 +199,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return {"calls": self._call_count, "avg_ms": self.avg_latency_ms})
+            result = {"calls": self._call_count, "avg_ms": self.avg_latency_ms}
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -219,7 +221,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return True)
+            result = True
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -241,7 +243,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -263,7 +265,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -285,7 +287,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return {"session": self._session_id, "calls": self._call_count})
+            result = {"session": self._session_id, "calls": self._call_count}
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -307,7 +309,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -329,7 +331,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return {"total_ms": self._total_ms, "calls": self._call_count})
+            result = {"total_ms": self._total_ms, "calls": self._call_count}
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -351,7 +353,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return {"throughput": self._call_count / max(0.001, self._total_ms/1000)})
+            result = {"throughput": self._call_count / max(0.001, self._total_ms/1000)}
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -373,7 +375,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -395,7 +397,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -417,7 +419,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -439,7 +441,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -461,7 +463,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return args[0] if args else None)
+            result = args[0] if args else None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -483,7 +485,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return args[0] if args else None)
+            result = args[0] if args else None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -505,7 +507,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return args[0] if args else [])
+            result = args[0] if args else []
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -527,7 +529,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return args[0] if args else [])
+            result = args[0] if args else []
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -549,7 +551,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return {"backend": "maia-300", "success": True})
+            result = {"backend": "maia-300", "success": True}
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -571,7 +573,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return {"dispatched": True, "latency_ms": 1.0})
+            result = {"dispatched": True, "latency_ms": 1.0}
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -593,7 +595,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return args[0] if args else [])
+            result = args[0] if args else []
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -615,7 +617,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -637,7 +639,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return args[0] if args else [])
+            result = args[0] if args else []
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -659,7 +661,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return args[0] if args else [])
+            result = args[0] if args else []
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -681,7 +683,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return None)
+            result = None
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -703,7 +705,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return args[0] if args else [])
+            result = args[0] if args else []
         except Exception as exc:
             with self._lock:
                 self._error_count += 1
@@ -725,7 +727,7 @@ class QaoaOptimizerM01:
         with self._lock:
             self._call_count += 1
         try:
-            result = (return {"module_id": MODULE_ID, "calls": self._call_count, "errors": self._error_count, "avg_ms": self.avg_latency_ms})
+            result = {"module_id": MODULE_ID, "calls": self._call_count, "errors": self._error_count, "avg_ms": self.avg_latency_ms}
         except Exception as exc:
             with self._lock:
                 self._error_count += 1

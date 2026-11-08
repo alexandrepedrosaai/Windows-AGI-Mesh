@@ -159,7 +159,7 @@ class ArchitecturePrivacyMechanism:
 
     def _gaussian_noise_std(self) -> float:
         """Compute Gaussian noise std for (epsilon, delta)-DP."""
-if self.epsilon <= 0 or not 0 < self.delta < 1:
+        if self.epsilon <= 0 or not 0 < self.delta < 1:
             raise ValueError("epsilon must be > 0 and delta must be in (0, 1)")
         c = math.sqrt(2 * math.log(1.25 / self.delta))
         return c * self.sensitivity / self.epsilon
@@ -656,7 +656,7 @@ class FederatedNAS:
             compute_budget=compute_budget,
         )
 
-node_seed = int.from_bytes(
+        node_seed = int.from_bytes(
             hashlib.sha256(node_id.encode("utf-8")).digest()[:4],
             "big"
         ) % (2**31)
