@@ -61,5 +61,18 @@ jobs:
     needs: build
     environment:
       name: 'Development'
-      url: {{https://github.com/alexandrepedrosaai/Windows-AGI-Mesh/new/main?filename=.github%2Fworkflows%2Fazure-webapps-node.yml&workflow_template=deployments%2Fazure-webapps-node 
-      
+      url: https://github.com/alexandrepedrosaai/Windows-AGI-Mesh
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: node-app
+        path: node-app
+
+    - name: Deploy to Azure Web App
+      if: env.AZURE_WEBAPP_NAME != 'your-app-name'
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: node-app

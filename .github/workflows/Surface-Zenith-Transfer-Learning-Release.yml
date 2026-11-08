@@ -93,10 +93,10 @@ jobs:
           cat > "$notes" <<EOF
           # $RELEASE_NAME
 
-          Automated release for commit \\`$GITHUB_SHA\\`.
+          Automated release for commit $GITHUB_SHA.
 
-          Source tree: \\`$SOURCE_DIR\\`
-          Deployment environment: \\`$DEPLOYMENT_ENVIRONMENT\\`
+          Source tree: $SOURCE_DIR
+          Deployment environment: $DEPLOYMENT_ENVIRONMENT
           Contents: every file and nested subfile under the source tree.
           Integrity: SHA256 manifest and archive checksum are attached.
           EOF

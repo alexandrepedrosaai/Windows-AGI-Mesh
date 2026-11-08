@@ -86,7 +86,6 @@ jobs:
   # 256 parallel cache lanes for the Q# stage (GitHub Actions matrix maximum).
   qsharp-cache:
     name: ZenithUI QSharp Cache ${{ matrix.shard }}
-    cache-mode: write
     needs: [majorana-zero-modes]
     if: >-
       always() &&
@@ -121,7 +120,6 @@ jobs:
 
   neural-cache:
     name: ZenithUI VA Q-learning Neural Cache
-    cache-mode: write
     needs: [majorana-zero-modes]
     if: >-
       always() &&
@@ -152,7 +150,6 @@ jobs:
 
   docker-publish:
     name: Build And Push ZenithUI
-    cache-mode: write
     outputs:
       digest: ${{ steps.image.outputs.digest }}
     needs: [majorana-zero-modes, qsharp-cache, neural-cache]
@@ -492,8 +489,8 @@ jobs:
       id-token: write
     runs-on: ubuntu-24.04
     env:
-      IMAGE: ${{ env.IMAGE }}
-      IMAGE_TAG: ${{ env.IMAGE_TAG }}
+      IMAGE: ghcr.io/alexandrepedrosaai/zenithui
+      IMAGE_TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
       DIGEST: ${{ needs.majorana-zero-modes.outputs.digest || needs.docker-publish.outputs.digest }}
     steps:
       - name: Login GHCR to read and attach attestations

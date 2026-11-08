@@ -413,8 +413,12 @@ jobs:
 
   zenith-parameters-autopilot:
     name: Zenith Parameters deploy with AutoML and multi-agent review
-    needs: mcp-agents-cross-deploy
-    if: needs.mcp-agents-cross-deploy.result == 'success'
+    needs:
+      - generate-acc-state
+      - mcp-agents-cross-deploy
+    if: >-
+      needs.generate-acc-state.result == 'success' &&
+      needs.mcp-agents-cross-deploy.result == 'success'
     permissions:
       actions: read
       contents: read

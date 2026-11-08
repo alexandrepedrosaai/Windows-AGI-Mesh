@@ -79,7 +79,6 @@ jobs:
   # 256 parallel cache lanes for the Q# stage (GitHub Actions matrix maximum).
   qsharp-cache:
     name: ZenithUI QSharp Cache ${{ matrix.shard }}
-    cache-mode: write
     needs: [majorana-zero-modes]
     if: >-
       always() &&
@@ -114,7 +113,6 @@ jobs:
 
   neural-cache:
     name: ZenithUI VA Q-learning Neural Cache
-    cache-mode: write
     needs: [majorana-zero-modes]
     if: >-
       always() &&
@@ -145,7 +143,6 @@ jobs:
 
   docker-publish:
     name: Build And Push ZenithUI
-    cache-mode: write
     outputs:
       digest: ${{ steps.image.outputs.digest }}
     needs: [majorana-zero-modes, qsharp-cache, neural-cache]
