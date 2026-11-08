@@ -413,15 +413,4 @@
     }
   },
   "attestation_statement": "Based on the cited GitHub records, the contribution lineage is attested as a human-controlled, agent-assisted transport and integration process. Microsoft and NASA co-authorship entries are recorded as commit-message metadata and are not represented here as proof of human or legal institutional approval."
-}SHA-256 do payload:
-a4d3f8efb0b02fd48e40064332b426c95c892854a8762022595edb74753800ea
-
-SHA-256 da chave pública:
-005506508e2f6b6e7de1bfaf7516b190603f81733f10d8edcb3ebdba5150ac49
-
-Algoritmo de assinatura:
-Ed25519
-
-Resultado da verificação:
-valid
-
+}
