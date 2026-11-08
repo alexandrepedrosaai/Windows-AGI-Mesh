@@ -1,0 +1,146 @@
+name: Mirror Debezium Images to GHCR
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Debezium image tag to mirror (e.g. 3.4)"
+        required: true
+        default: "3.4"
+        type: string
+
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+
+      print_tags:
+        description: "Print tag information"
+        required: true
+        type: boolean
+
+      environment:
+        description: "Execution environment"
+        required: true
+        type: environment
+
+env:
+  REGISTRY: ghcr.io
+
+concurrency:
+  group: mirror-debezium-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  print-tag:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.print_tags }}
+    permissions: {}
+
+    steps:
+      - name: Print workflow inputs
+        shell: bash
+        env:
+          EXECUTION_ENVIRONMENT: ${{ inputs.environment }}
+          LOG_LEVEL: ${{ inputs.logLevel }}
+          REQUESTED_TAG: ${{ inputs.tag }}
+        run: |
+          printf 'Environment : %s\n' "$EXECUTION_ENVIRONMENT"
+          printf 'Log Level   : %s\n' "$LOG_LEVEL"
+          printf 'Requested Tag: %s\n' "$REQUESTED_TAG"
+
+  mirror:
+    name: Mirror images to GHCR
+    runs-on: ubuntu-24.04-arm
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - source: quay.io/debezium/connect
+            target: ${{ github.repository_owner }}/microsoftgraph-connect
+
+          - source: quay.io/debezium/kafka
+            target: ${{ github.repository_owner }}/windows-kafka
+
+    steps:
+      - name: Show execution settings
+        shell: bash
+        run: |
+          echo "Environment : ${{ inputs.environment }}"
+          echo "Log Level   : ${{ inputs.logLevel }}"
+          echo "Lookup Tag  : ${{ inputs.tag }}"
+          echo "Source      : ${{ matrix.image.source }}"
+          echo "Target      : ${{ matrix.image.target }}"
+
+      - name: Enable debug logging
+        if: ${{ inputs.logLevel == 'debug' }}
+        shell: bash
+        run: |
+          set -x
+          docker version
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull source image
+        shell: bash
+        run: |
+          docker pull "${{ matrix.image.source }}:${{ inputs.tag }}"
+
+      - name: Resolve digest
+        id: digest
+        shell: bash
+        run: |
+          DIGEST="$(docker inspect \
+            --format='{{index .RepoDigests 0}}' \
+            "${{ matrix.image.source }}:${{ inputs.tag }}" \
+            | cut -d'@' -f2)"
+
+          DIGEST_TAG="$(echo "${DIGEST}" | sed 's/:/-/')"
+
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "digest_tag=${DIGEST_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Create immutable tag
+        shell: bash
+        run: |
+          docker tag \
+            "${{ matrix.image.source }}:${{ inputs.tag }}" \
+            "${{ env.REGISTRY }}/${{ matrix.image.target }}:${{ steps.digest.outputs.digest_tag }}"
+
+      - name: Push immutable image
+        shell: bash
+        run: |
+          docker push \
+            "${{ env.REGISTRY }}/${{ matrix.image.target }}:${{ steps.digest.outputs.digest_tag }}"
+
+      - name: Publish summary
+        shell: bash
+        run: |
+          {
+            echo "## Published immutable image"
+            echo
+            echo "Source:"
+            echo "\`${{ matrix.image.source }}:${{ inputs.tag }}\`"
+            echo
+            echo "Digest:"
+            echo "\`${{ steps.digest.outputs.digest }}\`"
+            echo
+            echo "Published:"
+            echo "\`${{ env.REGISTRY }}/${{ matrix.image.target }}:${{ steps.digest.outputs.digest_tag }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

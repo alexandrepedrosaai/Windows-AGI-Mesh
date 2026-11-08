@@ -1,0 +1,18 @@
+{
+  "case_id": "case_06",
+  "case_name": "Benchmark Case 06",
+  "qubit_count": 4,
+  "ancilla_count": 2,
+  "theta_z": 0.6,
+  "theta_y": 0.3,
+  "shot_count": 100,
+  "threshold": 0.5,
+  "expected_mean_lo": 0.3,
+  "expected_mean_hi": 0.7,
+  "backend": "quantinuum.qpu.helios-1",
+  "timeout_seconds": 300,
+  "tags": [
+    "automated",
+    "qubits-4"
+  ]
+}

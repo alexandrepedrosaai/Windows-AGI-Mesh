@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: WSL Zenith dashboards
+    type: file
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards

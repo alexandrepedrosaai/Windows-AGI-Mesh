@@ -1,0 +1,19 @@
+name: zenithui-edge-mesh
+services:
+  edge-ai:
+    image: ghcr.io/alexandrepedrosaai/zenithui:latest
+    environment:
+      ZENITH_ROLE: "container orchestration"
+      ZENITH_PROTOCOLS: "WebGPU,WebNN,WebTransport,WebXR"
+      ZENITH_CLUSTER_COUNT: "8"
+      ZENITH_ARRAY_WIDTH: "128"
+    networks: [zenith-mesh]
+  telemetry:
+    image: ghcr.io/alexandrepedrosaai/zenithui:latest
+    environment:
+      ZENITH_ROLE: "cluster telemetry"
+      WEBTRANSPORT_STREAM: "telemetry"
+    networks: [zenith-mesh]
+networks:
+  zenith-mesh:
+    driver: bridge

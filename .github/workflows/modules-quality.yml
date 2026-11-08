@@ -13,23 +13,39 @@ on:
 
   workflow_dispatch:
 
+# Default to least privilege.
 permissions:
-  contents: write
-  pull-requests: write
-  attestations: write
-  id-token: write
+  contents: read
 
 concurrency:
   group: agimesh-modules-quality-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  lint-workflow:
+    name: Validate GitHub Actions workflow
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run actionlint
+        uses: docker://rhysd/actionlint:latest
+        with:
+          args: -color
 
   build-test:
+    name: Quality - ${{ matrix.os }} - ${{ matrix.module }}
+
+    needs:
+      - lint-workflow
 
     strategy:
       fail-fast: false
-
       matrix:
         os:
           - ubuntu-latest
@@ -45,38 +61,38 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    steps:
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
 
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v4
+      - name: Setup .NET SDKs
+        uses: actions/setup-dotnet@v6.1.0
         with:
-          dotnet-version: 8.0.x
-
-      - name: Setup .NET 9
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 9.0.x
+          dotnet-version: |
+            8.0.x
+            9.0.x
 
       - name: Verify module exists
         shell: bash
         run: |
+          set -euo pipefail
 
           echo "Checking module..."
-
           test -f "${{ matrix.module }}"
-
           test -s "${{ matrix.module }}"
-
           echo "Module found."
 
       - name: Validate QS module metadata
         shell: bash
         run: |
+          set -euo pipefail
 
           FILE="${{ matrix.module }}"
 
@@ -98,6 +114,7 @@ jobs:
       - name: Validate forbidden tokens
         shell: bash
         run: |
+          set -euo pipefail
 
           FILE="${{ matrix.module }}"
 
@@ -113,16 +130,20 @@ jobs:
 
       - name: Validate QS structure
         shell: bash
+        env:
+          MODULE_PATH: ${{ matrix.module }}
         run: |
+          set -euo pipefail
 
-          python3 << 'PY'
+          python3 <<'PY'
+          import os
           from pathlib import Path
 
-          path = Path("${{ matrix.module }}")
+          path = Path(os.environ["MODULE_PATH"])
 
           text = path.read_text(
               encoding="utf-8",
-              errors="ignore"
+              errors="ignore",
           )
 
           if text.count("{") != text.count("}"):
@@ -143,12 +164,43 @@ jobs:
           print("QS structural validation passed.")
           PY
 
+      - name: Compile Q# module
+        shell: bash
+        env:
+          MODULE_PATH: ${{ matrix.module }}
+        run: |
+          set -euo pipefail
+
+          if [ -x "./scripts/compile-qsharp.sh" ]; then
+            ./scripts/compile-qsharp.sh "$MODULE_PATH"
+          else
+            echo "::error::Missing scripts/compile-qsharp.sh"
+            echo "Add the repository-specific QDK compilation command."
+            exit 1
+          fi
+
+      - name: Run Q# unit tests
+        shell: bash
+        env:
+          MODULE_PATH: ${{ matrix.module }}
+        run: |
+          set -euo pipefail
+
+          if [ -x "./scripts/test-qsharp.sh" ]; then
+            ./scripts/test-qsharp.sh "$MODULE_PATH"
+          else
+            echo "::error::Missing scripts/test-qsharp.sh"
+            echo "Add the repository-specific QDK unit-test command."
+            exit 1
+          fi
+
       - name: Install Syft
         uses: anchore/sbom-action/download-syft@v0
 
       - name: Generate CycloneDX SBOM
         shell: bash
         run: |
+          set -euo pipefail
 
           mkdir -p sbom
 
@@ -160,6 +212,7 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
+          set -euo pipefail
 
           mkdir -p hash
 
@@ -177,14 +230,12 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-
           New-Item `
             -ItemType Directory `
             -Force `
             hash
 
-          $file =
-            Get-Item "${{ matrix.module }}"
+          $file = Get-Item "${{ matrix.module }}"
 
           Get-FileHash `
             $file.FullName `
@@ -197,10 +248,13 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
+          set -euo pipefail
 
           mkdir -p dist
 
-          MODULE_NAME=$(basename "${{ matrix.module }}" .qs)
+          MODULE_NAME=$(
+            basename "${{ matrix.module }}" .qs
+          )
 
           tar \
             -czf \
@@ -211,13 +265,12 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-
           New-Item `
             -ItemType Directory `
             -Force `
             dist
 
-          $ModuleName =
+          $ModuleName = `
             [System.IO.Path]::GetFileNameWithoutExtension(
               "${{ matrix.module }}"
             )
@@ -232,13 +285,22 @@ jobs:
         id: artifact_name
         shell: bash
         run: |
-          MODULE_NAME=$(basename "${{ matrix.module }}" .qs)
-          echo "module_name=${MODULE_NAME}" >> "${GITHUB_OUTPUT}"
+          set -euo pipefail
+
+          MODULE_NAME=$(
+            basename "${{ matrix.module }}" .qs
+          )
+
+          echo \
+            "module_name=${MODULE_NAME}" \
+            >> "${GITHUB_OUTPUT}"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: quality-${{ matrix.os }}-${{ steps.artifact_name.outputs.module_name }}
+          name: >-
+            quality-${{ matrix.os }}-${{
+            steps.artifact_name.outputs.module_name }}
           path: |
             sbom/**
             hash/**
@@ -257,13 +319,14 @@ jobs:
           subject-path: dist/*.zip
 
   create-quality-pr:
-
     name: Create Quality Pull Request from existing branch
 
     needs:
-      - validate-build
+      - build-test
 
-    if: github.event_name != 'pull_request' && github.ref != 'refs/heads/main'
+    if: >-
+      github.event_name != 'pull_request' &&
+      github.ref != 'refs/heads/main'
 
     runs-on: ubuntu-latest
 
@@ -272,7 +335,6 @@ jobs:
       pull-requests: write
 
     steps:
-
       - name: Create or reuse Pull Request as GitHub Actions Bot
         uses: actions/github-script@v7
         env:
@@ -284,7 +346,10 @@ jobs:
             const base = 'main';
 
             if (!head || head === base) {
-              core.setFailed('A non-main correction branch is required to create the Pull Request.');
+              core.setFailed(
+                'A non-main correction branch is required ' +
+                'to create the Pull Request.'
+              );
               return;
             }
 
@@ -297,8 +362,17 @@ jobs:
             });
 
             if (existing.data.length > 0) {
-              core.info(`Pull Request already exists: ${existing.data[0].html_url}`);
-              core.setOutput('pull_request_url', existing.data[0].html_url);
+              const url = existing.data[0].html_url;
+
+              core.info(
+                `Pull Request already exists: ${url}`
+              );
+
+              core.setOutput(
+                'pull_request_url',
+                url
+              );
+
               return;
             }
 
@@ -308,8 +382,34 @@ jobs:
               head,
               base,
               title: 'AGIMesh Modules Quality Automation',
-              body: `## Automated Quality Pipeline\n\nThis Pull Request was opened automatically by GitHub Actions Bot from the existing correction branch \`${head}\`.\n\n### Corrections\n\n- Added QS module, version, and author metadata.\n- Preserved QS structural validation.\n- Avoided creating a restricted auxiliary branch.\n- Kept artifact names safe for all operating systems.\n\n### Modules\n\n- DeepSpace.qs\n- EdgeAIApp.qs\n- MagneticMajorana.qs\n- Nemotron.qs\n- XboxQuantumXR.qs`
+              body: `## Automated Quality Pipeline
+
+            This Pull Request was opened automatically by GitHub Actions Bot from the existing correction branch \`${head}\`.
+
+            ### Corrections
+
+            - Added QS module, version, and author metadata.
+            - Added Q# compilation and unit-test gates.
+            - Preserved QS structural validation.
+            - Added workflow validation with actionlint.
+            - Applied least-privilege workflow permissions.
+            - Avoided creating a restricted auxiliary branch.
+            - Kept artifact names safe for all operating systems.
+
+            ### Modules
+
+            - DeepSpace.qs
+            - EdgeAIApp.qs
+            - MagneticMajorana.qs
+            - Nemotron.qs
+            - XboxQuantumXR.qs`
             });
 
-            core.info(`Pull Request created: ${pull.data.html_url}`);
-            core.setOutput('pull_request_url', pull.data.html_url);
+            core.info(
+              `Pull Request created: ${pull.data.html_url}`
+            );
+
+            core.setOutput(
+              'pull_request_url',
+              pull.data.html_url
+            );

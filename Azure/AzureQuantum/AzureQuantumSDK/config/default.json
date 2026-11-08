@@ -1,0 +1,66 @@
+{
+  "model": {
+    "name": "windows-agi-mesh-5b",
+    "version": "1.0.0",
+    "hidden_dim": 4096,
+    "num_layers": 36,
+    "num_heads": 32,
+    "num_kv_heads": 8,
+    "ffn_dim": 14336,
+    "vocab_size": 131072,
+    "max_seq_len": 131072,
+    "quantization": "hybrid-q4-bf16"
+  },
+  "hardware": {
+    "maia300": {
+      "chiplet_id": 0,
+      "rack_id": 0,
+      "total_chiplets": 96,
+      "hbm4_capacity_gb": 288,
+      "hbm4_bandwidth_tbs": 18.0,
+      "compute_tflops_fp8": 6400,
+      "rack_power_kw": 167.0
+    },
+    "brainwave": {
+      "fpga_model": "intel-stratix-10-280",
+      "mac_units": 96000,
+      "peak_tflops_bf16": 35.0,
+      "latency_target_ms": 1.0
+    },
+    "majorana": {
+      "qpu_id": "majorana-1-alpha",
+      "physical_qubits": 8,
+      "logical_qubits": 1,
+      "t1_time_us": 1000.0,
+      "gate_fidelity_2q": 0.999,
+      "code_distance": 3
+    },
+    "hcf": {
+      "length_km": 100.0,
+      "bandwidth_tbps": 100.0,
+      "latency_reduction_pct": 47.0,
+      "refractive_index": 1.0003,
+      "manufacturer": "heraeus-covantics"
+    }
+  },
+  "training": {
+    "batch_size": 2048,
+    "learning_rate": 0.0003,
+    "total_steps": 500000,
+    "tensor_parallel": 8,
+    "pipeline_parallel": 4,
+    "data_parallel": 16,
+    "zero_stage": 3,
+    "mixed_precision": true
+  },
+  "inference": {
+    "max_new_tokens": 512,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "use_quantum_sampling": false,
+    "speculative_decoding": true,
+    "spec_draft_tokens": 5
+  },
+  "default_backend": "microsoft.simulator.full-state",
+  "log_level": "INFO"
+}

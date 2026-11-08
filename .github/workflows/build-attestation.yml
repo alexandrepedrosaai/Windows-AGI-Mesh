@@ -1,6 +1,9 @@
 name: Test, secure
 
 on:
+  push:
+    branches:
+      - main
   release:
     types:
       - published
@@ -9,23 +12,30 @@ on:
     inputs:
       release_tag:
         description: Existing GitHub Release tag, for example v1.0.0
-        required: true
+        required: false
+        default: v1.632.0
+        type: string
+      source_ref:
+        description: Optional branch, tag, or commit SHA to test instead of the release tag
+        required: false
         type: string
 
 permissions: {}
 
 concurrency:
-  group: docker-release-${{ github.event.release.tag_name || inputs.release_tag }}
+  group: docker-release-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
-  env:
+env:
   REGISTRY: ghcr.io
   LOCAL_IMAGE: windows-agi-mesh:ci
   IMAGE_ARCHIVE: windows-agi-mesh-docker-image.tar
   CHECKSUM_FILE: windows-agi-mesh-docker-image.tar.sha256
   SBOM_FILE: windows-agi-mesh.spdx.json
   SECURITY_REPORT: windows-agi-mesh-trivy-report.json
-  RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
-  jobs:
+  SOURCE_REF: ${{ github.event_name == 'release' && github.event.release.tag_name || github.event_name == 'workflow_dispatch' && (inputs.source_ref || inputs.release_tag) || github.sha }}
+  RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || github.event_name == 'workflow_dispatch' && inputs.release_tag || format('commit-{0}', github.sha) }}
+
+jobs:
   test:
     name: Test and validate source
     runs-on: ubuntu-latest
@@ -34,10 +44,44 @@ concurrency:
       contents: read
 
     steps:
+      - name: Validate release tag exists before checkout
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            echo "Using push commit ref: ${SOURCE_REF}"
+          elif [ -n "${{ inputs.source_ref }}" ]; then
+            echo "Using explicitly requested source ref: ${SOURCE_REF}"
+            if ! gh api \
+              --header 'Accept: application/vnd.github+json' \
+              "repos/${GITHUB_REPOSITORY}/commits/${SOURCE_REF}" \
+              --jq '.sha' >/dev/null; then
+              echo "::error::The source ref '${SOURCE_REF}' does not resolve to a commit."
+              exit 1
+            fi
+          else
+            if [[ ! "${RELEASE_TAG}" =~ ^[A-Za-z0-9._-]+$ ]]; then
+              echo "::error::The release tag contains unsupported characters: ${RELEASE_TAG}"
+              exit 1
+            fi
+
+            if ! gh api \
+              --header 'Accept: application/vnd.github+json' \
+              "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}" \
+              --jq '.object.sha' >/dev/null; then
+              echo "::error::The tag '${RELEASE_TAG}' does not exist in ${GITHUB_REPOSITORY}."
+              echo "::notice::Choose an existing tag, such as v1.632.0, or create the tag before dispatching this workflow."
+              exit 1
+            fi
+          fi
+
       - name: Check out release source
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name || inputs.release_tag }}
+          ref: ${{ env.SOURCE_REF }}
           fetch-depth: 1
           persist-credentials: false
 
@@ -244,7 +288,7 @@ concurrency:
       - name: Check out release source
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name || inputs.release_tag }}
+          ref: ${{ env.SOURCE_REF }}
           fetch-depth: 1
           persist-credentials: false
 
@@ -340,7 +384,7 @@ concurrency:
       - name: Check out tested release source
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name || inputs.release_tag }}
+          ref: ${{ env.SOURCE_REF }}
           fetch-depth: 1
           persist-credentials: false
 
@@ -706,3 +750,20 @@ concurrency:
     environment:
       name: production
       url: https://github.com/alexandrepedrosaai/Windows-AGI-Mesh
+    permissions:
+      contents: read
+    steps:
+      - name: Download verified Docker release bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-release-bundle
+          path: deploy-bundle
+
+      - name: Confirm release bundle is ready for deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s "deploy-bundle/${IMAGE_ARCHIVE}"
+          test -s "deploy-bundle/${CHECKSUM_FILE}"
+          test -s "deploy-bundle/${SBOM_FILE}"
+          echo "Verified Docker release bundle is ready for the production deployment environment."

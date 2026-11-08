@@ -1,0 +1,17 @@
+{
+  "author": "Windows-AGI-Mesh Team",
+  "license": "MIT",
+  "description": "Windows-AGI-Mesh-QuantumSDK Q# project",
+  "files": [
+    "src/qsharp/Types.qs",
+    "src/qsharp/Validation.qs",
+    "src/qsharp/Arrays.qs",
+    "src/qsharp/Circuits.qs",
+    "src/qsharp/Sampling.qs",
+    "src/qsharp/Factorization.qs",
+    "src/qsharp/Api.qs",
+    "src/qsharp/Entrypoint.qs",
+    "src/qsharp/Benchmarks.qs",
+    "src/qsharp/Buffers.qs"
+  ]
+}

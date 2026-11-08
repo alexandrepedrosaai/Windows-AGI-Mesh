@@ -1,0 +1,594 @@
+name: CI-CD 03.2 ZenithUI Docker Build Push
+
+on:
+  workflow_run:
+    workflows: ["CI-CD 02 Build Test Publish"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  actions: write
+
+env:
+  # OCI image names are case-sensitive and must be lowercase.
+  IMAGE: ghcr.io/alexandrepedrosaai/zenithui
+  IMAGE_TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+jobs:
+  # Topological Majorana Zero Modes fast path: build and publish ZenithUI first.
+  # A successful self-build skips the 256 Q# cache lanes and the legacy publish job.
+  # If it fails, the existing cache-and-publish pipeline is used as fallback.
+  majorana-zero-modes:
+    name: Majorana Zero Modes — ZenithUI polymorphic build and publish
+    outputs:
+      digest: ${{ steps.image.outputs.digest }}
+    if: >-
+      (github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success') &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.head_repository.full_name ==
+      github.repository && github.event.workflow_run.head_branch == 'main'))
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Login GHCR with GitHub Actions Bot token
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker-container
+      - name: Build and publish ZenithUI (Majorana fast path)
+        id: image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+          sbom: true
+          provenance: mode=max
+      - name: Pull published ZenithUI container
+        run: |
+          set -euo pipefail
+          image_ref="${IMAGE}:${IMAGE_TAG}"
+          docker pull "$image_ref"
+          docker image inspect "$image_ref" >/dev/null
+      - name: Run VA Q-learning neural polymorphic reconstruction
+        run: |
+          set -euo pipefail
+          mkdir -p docker-metadata
+          image_ref="${IMAGE}:${IMAGE_TAG}"
+          docker run --rm "$image_ref" \
+            dotnet /opt/vaql/VAQLearningNeural.dll --reconstruct \
+            | tee docker-metadata/va-qlearning-reconstruction.txt
+      - name: Export image metadata
+        run: |
+          set -euo pipefail
+          mkdir -p docker-metadata
+          printf '%s\n' "${IMAGE}:${IMAGE_TAG}" > docker-metadata/image.txt
+      - name: Upload image metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: zenithui-image-metadata-${{ env.IMAGE_TAG }}
+          path: docker-metadata/
+
+  # 256 parallel cache lanes for the Q# stage (GitHub Actions matrix maximum).
+  qsharp-cache:
+    name: ZenithUI QSharp Cache ${{ matrix.shard }}
+    needs: [majorana-zero-modes]
+    if: >-
+      always() &&
+      needs.majorana-zero-modes.result == 'failure' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name ==
+      github.repository && github.event.workflow_run.head_branch == 'main'))
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker-container
+      - name: Build QSharp stage shard ${{ matrix.shard }} and cache it
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          target: qsharp-build
+          push: false
+          cache-from: type=gha,scope=zenithui-qsharp-${{ matrix.shard }}
+          cache-to: type=gha,mode=max,scope=zenithui-qsharp-${{ matrix.shard }},ignore-error=true
+
+  neural-cache:
+    name: ZenithUI VA Q-learning Neural Cache
+    needs: [majorana-zero-modes]
+    if: >-
+      always() &&
+      needs.majorana-zero-modes.result == 'failure' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name ==
+      github.repository && github.event.workflow_run.head_branch == 'main'))
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker-container
+      - name: Build VA Q-learning Neural stage and cache it
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          target: neural-build
+          push: false
+          cache-from: type=gha,scope=zenithui-neural
+          cache-to: type=gha,mode=max,scope=zenithui-neural,ignore-error=true
+
+  docker-publish:
+    name: Build And Push ZenithUI
+    outputs:
+      digest: ${{ steps.image.outputs.digest }}
+    needs: [majorana-zero-modes, qsharp-cache, neural-cache]
+    if: >-
+      always() &&
+      needs.majorana-zero-modes.result == 'failure' &&
+      needs.qsharp-cache.result == 'success' &&
+      needs.neural-cache.result == 'success' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name ==
+      github.repository && github.event.workflow_run.head_branch == 'main'))
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Login GHCR with GitHub Actions Bot token
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Set up Docker Buildx with cache-capable driver
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker-container
+      - name: Build And Push ZenithUI
+        id: image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+          sbom: true
+          provenance: mode=max
+          # Consume all 256 Q# caches, the neural cache, and the final-image cache.
+          cache-from: |
+            type=gha,scope=zenithui-qsharp-1
+            type=gha,scope=zenithui-qsharp-2
+            type=gha,scope=zenithui-qsharp-3
+            type=gha,scope=zenithui-qsharp-4
+            type=gha,scope=zenithui-qsharp-5
+            type=gha,scope=zenithui-qsharp-6
+            type=gha,scope=zenithui-qsharp-7
+            type=gha,scope=zenithui-qsharp-8
+            type=gha,scope=zenithui-qsharp-9
+            type=gha,scope=zenithui-qsharp-10
+            type=gha,scope=zenithui-qsharp-11
+            type=gha,scope=zenithui-qsharp-12
+            type=gha,scope=zenithui-qsharp-13
+            type=gha,scope=zenithui-qsharp-14
+            type=gha,scope=zenithui-qsharp-15
+            type=gha,scope=zenithui-qsharp-16
+            type=gha,scope=zenithui-qsharp-17
+            type=gha,scope=zenithui-qsharp-18
+            type=gha,scope=zenithui-qsharp-19
+            type=gha,scope=zenithui-qsharp-20
+            type=gha,scope=zenithui-qsharp-21
+            type=gha,scope=zenithui-qsharp-22
+            type=gha,scope=zenithui-qsharp-23
+            type=gha,scope=zenithui-qsharp-24
+            type=gha,scope=zenithui-qsharp-25
+            type=gha,scope=zenithui-qsharp-26
+            type=gha,scope=zenithui-qsharp-27
+            type=gha,scope=zenithui-qsharp-28
+            type=gha,scope=zenithui-qsharp-29
+            type=gha,scope=zenithui-qsharp-30
+            type=gha,scope=zenithui-qsharp-31
+            type=gha,scope=zenithui-qsharp-32
+            type=gha,scope=zenithui-qsharp-33
+            type=gha,scope=zenithui-qsharp-34
+            type=gha,scope=zenithui-qsharp-35
+            type=gha,scope=zenithui-qsharp-36
+            type=gha,scope=zenithui-qsharp-37
+            type=gha,scope=zenithui-qsharp-38
+            type=gha,scope=zenithui-qsharp-39
+            type=gha,scope=zenithui-qsharp-40
+            type=gha,scope=zenithui-qsharp-41
+            type=gha,scope=zenithui-qsharp-42
+            type=gha,scope=zenithui-qsharp-43
+            type=gha,scope=zenithui-qsharp-44
+            type=gha,scope=zenithui-qsharp-45
+            type=gha,scope=zenithui-qsharp-46
+            type=gha,scope=zenithui-qsharp-47
+            type=gha,scope=zenithui-qsharp-48
+            type=gha,scope=zenithui-qsharp-49
+            type=gha,scope=zenithui-qsharp-50
+            type=gha,scope=zenithui-qsharp-51
+            type=gha,scope=zenithui-qsharp-52
+            type=gha,scope=zenithui-qsharp-53
+            type=gha,scope=zenithui-qsharp-54
+            type=gha,scope=zenithui-qsharp-55
+            type=gha,scope=zenithui-qsharp-56
+            type=gha,scope=zenithui-qsharp-57
+            type=gha,scope=zenithui-qsharp-58
+            type=gha,scope=zenithui-qsharp-59
+            type=gha,scope=zenithui-qsharp-60
+            type=gha,scope=zenithui-qsharp-61
+            type=gha,scope=zenithui-qsharp-62
+            type=gha,scope=zenithui-qsharp-63
+            type=gha,scope=zenithui-qsharp-64
+            type=gha,scope=zenithui-qsharp-65
+            type=gha,scope=zenithui-qsharp-66
+            type=gha,scope=zenithui-qsharp-67
+            type=gha,scope=zenithui-qsharp-68
+            type=gha,scope=zenithui-qsharp-69
+            type=gha,scope=zenithui-qsharp-70
+            type=gha,scope=zenithui-qsharp-71
+            type=gha,scope=zenithui-qsharp-72
+            type=gha,scope=zenithui-qsharp-73
+            type=gha,scope=zenithui-qsharp-74
+            type=gha,scope=zenithui-qsharp-75
+            type=gha,scope=zenithui-qsharp-76
+            type=gha,scope=zenithui-qsharp-77
+            type=gha,scope=zenithui-qsharp-78
+            type=gha,scope=zenithui-qsharp-79
+            type=gha,scope=zenithui-qsharp-80
+            type=gha,scope=zenithui-qsharp-81
+            type=gha,scope=zenithui-qsharp-82
+            type=gha,scope=zenithui-qsharp-83
+            type=gha,scope=zenithui-qsharp-84
+            type=gha,scope=zenithui-qsharp-85
+            type=gha,scope=zenithui-qsharp-86
+            type=gha,scope=zenithui-qsharp-87
+            type=gha,scope=zenithui-qsharp-88
+            type=gha,scope=zenithui-qsharp-89
+            type=gha,scope=zenithui-qsharp-90
+            type=gha,scope=zenithui-qsharp-91
+            type=gha,scope=zenithui-qsharp-92
+            type=gha,scope=zenithui-qsharp-93
+            type=gha,scope=zenithui-qsharp-94
+            type=gha,scope=zenithui-qsharp-95
+            type=gha,scope=zenithui-qsharp-96
+            type=gha,scope=zenithui-qsharp-97
+            type=gha,scope=zenithui-qsharp-98
+            type=gha,scope=zenithui-qsharp-99
+            type=gha,scope=zenithui-qsharp-100
+            type=gha,scope=zenithui-qsharp-101
+            type=gha,scope=zenithui-qsharp-102
+            type=gha,scope=zenithui-qsharp-103
+            type=gha,scope=zenithui-qsharp-104
+            type=gha,scope=zenithui-qsharp-105
+            type=gha,scope=zenithui-qsharp-106
+            type=gha,scope=zenithui-qsharp-107
+            type=gha,scope=zenithui-qsharp-108
+            type=gha,scope=zenithui-qsharp-109
+            type=gha,scope=zenithui-qsharp-110
+            type=gha,scope=zenithui-qsharp-111
+            type=gha,scope=zenithui-qsharp-112
+            type=gha,scope=zenithui-qsharp-113
+            type=gha,scope=zenithui-qsharp-114
+            type=gha,scope=zenithui-qsharp-115
+            type=gha,scope=zenithui-qsharp-116
+            type=gha,scope=zenithui-qsharp-117
+            type=gha,scope=zenithui-qsharp-118
+            type=gha,scope=zenithui-qsharp-119
+            type=gha,scope=zenithui-qsharp-120
+            type=gha,scope=zenithui-qsharp-121
+            type=gha,scope=zenithui-qsharp-122
+            type=gha,scope=zenithui-qsharp-123
+            type=gha,scope=zenithui-qsharp-124
+            type=gha,scope=zenithui-qsharp-125
+            type=gha,scope=zenithui-qsharp-126
+            type=gha,scope=zenithui-qsharp-127
+            type=gha,scope=zenithui-qsharp-128
+            type=gha,scope=zenithui-qsharp-129
+            type=gha,scope=zenithui-qsharp-130
+            type=gha,scope=zenithui-qsharp-131
+            type=gha,scope=zenithui-qsharp-132
+            type=gha,scope=zenithui-qsharp-133
+            type=gha,scope=zenithui-qsharp-134
+            type=gha,scope=zenithui-qsharp-135
+            type=gha,scope=zenithui-qsharp-136
+            type=gha,scope=zenithui-qsharp-137
+            type=gha,scope=zenithui-qsharp-138
+            type=gha,scope=zenithui-qsharp-139
+            type=gha,scope=zenithui-qsharp-140
+            type=gha,scope=zenithui-qsharp-141
+            type=gha,scope=zenithui-qsharp-142
+            type=gha,scope=zenithui-qsharp-143
+            type=gha,scope=zenithui-qsharp-144
+            type=gha,scope=zenithui-qsharp-145
+            type=gha,scope=zenithui-qsharp-146
+            type=gha,scope=zenithui-qsharp-147
+            type=gha,scope=zenithui-qsharp-148
+            type=gha,scope=zenithui-qsharp-149
+            type=gha,scope=zenithui-qsharp-150
+            type=gha,scope=zenithui-qsharp-151
+            type=gha,scope=zenithui-qsharp-152
+            type=gha,scope=zenithui-qsharp-153
+            type=gha,scope=zenithui-qsharp-154
+            type=gha,scope=zenithui-qsharp-155
+            type=gha,scope=zenithui-qsharp-156
+            type=gha,scope=zenithui-qsharp-157
+            type=gha,scope=zenithui-qsharp-158
+            type=gha,scope=zenithui-qsharp-159
+            type=gha,scope=zenithui-qsharp-160
+            type=gha,scope=zenithui-qsharp-161
+            type=gha,scope=zenithui-qsharp-162
+            type=gha,scope=zenithui-qsharp-163
+            type=gha,scope=zenithui-qsharp-164
+            type=gha,scope=zenithui-qsharp-165
+            type=gha,scope=zenithui-qsharp-166
+            type=gha,scope=zenithui-qsharp-167
+            type=gha,scope=zenithui-qsharp-168
+            type=gha,scope=zenithui-qsharp-169
+            type=gha,scope=zenithui-qsharp-170
+            type=gha,scope=zenithui-qsharp-171
+            type=gha,scope=zenithui-qsharp-172
+            type=gha,scope=zenithui-qsharp-173
+            type=gha,scope=zenithui-qsharp-174
+            type=gha,scope=zenithui-qsharp-175
+            type=gha,scope=zenithui-qsharp-176
+            type=gha,scope=zenithui-qsharp-177
+            type=gha,scope=zenithui-qsharp-178
+            type=gha,scope=zenithui-qsharp-179
+            type=gha,scope=zenithui-qsharp-180
+            type=gha,scope=zenithui-qsharp-181
+            type=gha,scope=zenithui-qsharp-182
+            type=gha,scope=zenithui-qsharp-183
+            type=gha,scope=zenithui-qsharp-184
+            type=gha,scope=zenithui-qsharp-185
+            type=gha,scope=zenithui-qsharp-186
+            type=gha,scope=zenithui-qsharp-187
+            type=gha,scope=zenithui-qsharp-188
+            type=gha,scope=zenithui-qsharp-189
+            type=gha,scope=zenithui-qsharp-190
+            type=gha,scope=zenithui-qsharp-191
+            type=gha,scope=zenithui-qsharp-192
+            type=gha,scope=zenithui-qsharp-193
+            type=gha,scope=zenithui-qsharp-194
+            type=gha,scope=zenithui-qsharp-195
+            type=gha,scope=zenithui-qsharp-196
+            type=gha,scope=zenithui-qsharp-197
+            type=gha,scope=zenithui-qsharp-198
+            type=gha,scope=zenithui-qsharp-199
+            type=gha,scope=zenithui-qsharp-200
+            type=gha,scope=zenithui-qsharp-201
+            type=gha,scope=zenithui-qsharp-202
+            type=gha,scope=zenithui-qsharp-203
+            type=gha,scope=zenithui-qsharp-204
+            type=gha,scope=zenithui-qsharp-205
+            type=gha,scope=zenithui-qsharp-206
+            type=gha,scope=zenithui-qsharp-207
+            type=gha,scope=zenithui-qsharp-208
+            type=gha,scope=zenithui-qsharp-209
+            type=gha,scope=zenithui-qsharp-210
+            type=gha,scope=zenithui-qsharp-211
+            type=gha,scope=zenithui-qsharp-212
+            type=gha,scope=zenithui-qsharp-213
+            type=gha,scope=zenithui-qsharp-214
+            type=gha,scope=zenithui-qsharp-215
+            type=gha,scope=zenithui-qsharp-216
+            type=gha,scope=zenithui-qsharp-217
+            type=gha,scope=zenithui-qsharp-218
+            type=gha,scope=zenithui-qsharp-219
+            type=gha,scope=zenithui-qsharp-220
+            type=gha,scope=zenithui-qsharp-221
+            type=gha,scope=zenithui-qsharp-222
+            type=gha,scope=zenithui-qsharp-223
+            type=gha,scope=zenithui-qsharp-224
+            type=gha,scope=zenithui-qsharp-225
+            type=gha,scope=zenithui-qsharp-226
+            type=gha,scope=zenithui-qsharp-227
+            type=gha,scope=zenithui-qsharp-228
+            type=gha,scope=zenithui-qsharp-229
+            type=gha,scope=zenithui-qsharp-230
+            type=gha,scope=zenithui-qsharp-231
+            type=gha,scope=zenithui-qsharp-232
+            type=gha,scope=zenithui-qsharp-233
+            type=gha,scope=zenithui-qsharp-234
+            type=gha,scope=zenithui-qsharp-235
+            type=gha,scope=zenithui-qsharp-236
+            type=gha,scope=zenithui-qsharp-237
+            type=gha,scope=zenithui-qsharp-238
+            type=gha,scope=zenithui-qsharp-239
+            type=gha,scope=zenithui-qsharp-240
+            type=gha,scope=zenithui-qsharp-241
+            type=gha,scope=zenithui-qsharp-242
+            type=gha,scope=zenithui-qsharp-243
+            type=gha,scope=zenithui-qsharp-244
+            type=gha,scope=zenithui-qsharp-245
+            type=gha,scope=zenithui-qsharp-246
+            type=gha,scope=zenithui-qsharp-247
+            type=gha,scope=zenithui-qsharp-248
+            type=gha,scope=zenithui-qsharp-249
+            type=gha,scope=zenithui-qsharp-250
+            type=gha,scope=zenithui-qsharp-251
+            type=gha,scope=zenithui-qsharp-252
+            type=gha,scope=zenithui-qsharp-253
+            type=gha,scope=zenithui-qsharp-254
+            type=gha,scope=zenithui-qsharp-255
+            type=gha,scope=zenithui-qsharp-256
+            type=gha,scope=zenithui-neural
+            type=gha,scope=zenithui-final
+          cache-to: type=gha,mode=max,scope=zenithui-final,ignore-error=true
+      - name: Pull published ZenithUI container
+        run: |
+          set -euo pipefail
+          image_ref="${IMAGE}:${IMAGE_TAG}"
+          docker pull "$image_ref"
+          docker image inspect "$image_ref" >/dev/null
+      - name: Run VA Q-learning neural polymorphic reconstruction
+        run: |
+          set -euo pipefail
+          mkdir -p docker-metadata
+          image_ref="${IMAGE}:${IMAGE_TAG}"
+          docker run --rm "$image_ref" \
+            dotnet /opt/vaql/VAQLearningNeural.dll --reconstruct \
+            | tee docker-metadata/va-qlearning-reconstruction.txt
+      - name: Export image metadata
+        run: |
+          mkdir -p docker-metadata
+          printf '%s\n' "${IMAGE}:${IMAGE_TAG}" > docker-metadata/image.txt
+      - name: Upload image metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: zenithui-image-metadata-${{ env.IMAGE_TAG }}
+          path: docker-metadata/
+# Attest the exact published image digest with OIDC and inventory each file
+  # in its merged container filesystem using SHA-256.
+  container-attestation:
+    name: OIDC signature and per-file SHA-256 attestation
+    needs: [majorana-zero-modes, qsharp-cache, neural-cache, docker-publish]
+    if: >-
+      always() &&
+      (needs.majorana-zero-modes.result == 'success' ||
+      needs.docker-publish.result == 'success')
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    runs-on: ubuntu-24.04
+    env:
+      IMAGE: ghcr.io/alexandrepedrosaai/zenithui
+      IMAGE_TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
+      DIGEST: ${{ needs.majorana-zero-modes.outputs.digest || needs.docker-publish.outputs.digest }}
+    steps:
+      - name: Login GHCR to read and attach attestations
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v4.1.0
+      - name: Verify digest output exists
+        run: |
+          set -euo pipefail
+          test -n "$DIGEST"
+          case "$DIGEST" in sha256:*) ;; *) echo "Unexpected image digest: $DIGEST" >&2; exit 1 ;; esac
+      - name: Pull exact image digest and export its container filesystem
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          image_ref="${IMAGE}@${DIGEST}"
+          docker pull "$image_ref"
+          container_id="$(docker create "$image_ref")"
+          trap 'docker rm -f "$container_id" >/dev/null 2>&1 || true' EXIT
+          docker export --output dist/container-rootfs.tar "$container_id"
+          docker tag "$image_ref" "${IMAGE}:${IMAGE_TAG}"
+          docker save --output dist/zenithui-image.tar "${IMAGE}:${IMAGE_TAG}"
+      - name: Generate SHA-256 for every regular file in the container filesystem
+        env:
+          IMAGE: ${{ env.IMAGE }}
+          DIGEST: ${{ env.DIGEST }}
+        run: |
+          set -euo pipefail
+          python3 - "$IMAGE" "$DIGEST" dist/container-rootfs.tar <<'PYTHON'
+          import hashlib
+          import json
+          import sys
+          import tarfile
+
+          image, digest, archive = sys.argv[1:]
+          entries = []
+          with tarfile.open(archive, "r:*") as tf:
+              members = sorted(tf.getmembers(), key=lambda item: item.name)
+              for member in members:
+                  if not member.isfile():
+                      continue
+                  stream = tf.extractfile(member)
+                  if stream is None:
+                      continue
+                  hasher = hashlib.sha256()
+                  while True:
+                      block = stream.read(1024 * 1024)
+                      if not block:
+                          break
+                      hasher.update(block)
+                  name = member.name
+                  while name.startswith("./"):
+                      name = name[2:]
+                  name = "/" + name.lstrip("/")
+                  entries.append({
+                      "path": name,
+                      "sha256": hasher.hexdigest(),
+                      "size_bytes": member.size,
+                  })
+
+          document = {
+              "image": f"{image}@{digest}",
+              "hash_algorithm": "SHA-256",
+              "file_count": len(entries),
+              "files": entries,
+          }
+          with open("dist/container-files.json", "w", encoding="utf-8") as output:
+              json.dump(document, output, indent=2, sort_keys=True)
+              output.write("\n")
+          with open("dist/container-files.sha256", "w", encoding="utf-8") as output:
+              for entry in entries:
+                  output.write(f"{entry['sha256']}  {entry['path']}\n")
+          PYTHON
+          rm dist/container-rootfs.tar
+          printf '%s\n' "${IMAGE}@${DIGEST}" > dist/image-digest.txt
+          (cd dist && sha256sum zenithui-image.tar container-files.json container-files.sha256 image-digest.txt > SHA256SUMS)
+          (cd dist && sha256sum --check SHA256SUMS)
+      - name: Sign image and publish per-file hash attestation with GitHub OIDC
+        run: |
+          set -euo pipefail
+          image_ref="${IMAGE}@${DIGEST}"
+          cosign sign --yes "$image_ref"
+          cosign attest --yes --type custom --predicate dist/container-files.json "$image_ref"
+          cosign sign-blob --yes --bundle dist/SHA256SUMS.sigstore.json dist/SHA256SUMS
+      - name: Upload image and signed file-hash manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: zenithui-supply-chain-${{ env.IMAGE_TAG }}
+          path: |
+            dist/zenithui-image.tar
+            dist/image-digest.txt
+            dist/container-files.json
+            dist/container-files.sha256
+            dist/SHA256SUMS
+            dist/SHA256SUMS.sigstore.json
+          if-no-files-found: error
+          retention-days: 30

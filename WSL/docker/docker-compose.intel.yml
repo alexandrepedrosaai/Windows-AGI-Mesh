@@ -1,0 +1,12 @@
+services:
+  intel-runtime:
+    build:
+      context: ..
+      dockerfile: docker/dockerfiles/Dockerfile.onnx
+    environment:
+      ACCELERATOR: intel-oneapi
+      EDGE_PROTOCOLS: WebGPU,WebNN,WebTransport,WebXR
+    networks: [agi-mesh]
+networks:
+  agi-mesh:
+    driver: bridge

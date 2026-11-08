@@ -1,0 +1,162 @@
+name: Surface Zenith and Transfer Learning Releases
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  deployments: write
+  actions: write
+
+jobs:
+  package-release-deploy:
+    name: ${{ matrix.release_name }}
+    runs-on: ubuntu-24.04
+    environment: ${{ matrix.environment }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: surface-zenith
+            source: Surface-Zenith
+            environment: ZenithUI
+            release_name: Surface Zenith
+            tag_prefix: surface-zenith
+          - id: transfer-learning
+            source: Transfer-Learning
+            environment: TransferLearning
+            release_name: Transfer Learning
+            tag_prefix: transfer-learning
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_DIR: ${{ matrix.source }}
+      RELEASE_TAG: ${{ matrix.tag_prefix }}-${{ github.sha }}
+      RELEASE_NAME: ${{ matrix.release_name }}
+      DEPLOYMENT_ENVIRONMENT: ${{ matrix.environment }}
+      ARTIFACT_ID: ${{ matrix.id }}
+    steps:
+      - name: Checkout complete repository tree
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Verify complete source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d "$SOURCE_DIR"
+          file_count=$(find "$SOURCE_DIR" -type f | wc -l)
+          test "$file_count" -gt 0
+          printf 'Packaging %s files from %s\n' "$file_count" "$SOURCE_DIR"
+
+      - name: Build recursive archive and SHA256 manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "release-assets/$ARTIFACT_ID"
+          archive="release-assets/$ARTIFACT_ID/${ARTIFACT_ID}-${GITHUB_SHA}.tar.gz"
+          manifest="release-assets/$ARTIFACT_ID/${ARTIFACT_ID}-${GITHUB_SHA}.sha256"
+          archive_sha="${archive}.sha256"
+
+          # -C keeps every file, subfile, and nested subfile under its source tree.
+          tar -czf "$archive" -C "$SOURCE_DIR" .
+          (
+            cd "$SOURCE_DIR"
+            find . -type f -print0 | sort -z | xargs -0 sha256sum
+          ) > "$manifest"
+          sha256sum "$archive" > "$archive_sha"
+
+          printf 'archive=%s\nmanifest=%s\narchive_sha=%s\n' \
+            "$archive" "$manifest" "$archive_sha" \
+            > "release-assets/$ARTIFACT_ID/asset-index.txt"
+
+      - name: Upload complete tree artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.id }}-${{ github.sha }}
+          path: release-assets/${{ matrix.id }}/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Create or update per-commit release
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="release-assets/$ARTIFACT_ID/${ARTIFACT_ID}-${GITHUB_SHA}.tar.gz"
+          manifest="release-assets/$ARTIFACT_ID/${ARTIFACT_ID}-${GITHUB_SHA}.sha256"
+          archive_sha="${archive}.sha256"
+          notes="release-assets/$ARTIFACT_ID/release-notes.md"
+
+          cat > "$notes" <<EOF
+          # $RELEASE_NAME
+
+          Automated release for commit $GITHUB_SHA.
+
+          Source tree: $SOURCE_DIR
+          Deployment environment: $DEPLOYMENT_ENVIRONMENT
+          Contents: every file and nested subfile under the source tree.
+          Integrity: SHA256 manifest and archive checksum are attached.
+          EOF
+
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$RELEASE_NAME - $GITHUB_SHA" \
+              --notes-file "$notes"
+            gh release upload "$RELEASE_TAG" \
+              "$archive" "$manifest" "$archive_sha" \
+              --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$RELEASE_TAG" \
+              "$archive" "$manifest" "$archive_sha" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "$RELEASE_NAME - $GITHUB_SHA" \
+              --notes-file "$notes"
+          fi
+
+          gh release view "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --json url --jq .url > "release-assets/$ARTIFACT_ID/release-url.txt"
+
+      - name: Create deployment record in ${{ matrix.environment }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_url=$(cat "release-assets/$ARTIFACT_ID/release-url.txt")
+          deployment_payload=$(jq -n \
+            --arg ref "$GITHUB_SHA" \
+            --arg environment "$DEPLOYMENT_ENVIRONMENT" \
+            --arg description "Deploy $RELEASE_NAME for $GITHUB_SHA" \
+            '{ref: $ref, environment: $environment, description: $description, auto_merge: false, required_contexts: []}')
+
+          deployment_id=$(gh api --method POST \
+            "repos/$GITHUB_REPOSITORY/deployments" \
+            --input - <<< "$deployment_payload" \
+            --jq '.id')
+
+          status_payload=$(jq -n \
+            --arg state success \
+            --arg target_url "$release_url" \
+            --arg environment_url "$release_url" \
+            --arg description "Release deployed to $DEPLOYMENT_ENVIRONMENT" \
+            '{state: $state, target_url: $target_url, environment_url: $environment_url, description: $description}')
+
+          gh api --method POST \
+            "repos/$GITHUB_REPOSITORY/deployments/$deployment_id/statuses" \
+            --input - <<< "$status_payload"
+
+          printf 'deployment_id=%s\nenvironment=%s\nrelease=%s\n' \
+            "$deployment_id" "$DEPLOYMENT_ENVIRONMENT" "$release_url" \
+            > "release-assets/$ARTIFACT_ID/deployment.txt"
+
+      - name: Upload release and deployment record
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.id }}-release-deployment-${{ github.sha }}
+          path: release-assets/${{ matrix.id }}/
+          if-no-files-found: error
+          retention-days: 30

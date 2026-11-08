@@ -1,0 +1,10 @@
+groups:
+  - name: wsl-zenith
+    rules:
+      - alert: BenchmarkExporterDown
+        expr: up{job="benchmark-exporter"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: WSL Zenith benchmark exporter is unavailable

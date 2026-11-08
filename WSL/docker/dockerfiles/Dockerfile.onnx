@@ -1,0 +1,7 @@
+FROM python:3.12-slim
+WORKDIR /app
+COPY collectors /app/collectors
+COPY benchmark /app/benchmark
+RUN pip install --no-cache-dir onnxruntime numpy psutil
+ENV INFERENCE_BACKEND=onnxruntime EDGE_DEVICE=cpu
+CMD ["python", "/app/benchmark/benchmark_onnx.py"]

@@ -2,7 +2,7 @@ namespace Mzm.VAQLearningNeural;
 
 public static class Program
 {
-    public static void Main()
+    public static void Main(string[] args)
     {
         var agent = new VariationalQuantumQLearner(stateCount: 4, actionCount: 2, seed: 7);
         for (var episode = 0; episode < 32; episode++)
@@ -15,6 +15,10 @@ public static class Program
         }
 
         Console.WriteLine($"VA Q-learning neural polymorphism score: {agent.Score():F4}");
+        if (args.Contains("--reconstruct", StringComparer.OrdinalIgnoreCase))
+        {
+            Console.WriteLine($"VA Q-learning neural polymorphic reconstruction: {agent.ReconstructionScore():F4} (parameters={agent.ParameterCount})");
+        }
     }
 }
 
@@ -74,4 +78,13 @@ public sealed class VariationalQuantumQLearner
         var value = Enumerable.Range(0, q.GetLength(0)).Sum(s => Math.Max(q[s, 0], q[s, 1]));
         return value + polymorphism;
     }
+
+    public int ParameterCount => q.Length + polymorphicStates.Sum(state => state switch
+    {
+        ComputationalState computational => computational.Amplitudes.Length,
+        VariationalState variational => variational.Parameters.Length,
+        _ => 0
+    });
+
+    public double ReconstructionScore() => Score() * ParameterCount;
 }

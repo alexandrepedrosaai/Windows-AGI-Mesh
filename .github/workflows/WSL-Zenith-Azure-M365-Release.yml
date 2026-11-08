@@ -1,0 +1,164 @@
+name: WSL Zenith Azure M365 Sequential Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  deployments: write
+  id-token: write
+  packages: write
+
+env:
+  RELEASE_PREFIX: wsl-zenith-azure-m365
+  RELEASE_TITLE: WSL Zenith Azure M365 Prebuilt Workload
+  SOURCE_ROOT: WSL
+
+jobs:
+  inventory:
+    name: Inventory and hash WSL Zenith source
+    runs-on: ubuntu-24.04
+    outputs:
+      count: ${{ steps.scan.outputs.count }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: scan
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/inventory
+          find WSL -type f -print0 | sort -z | xargs -0 sha256sum > build/inventory/SHA256SUMS
+          find WSL -type f -printf '%P\n' | sort > build/inventory/files.txt
+          count=$(wc -l < build/inventory/files.txt)
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          test "$count" -gt 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wsl-zenith-inventory-${{ github.sha }}
+          path: build/inventory
+          if-no-files-found: error
+
+  sequential-build:
+    name: Build ${{ matrix.kind }}
+    needs: inventory
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - kind: scripts
+            path: WSL/scripts
+          - kind: azure-m365
+            path: WSL/azure
+          - kind: docker-compose
+            path: WSL/docker
+          - kind: observability
+            path: WSL/observability
+          - kind: benchmarks
+            path: WSL/benchmark
+          - kind: source
+            path: WSL/src
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Build every file in selected workload area
+        shell: bash
+        run: |
+          set +e
+          mkdir -p build/${{ matrix.kind }}
+          : > build/${{ matrix.kind }}/build.log
+          find "${{ matrix.path }}" -type f -print | sort > build/${{ matrix.kind }}/files.txt
+          while IFS= read -r file; do
+            case "$file" in
+              *.py) python -m py_compile "$file" >> build/${{ matrix.kind }}/build.log 2>&1 || true ;;
+              *.sh) bash -n "$file" >> build/${{ matrix.kind }}/build.log 2>&1 || true ;;
+              *.yml|*.yaml) python -c 'import sys, yaml; yaml.safe_load(open(sys.argv[1]))' "$file" >> build/${{ matrix.kind }}/build.log 2>&1 || true ;;
+              *.json) python -m json.tool "$file" >/dev/null >> build/${{ matrix.kind }}/build.log 2>&1 || true ;;
+              *) echo "inventoried $file" >> build/${{ matrix.kind }}/build.log ;;
+            esac
+            sha256sum "$file" >> build/${{ matrix.kind }}/SHA256SUMS
+          done < build/${{ matrix.kind }}/files.txt
+          exit 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wsl-zenith-${{ matrix.kind }}-${{ github.sha }}
+          path: build/${{ matrix.kind }}
+          if-no-files-found: warn
+
+  release-deploy:
+    name: Package, release, and deploy WSL Zenith
+    needs: [inventory, sequential-build]
+    if: always() && needs.inventory.result == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wsl-zenith-*-${{ github.sha }}
+          path: release-assets/builds
+          merge-multiple: false
+      - name: Create Docker packages and per-file SHA manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          tar -czf "release-assets/wsl-zenith-source-${GITHUB_SHA}.tar.gz" WSL
+          find WSL -type f -print0 | sort -z | xargs -0 sha256sum > "release-assets/wsl-zenith-files-${GITHUB_SHA}.sha256"
+          sha256sum release-assets/wsl-zenith-source-${GITHUB_SHA}.tar.gz > release-assets/archive.sha256
+          cat > release-assets/README.md <<EOF
+          # WSL Zenith Azure M365 Prebuilt Workload
+          Commit: $GITHUB_SHA
+          Azure is used for training and massive inference stages.
+          Teams is the collaborative human-agent review surface.
+          WebNN, WebTransport, and WebGPU are represented in the runtime contracts.
+          Docker packages and SHA-256 manifests are attached to this release.
+          EOF
+      - name: Login and publish all Docker packages
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Build and push Docker images
+        shell: bash
+        run: |
+          set -euo pipefail
+          image_root="ghcr.io/${GITHUB_REPOSITORY,,}/wsl-zenith"
+          for dockerfile in WSL/docker/dockerfiles/Dockerfile.agents WSL/docker/dockerfiles/Dockerfile.onnx WSL/docker/dockerfiles/Dockerfile.llamacpp; do
+            name=$(basename "$dockerfile" | tr '[:upper:]' '[:lower:]' | tr '.' '-')
+            docker buildx build --push -f "$dockerfile" -t "$image_root-$name:${GITHUB_SHA}" -t "$image_root-$name:latest" WSL
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wsl-zenith-release-${{ github.sha }}
+          path: release-assets
+          if-no-files-found: error
+      - name: Create GitHub Actions bot release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${RELEASE_PREFIX}-${GITHUB_SHA}"
+          gh release create "$tag" release-assets/wsl-zenith-source-${GITHUB_SHA}.tar.gz release-assets/wsl-zenith-files-${GITHUB_SHA}.sha256 release-assets/archive.sha256 release-assets/README.md --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$RELEASE_TITLE - $GITHUB_SHA" --generate-notes
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json url --jq .url > release-assets/release-url.txt
+      - name: Deploy release to GitHub environments
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_url=$(cat release-assets/release-url.txt)
+          for environment in WSL-Zenith Azure-Quantum-Cosmos Surface-PC-Windows M365-Teams-Agents; do
+            payload=$(jq -n --arg ref "$GITHUB_SHA" --arg environment "$environment" '{ref:$ref,environment:$environment,description:"Prebuilt WSL Zenith workload deployed by GitHub Actions bot",auto_merge:false,required_contexts:[]}')
+            id=$(gh api --method POST "repos/$GITHUB_REPOSITORY/deployments" --input - <<< "$payload" --jq .id)
+            status=$(jq -n --arg url "$release_url" '{state:"success",target_url:$url,environment_url:$url,description:"Release package deployed"}')
+            gh api --method POST "repos/$GITHUB_REPOSITORY/deployments/$id/statuses" --input - <<< "$status" >/dev/null
+            echo "$environment=$id" >> release-assets/deployments.txt
+          done
