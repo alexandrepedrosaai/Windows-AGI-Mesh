@@ -12,8 +12,12 @@ on:
     inputs:
       release_tag:
         description: Existing GitHub Release tag, for example v1.0.0
-        required: true
+        required: false
         default: v1.632.0
+        type: string
+      source_ref:
+        description: Optional branch, tag, or commit SHA to test instead of the release tag
+        required: false
         type: string
 
 permissions: {}
@@ -28,7 +32,7 @@ env:
   CHECKSUM_FILE: windows-agi-mesh-docker-image.tar.sha256
   SBOM_FILE: windows-agi-mesh.spdx.json
   SECURITY_REPORT: windows-agi-mesh-trivy-report.json
-  SOURCE_REF: ${{ github.event_name == 'release' && github.event.release.tag_name || github.event_name == 'workflow_dispatch' && inputs.release_tag || github.sha }}
+  SOURCE_REF: ${{ github.event_name == 'release' && github.event.release.tag_name || github.event_name == 'workflow_dispatch' && (inputs.source_ref || inputs.release_tag) || github.sha }}
   RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || github.event_name == 'workflow_dispatch' && inputs.release_tag || format('commit-{0}', github.sha) }}
 
 jobs:
@@ -49,6 +53,15 @@ jobs:
 
           if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
             echo "Using push commit ref: ${SOURCE_REF}"
+          elif [ -n "${{ inputs.source_ref }}" ]; then
+            echo "Using explicitly requested source ref: ${SOURCE_REF}"
+            if ! gh api \
+              --header 'Accept: application/vnd.github+json' \
+              "repos/${GITHUB_REPOSITORY}/commits/${SOURCE_REF}" \
+              --jq '.sha' >/dev/null; then
+              echo "::error::The source ref '${SOURCE_REF}' does not resolve to a commit."
+              exit 1
+            fi
           else
             if [[ ! "${RELEASE_TAG}" =~ ^[A-Za-z0-9._-]+$ ]]; then
               echo "::error::The release tag contains unsupported characters: ${RELEASE_TAG}"
