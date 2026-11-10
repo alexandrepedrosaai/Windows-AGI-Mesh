@@ -10,19 +10,21 @@ Windows-AGI-Mesh is a technical framework to evaluate and integrate AGI architec
 - `examples/` contains an illustrative local-first Windows PC deployment.
 
 ---- 
+# GitHub 3D Semantic Interoperability Mesh (Dark)
+<img width="1162" height="2268" alt="image" src="https://github.com/user-attachments/assets/54c0668f-7be9-4066-944f-145a6c07a3d6" />
+
 A API not all (bot 500B) all rights remains in Alexandre Pedrosa Author and Engineer, I dond conceive license because 500B dollars except if 35% Dola Microsoft (my part.... you dont ned to know, if it merge)
 Adicione evidências reproduzíveis ao white paperConverta o pitch em 10 slidesCrie um plano de validação independente
 Se o objetivo é um documento para investidores, conselho estratégico ou M&A, eu mudaria radicalmente o posicionamento.
 
-Eu removeria completamente:
+# GitHub 3D Infrastructure Stack (Light)
+<img width="771" height="2268" alt="image" src="https://github.com/user-attachments/assets/fd55aaf4-54e9-43a0-8331-c9e2ae6f48bb" />
 
 Research
 Lab
 Prototype
 Experiment
 
-
-e substituiria por:
 
 Deployed Capability
 Validated Workflow
@@ -96,6 +98,9 @@ Tasks
 State
 
 Objectives
+
+# Isometric "3D" Vision Diagram
+<img width="1772" height="2268" alt="image" src="https://github.com/user-attachments/assets/990b1521-baa2-4421-b456-410a0b236bd5" />
 
 
 can survive transfer through a conversational artifact.
