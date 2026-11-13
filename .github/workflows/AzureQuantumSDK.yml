@@ -1,0 +1,199 @@
+name: AzureQuantumSDK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Azure/**'
+      - '.github/workflows/AzureQuantumSDK.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: azure-quantumsdk-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  SDK_DIR: Azure/AzureQuantum/AzureQuantumSDK
+  ARTIFACT_ROOT: artifacts/azure-quantumsdk
+  PACKAGE_SCOPE: '@alexandrepedrosaai/azurequantumsdk'
+
+jobs:
+  build-matrix:
+    name: Build Azure tree (${{ matrix.component }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        component:
+          - python
+          - qsharp
+          - powershell
+          - data
+          - npm
+    steps:
+      - name: Check out Azure source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate all Azure files
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=$(find Azure -type f -not -path '*/.git/*' | wc -l)
+          test "$count" -gt 0
+          echo "Azure files discovered: $count"
+          find Azure -type f -not -path '*/.git/*' -print0 | sort -z | xargs -0 -r sha256sum > /tmp/azure-files.sha256
+          test -s /tmp/azure-files.sha256
+
+      - name: Build Python sources
+        if: matrix.component == 'python'
+        shell: bash
+        run: python -m compileall -q Azure
+
+      - name: Validate Q# sources
+        if: matrix.component == 'qsharp'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' files < <(find Azure -type f -name '*.qs' -print0)
+          test "${#files[@]}" -gt 0
+          for file in "${files[@]}"; do
+            test -s "$file"
+            grep -Eq '\b(namespace|operation|function|newtype)\b' "$file"
+          done
+          echo "Validated ${#files[@]} Q# files"
+
+      - name: Validate PowerShell sources
+        if: matrix.component == 'powershell'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if command -v pwsh >/dev/null 2>&1; then
+            while IFS= read -r -d '' file; do
+              pwsh -NoLogo -NoProfile -NonInteractive -Command "[System.Management.Automation.Language.Parser]::ParseFile('$PWD/$file',[ref]\$null,[ref]\$null) | Out-Null"
+            done < <(find Azure -type f \( -name '*.ps1' -o -name '*.psm1' -o -name '*.psd1' \) -print0)
+          else
+            echo 'PowerShell is not installed; source files will remain in the complete archive.'
+          fi
+
+      - name: Validate JSON and package metadata
+        if: matrix.component == 'data'
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do jq empty "$file"; done < <(find Azure -type f -name '*.json' -print0)
+          node --check "$SDK_DIR/npm/index.js"
+          node --check "$SDK_DIR/npm/self-check.js"
+
+      - name: Build and install AzureQuantumSDK from its own package
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
+          npm pkg set --prefix "$SDK_DIR" version="$version"
+          mkdir -p "$RUNNER_TEMP/azure-package" "$RUNNER_TEMP/azure-self-install"
+          package_file=$(npm pack "$SDK_DIR" --pack-destination "$RUNNER_TEMP/azure-package" | tail -n 1)
+          test -f "$RUNNER_TEMP/azure-package/$package_file"
+          npm install --ignore-scripts --no-save --prefix "$RUNNER_TEMP/azure-self-install" "$RUNNER_TEMP/azure-package/$package_file"
+          node - <<'NODE'
+          const sdk = require(process.env.RUNNER_TEMP + '/azure-self-install/node_modules/@alexandrepedrosaai/azurequantumsdk');
+          const client = sdk.createClient();
+          if (!client.manifest().length || !/^[a-f0-9]{64}$/.test(client.digest())) process.exit(1);
+          console.log(JSON.stringify({files: client.manifest().length, digest: client.digest()}));
+          NODE
+          cp "$RUNNER_TEMP/azure-package/$package_file" "$RUNNER_TEMP/azure-package/azurequantumsdk-${{ matrix.component }}.tgz"
+
+      - name: Create complete Azure archive and digests
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$ARTIFACT_ROOT/${{ matrix.component }}"
+          mkdir -p "$out"
+          tar --sort=name --owner=0 --group=0 --numeric-owner -czf "$out/azure-${{ matrix.component }}.tar.gz" Azure
+          sha256sum "$out/azure-${{ matrix.component }}.tar.gz" > "$out/azure-${{ matrix.component }}.tar.gz.sha256"
+          cp /tmp/azure-files.sha256 "$out/azure-files.sha256"
+          cp "$RUNNER_TEMP/azure-package/azurequantumsdk-${{ matrix.component }}.tgz" "$out/"
+          sha256sum "$out"/* > "$out/digest-${{ matrix.component }}.sha256"
+          find "$out" -type f -printf '%P\n' | sort
+
+      - name: Upload matrix artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-quantumsdk-${{ matrix.component }}
+          path: artifacts/azure-quantumsdk/${{ matrix.component }}
+          if-no-files-found: error
+          compression-level: 6
+
+  publish-and-release:
+    name: Publish package and AzureQuantumSDK release
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    environment: AzureQuantumSDK
+    steps:
+      - name: Download all matrix artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: azure-quantumsdk-*
+          path: release-assets
+          merge-multiple: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: '@alexandrepedrosaai'
+
+      - name: Publish AzureQuantumSDK to GitHub Packages npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_file=$(find release-assets -type f -name 'azurequantumsdk-npm.tgz' -print -quit)
+          test -n "$package_file"
+          npm publish "$package_file" --registry=https://npm.pkg.github.com
+
+      - name: Create draft release tag
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="azure-quantumsdk-${GITHUB_SHA:0:12}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          gh release create "$tag" --draft --title "AzureQuantumSDK ${GITHUB_SHA:0:12}" \
+            --notes "Automated AzureQuantumSDK build for commit ${GITHUB_SHA}. Matrix artifacts were produced and hashed by GitHub Actions Bot."
+
+      - name: Upload all matrix artifacts and digests
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            gh release upload "${{ steps.release.outputs.tag }}" "$file" --clobber
+          done < <(find release-assets -type f -print0 | sort -z)
+
+      - name: Publish official release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ steps.release.outputs.tag }}" --draft=false

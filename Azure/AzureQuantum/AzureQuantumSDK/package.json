@@ -1,0 +1,34 @@
+{
+  "name": "@alexandrepedrosaai/azurequantumsdk",
+  "version": "0.1.0",
+  "description": "Azure Quantum SDK assets and deterministic manifest tooling for Windows-AGI-Mesh.",
+  "type": "commonjs",
+  "main": "npm/index.js",
+  "exports": {
+    ".": "./npm/index.js"
+  },
+  "files": [
+    "config/",
+    "docs/",
+    "models/",
+    "src/",
+    "AzureQuantumSDK.qs",
+    "npm/",
+    "README.md"
+  ],
+  "scripts": {
+    "self-check": "node npm/self-check.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexandrepedrosaai/Windows-AGI-Mesh.git",
+    "directory": "Azure/AzureQuantum/AzureQuantumSDK"
+  },
+  "license": "MIT"
+}
