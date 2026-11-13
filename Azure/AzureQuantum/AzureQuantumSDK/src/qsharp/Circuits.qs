@@ -457,7 +457,7 @@ namespace WindowsAGI.QuantumSDK.Circuits {
     ) : Unit is Adj + Ctl {
         let n = Length(qubits);
         let d = Length(data);
-        for layer in 0..layers - 1 {
+        if d == 0 { fail "DataReuploadingCircuit: data must not be empty."; }
             for i in 0..n - 1 {
                 let dataIdx = (layer * n + i) % d;
                 let wIdx    = layer * n + i;
