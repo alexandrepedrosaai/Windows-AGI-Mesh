@@ -1,0 +1,508 @@
+name: AzureQuantumSDK Per-File Matrix Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Azure/AzureQuantum/AzureQuantumSDK/src/**'
+      - '.github/workflows/AzureQuantumSDK-Per-File.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  SDK_ROOT: Azure/AzureQuantum/AzureQuantumSDK
+  PACKAGE_NAME: '@alexandrepedrosaai/azurequantumsdk'
+  NPM_REGISTRY: https://npm.pkg.github.com
+  ARTIFACT_ROOT: artifacts/azurequantumsdk-per-file
+
+jobs:
+  discover:
+    name: Discover AzureQuantumSDK source files
+    runs-on: ubuntu-latest
+    outputs:
+      shard0: ${{ steps.shards.outputs.shard0 }}
+      shard1: ${{ steps.shards.outputs.shard1 }}
+      shard2: ${{ steps.shards.outputs.shard2 }}
+      shard3: ${{ steps.shards.outputs.shard3 }}
+      total: ${{ steps.shards.outputs.total }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          files = sorted(p.as_posix() for p in Path('Azure/AzureQuantum/AzureQuantumSDK/src').rglob('*') if p.is_file())
+          shards = [files[i:i+256] for i in range(0, len(files), 256)]
+          while len(shards) < 4: shards.append([])
+          if len(shards) > 4: raise SystemExit(f'{len(files)} files require more than four 256-job shards')
+          for i, shard in enumerate(shards): print(f'shard{i}={json.dumps(shard, separators=(",", ":"))}')
+          print(f'total={len(files)}')
+          PY
+
+  shard0:
+    name: Build and upload source file (${{ matrix.file }})
+    needs: discover
+    if: ${{ needs.discover.outputs.total != '0' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 256
+      matrix:
+        file: ${{ fromJSON(needs.discover.outputs.shard0) }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js and GitHub Packages auth
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: '@alexandrepedrosaai'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download latest AzureQuantumSDK npm package before build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/latest-sdk" "$RUNNER_TEMP/sdk-install"
+          npm pack "$PACKAGE_NAME@latest" --registry="$NPM_REGISTRY" --pack-destination "$RUNNER_TEMP/latest-sdk"
+          package_file=$(find "$RUNNER_TEMP/latest-sdk" -type f -name '*.tgz' -print -quit)
+          test -n "$package_file"
+          npm install --ignore-scripts --no-save --prefix "$RUNNER_TEMP/sdk-install" "$package_file"
+          SDK_PACKAGE_ROOT="$RUNNER_TEMP/sdk-install/node_modules/@alexandrepedrosaai/azurequantumsdk"
+          test -d "$SDK_PACKAGE_ROOT"
+          node - <<'NODE'
+          const sdk = require(process.env.RUNNER_TEMP + '/sdk-install/node_modules/@alexandrepedrosaai/azurequantumsdk');
+          const c = sdk.createClient();
+          if (!c.manifest().length || !/^[a-f0-9]{64}$/.test(c.digest())) process.exit(1);
+          console.log(JSON.stringify({latestPackageFiles: c.manifest().length, latestPackageDigest: c.digest()}));
+          NODE
+
+      - name: Build and validate selected source file
+        shell: bash
+        env:
+          SOURCE_FILE: ${{ matrix.file }}
+        run: |
+          set -euo pipefail
+          test -s "$SOURCE_FILE"
+          case "$SOURCE_FILE" in
+            *.py) python3 -m py_compile "$SOURCE_FILE"; rm -rf "$(dirname "$SOURCE_FILE")/__pycache__" ;;
+            *.json) jq empty "$SOURCE_FILE" ;;
+            *.js|*.mjs|*.cjs) node --check "$SOURCE_FILE" ;;
+            *.qs) grep -Eq '\b(namespace|operation|function|newtype)\b' "$SOURCE_FILE" ;;
+            *) test -s "$SOURCE_FILE" ;;
+          esac
+
+      - name: Package selected file and write SHA-256 digest
+        shell: bash
+        env:
+          SOURCE_FILE: ${{ matrix.file }}
+        run: |
+          set -euo pipefail
+          safe=$(printf '%s' "$SOURCE_FILE" | tr '/ ' '__')
+          out="$ARTIFACT_ROOT/$safe"
+          mkdir -p "$out/file/$(dirname "$SOURCE_FILE")"
+          cp "$SOURCE_FILE" "$out/file/$SOURCE_FILE"
+          (cd "$out/file" && tar --sort=name --owner=0 --group=0 --numeric-owner -czf "../$safe.tar.gz" "$SOURCE_FILE")
+          sha256sum "$out/file/$SOURCE_FILE" > "$out/$safe.sha256"
+          sha256sum "$out/$safe.tar.gz" >> "$out/$safe.sha256"
+          printf '%s\n' "$SOURCE_FILE" > "$out/$safe.path"
+
+      - name: Upload selected file and digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-src-shard0-${{ strategy.job-index }}
+          path: artifacts/azurequantumsdk-per-file
+          if-no-files-found: error
+          compression-level: 6
+  shard1:
+    name: Build and upload source file (${{ matrix.file }})
+    needs: discover
+    if: ${{ needs.discover.outputs.total != '0' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 256
+      matrix:
+        file: ${{ fromJSON(needs.discover.outputs.shard1) }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js and GitHub Packages auth
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: '@alexandrepedrosaai'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download latest AzureQuantumSDK npm package before build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/latest-sdk" "$RUNNER_TEMP/sdk-install"
+          npm pack "$PACKAGE_NAME@latest" --registry="$NPM_REGISTRY" --pack-destination "$RUNNER_TEMP/latest-sdk"
+          package_file=$(find "$RUNNER_TEMP/latest-sdk" -type f -name '*.tgz' -print -quit)
+          test -n "$package_file"
+          npm install --ignore-scripts --no-save --prefix "$RUNNER_TEMP/sdk-install" "$package_file"
+          SDK_PACKAGE_ROOT="$RUNNER_TEMP/sdk-install/node_modules/@alexandrepedrosaai/azurequantumsdk"
+          test -d "$SDK_PACKAGE_ROOT"
+          node - <<'NODE'
+          const sdk = require(process.env.RUNNER_TEMP + '/sdk-install/node_modules/@alexandrepedrosaai/azurequantumsdk');
+          const c = sdk.createClient();
+          if (!c.manifest().length || !/^[a-f0-9]{64}$/.test(c.digest())) process.exit(1);
+          console.log(JSON.stringify({latestPackageFiles: c.manifest().length, latestPackageDigest: c.digest()}));
+          NODE
+
+      - name: Build and validate selected source file
+        shell: bash
+        env:
+          SOURCE_FILE: ${{ matrix.file }}
+        run: |
+          set -euo pipefail
+          test -s "$SOURCE_FILE"
+          case "$SOURCE_FILE" in
+            *.py) python3 -m py_compile "$SOURCE_FILE"; rm -rf "$(dirname "$SOURCE_FILE")/__pycache__" ;;
+            *.json) jq empty "$SOURCE_FILE" ;;
+            *.js|*.mjs|*.cjs) node --check "$SOURCE_FILE" ;;
+            *.qs) grep -Eq '\b(namespace|operation|function|newtype)\b' "$SOURCE_FILE" ;;
+            *) test -s "$SOURCE_FILE" ;;
+          esac
+
+      - name: Package selected file and write SHA-256 digest
+        shell: bash
+        env:
+          SOURCE_FILE: ${{ matrix.file }}
+        run: |
+          set -euo pipefail
+          safe=$(printf '%s' "$SOURCE_FILE" | tr '/ ' '__')
+          out="$ARTIFACT_ROOT/$safe"
+          mkdir -p "$out/file/$(dirname "$SOURCE_FILE")"
+          cp "$SOURCE_FILE" "$out/file/$SOURCE_FILE"
+          (cd "$out/file" && tar --sort=name --owner=0 --group=0 --numeric-owner -czf "../$safe.tar.gz" "$SOURCE_FILE")
+          sha256sum "$out/file/$SOURCE_FILE" > "$out/$safe.sha256"
+          sha256sum "$out/$safe.tar.gz" >> "$out/$safe.sha256"
+          printf '%s\n' "$SOURCE_FILE" > "$out/$safe.path"
+
+      - name: Upload selected file and digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-src-shard1-${{ strategy.job-index }}
+          path: artifacts/azurequantumsdk-per-file
+          if-no-files-found: error
+          compression-level: 6
+  shard2:
+    name: Build and upload source file (${{ matrix.file }})
+    needs: discover
+    if: ${{ needs.discover.outputs.total != '0' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 256
+      matrix:
+        file: ${{ fromJSON(needs.discover.outputs.shard2) }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js and GitHub Packages auth
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: '@alexandrepedrosaai'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download latest AzureQuantumSDK npm package before build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/latest-sdk" "$RUNNER_TEMP/sdk-install"
+          npm pack "$PACKAGE_NAME@latest" --registry="$NPM_REGISTRY" --pack-destination "$RUNNER_TEMP/latest-sdk"
+          package_file=$(find "$RUNNER_TEMP/latest-sdk" -type f -name '*.tgz' -print -quit)
+          test -n "$package_file"
+          npm install --ignore-scripts --no-save --prefix "$RUNNER_TEMP/sdk-install" "$package_file"
+          SDK_PACKAGE_ROOT="$RUNNER_TEMP/sdk-install/node_modules/@alexandrepedrosaai/azurequantumsdk"
+          test -d "$SDK_PACKAGE_ROOT"
+          node - <<'NODE'
+          const sdk = require(process.env.RUNNER_TEMP + '/sdk-install/node_modules/@alexandrepedrosaai/azurequantumsdk');
+          const c = sdk.createClient();
+          if (!c.manifest().length || !/^[a-f0-9]{64}$/.test(c.digest())) process.exit(1);
+          console.log(JSON.stringify({latestPackageFiles: c.manifest().length, latestPackageDigest: c.digest()}));
+          NODE
+
+      - name: Build and validate selected source file
+        shell: bash
+        env:
+          SOURCE_FILE: ${{ matrix.file }}
+        run: |
+          set -euo pipefail
+          test -s "$SOURCE_FILE"
+          case "$SOURCE_FILE" in
+            *.py) python3 -m py_compile "$SOURCE_FILE"; rm -rf "$(dirname "$SOURCE_FILE")/__pycache__" ;;
+            *.json) jq empty "$SOURCE_FILE" ;;
+            *.js|*.mjs|*.cjs) node --check "$SOURCE_FILE" ;;
+            *.qs) grep -Eq '\b(namespace|operation|function|newtype)\b' "$SOURCE_FILE" ;;
+            *) test -s "$SOURCE_FILE" ;;
+          esac
+
+      - name: Package selected file and write SHA-256 digest
+        shell: bash
+        env:
+          SOURCE_FILE: ${{ matrix.file }}
+        run: |
+          set -euo pipefail
+          safe=$(printf '%s' "$SOURCE_FILE" | tr '/ ' '__')
+          out="$ARTIFACT_ROOT/$safe"
+          mkdir -p "$out/file/$(dirname "$SOURCE_FILE")"
+          cp "$SOURCE_FILE" "$out/file/$SOURCE_FILE"
+          (cd "$out/file" && tar --sort=name --owner=0 --group=0 --numeric-owner -czf "../$safe.tar.gz" "$SOURCE_FILE")
+          sha256sum "$out/file/$SOURCE_FILE" > "$out/$safe.sha256"
+          sha256sum "$out/$safe.tar.gz" >> "$out/$safe.sha256"
+          printf '%s\n' "$SOURCE_FILE" > "$out/$safe.path"
+
+      - name: Upload selected file and digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-src-shard2-${{ strategy.job-index }}
+          path: artifacts/azurequantumsdk-per-file
+          if-no-files-found: error
+          compression-level: 6
+  shard3:
+    name: Build and upload source file (${{ matrix.file }})
+    needs: discover
+    if: ${{ needs.discover.outputs.total != '0' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 256
+      matrix:
+        file: ${{ fromJSON(needs.discover.outputs.shard3) }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js and GitHub Packages auth
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: '@alexandrepedrosaai'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download latest AzureQuantumSDK npm package before build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/latest-sdk" "$RUNNER_TEMP/sdk-install"
+          npm pack "$PACKAGE_NAME@latest" --registry="$NPM_REGISTRY" --pack-destination "$RUNNER_TEMP/latest-sdk"
+          package_file=$(find "$RUNNER_TEMP/latest-sdk" -type f -name '*.tgz' -print -quit)
+          test -n "$package_file"
+          npm install --ignore-scripts --no-save --prefix "$RUNNER_TEMP/sdk-install" "$package_file"
+          SDK_PACKAGE_ROOT="$RUNNER_TEMP/sdk-install/node_modules/@alexandrepedrosaai/azurequantumsdk"
+          test -d "$SDK_PACKAGE_ROOT"
+          node - <<'NODE'
+          const sdk = require(process.env.RUNNER_TEMP + '/sdk-install/node_modules/@alexandrepedrosaai/azurequantumsdk');
+          const c = sdk.createClient();
+          if (!c.manifest().length || !/^[a-f0-9]{64}$/.test(c.digest())) process.exit(1);
+          console.log(JSON.stringify({latestPackageFiles: c.manifest().length, latestPackageDigest: c.digest()}));
+          NODE
+
+      - name: Build and validate selected source file
+        shell: bash
+        env:
+          SOURCE_FILE: ${{ matrix.file }}
+        run: |
+          set -euo pipefail
+          test -s "$SOURCE_FILE"
+          case "$SOURCE_FILE" in
+            *.py) python3 -m py_compile "$SOURCE_FILE"; rm -rf "$(dirname "$SOURCE_FILE")/__pycache__" ;;
+            *.json) jq empty "$SOURCE_FILE" ;;
+            *.js|*.mjs|*.cjs) node --check "$SOURCE_FILE" ;;
+            *.qs) grep -Eq '\b(namespace|operation|function|newtype)\b' "$SOURCE_FILE" ;;
+            *) test -s "$SOURCE_FILE" ;;
+          esac
+
+      - name: Package selected file and write SHA-256 digest
+        shell: bash
+        env:
+          SOURCE_FILE: ${{ matrix.file }}
+        run: |
+          set -euo pipefail
+          safe=$(printf '%s' "$SOURCE_FILE" | tr '/ ' '__')
+          out="$ARTIFACT_ROOT/$safe"
+          mkdir -p "$out/file/$(dirname "$SOURCE_FILE")"
+          cp "$SOURCE_FILE" "$out/file/$SOURCE_FILE"
+          (cd "$out/file" && tar --sort=name --owner=0 --group=0 --numeric-owner -czf "../$safe.tar.gz" "$SOURCE_FILE")
+          sha256sum "$out/file/$SOURCE_FILE" > "$out/$safe.sha256"
+          sha256sum "$out/$safe.tar.gz" >> "$out/$safe.sha256"
+          printf '%s\n' "$SOURCE_FILE" > "$out/$safe.path"
+
+      - name: Upload selected file and digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-src-shard3-${{ strategy.job-index }}
+          path: artifacts/azurequantumsdk-per-file
+          if-no-files-found: error
+          compression-level: 6
+
+  package-and-release:
+    name: Pack NuGet and publish MajoranaSDK PhotonicSDK BrainwaveSDK
+    needs: [discover, shard0, shard1, shard2, shard3]
+    if: ${{ always() && needs.discover.result == 'success' && needs.shard0.result == 'success' && needs.shard1.result == 'success' && needs.shard2.result == 'success' && needs.shard3.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download every per-file artifact and digest
+        uses: actions/download-artifact@v4
+        with:
+          pattern: azure-src-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: '@alexandrepedrosaai'
+
+      - name: Create complete source archive and aggregate digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets/complete
+          tar --sort=name --owner=0 --group=0 --numeric-owner -czf release-assets/complete/azurequantumsdk-src.tar.gz Azure/AzureQuantum/AzureQuantumSDK/src
+          sha256sum release-assets/complete/azurequantumsdk-src.tar.gz > release-assets/complete/azurequantumsdk-src.tar.gz.sha256
+          find release-assets -type f -print0 | sort -z | xargs -0 -r sha256sum > release-assets/complete/all-artifacts.sha256
+          test -s release-assets/complete/all-artifacts.sha256
+
+      - name: Create and pack three NuGet packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="0.1.0-ci.${GITHUB_RUN_ID}"
+          mkdir -p release-assets/nuget
+          for package in MajoranaSDK PhotonicSDK BrainwaveSDK; do
+            work="$RUNNER_TEMP/$package"
+            mkdir -p "$work"
+            cat > "$work/$package.csproj" <<EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <TargetFramework>netstandard2.0</TargetFramework>
+              <PackageId>$package</PackageId>
+              <Version>$version</Version>
+              <PackageDescription>AzureQuantumSDK source and digests for $package.</PackageDescription>
+              <PackageTags>azure quantum windows agi mesh</PackageTags>
+              <PackageLicenseExpression>MIT</PackageLicenseExpression>
+              <IncludeBuildOutput>false</IncludeBuildOutput>
+              <NoBuild>true</NoBuild>
+              <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+            </PropertyGroup>
+            <ItemGroup>
+              <None Include="$GITHUB_WORKSPACE/Azure/AzureQuantum/AzureQuantumSDK/src/**" Pack="true" PackagePath="contentFiles/any/any/AzureQuantumSDK/src" />
+              <None Include="$GITHUB_WORKSPACE/release-assets/complete/**" Pack="true" PackagePath="contentFiles/any/any/digests" />
+            </ItemGroup>
+          </Project>
+          EOF
+            dotnet pack "$work/$package.csproj" -c Release -o release-assets/nuget
+          done
+          sha256sum release-assets/nuget/*.nupkg > release-assets/nuget/packages.sha256
+
+      - name: Publish NuGet packages
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          source="https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
+          for package in release-assets/nuget/*.nupkg; do
+            dotnet nuget push "$package" --source "$source" --api-key "$NUGET_AUTH_TOKEN" --skip-duplicate
+          done
+
+      - name: Create and push three Docker containers
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          context="$RUNNER_TEMP/azure-docker-context"
+          mkdir -p "$context/src"
+          cp -R Azure/AzureQuantum/AzureQuantumSDK/src/. "$context/src/"
+          cat > "$context/Dockerfile" <<'EOF'
+          FROM python:3.12-slim
+          WORKDIR /opt/azurequantumsdk
+          COPY src ./src
+          CMD ["python", "-c", "print('AzureQuantumSDK workload container ready')"]
+          EOF
+          for image in majoranasdk photonicsdk brainwavesdk; do
+            docker build -f "$context/Dockerfile" -t "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$image:latest" -t "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$image:${GITHUB_SHA:0:12}" "$context"
+            docker push "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$image:latest"
+            docker push "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$image:${GITHUB_SHA:0:12}"
+            docker save "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$image:${GITHUB_SHA:0:12}" | gzip > "release-assets/${image}.tar.gz"
+            sha256sum "release-assets/${image}.tar.gz" > "release-assets/${image}.tar.gz.sha256"
+          done
+
+      - name: Create draft release
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="azurequantumsdk-per-file-${GITHUB_SHA:0:12}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          gh release create "$tag" --draft --title "AzureQuantumSDK Per-File Matrix ${GITHUB_SHA:0:12}" --notes "Per-file AzureQuantumSDK matrix build. NuGet packages: MajoranaSDK, PhotonicSDK, BrainwaveSDK. Docker images and SHA-256 digests were generated by GitHub Actions Bot."
+
+      - name: Upload all files, packages, containers and digests
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          find release-assets -type f -print0 | sort -z | while IFS= read -r -d '' file; do
+            gh release upload "${{ steps.release.outputs.tag }}" "$file" --clobber
+          done
+
+      - name: Publish official release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ steps.release.outputs.tag }}" --draft=false
