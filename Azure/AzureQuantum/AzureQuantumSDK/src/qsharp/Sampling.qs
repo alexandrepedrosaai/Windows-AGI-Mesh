@@ -93,6 +93,9 @@ namespace WindowsAGI.QuantumSDK.Sampling {
         shotCount    : Int
     ) : SamplingStats {
         ValidateExperiment(qubitCount, shotCount);
+        ValidateAncillaCount(ancillaCount);
+        ValidateAngle(thetaZ, "thetaZ");
+        ValidateAngle(thetaY, "thetaY");
 
         mutable samples = [];
         for _ in 1..shotCount {
