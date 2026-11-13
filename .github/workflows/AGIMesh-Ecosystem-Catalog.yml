@@ -108,8 +108,9 @@ jobs:
           case "$ecosystem" in
             NuGet)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
-          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup></Project>
+          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup><ItemGroup><None Include="$work/README.md" Pack="true" PackagePath="contentFiles/any/any" /></ItemGroup></Project>
           EOF
               dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
             npm)
@@ -126,7 +127,7 @@ jobs:
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
-          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.files=Dir['lib/**/*.rb']; end
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
               (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
             Containers)
@@ -209,8 +210,9 @@ jobs:
           case "$ecosystem" in
             NuGet)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
-          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup></Project>
+          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup><ItemGroup><None Include="$work/README.md" Pack="true" PackagePath="contentFiles/any/any" /></ItemGroup></Project>
           EOF
               dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
             npm)
@@ -227,7 +229,7 @@ jobs:
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
-          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.files=Dir['lib/**/*.rb']; end
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
               (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
             Containers)
@@ -310,8 +312,9 @@ jobs:
           case "$ecosystem" in
             NuGet)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
-          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup></Project>
+          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup><ItemGroup><None Include="$work/README.md" Pack="true" PackagePath="contentFiles/any/any" /></ItemGroup></Project>
           EOF
               dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
             npm)
@@ -328,7 +331,7 @@ jobs:
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
-          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.files=Dir['lib/**/*.rb']; end
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
               (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
             Containers)
@@ -411,8 +414,9 @@ jobs:
           case "$ecosystem" in
             NuGet)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
-          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup></Project>
+          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup><ItemGroup><None Include="$work/README.md" Pack="true" PackagePath="contentFiles/any/any" /></ItemGroup></Project>
           EOF
               dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
             npm)
@@ -429,7 +433,7 @@ jobs:
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
-          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.files=Dir['lib/**/*.rb']; end
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
               (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
             Containers)
@@ -512,8 +516,9 @@ jobs:
           case "$ecosystem" in
             NuGet)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
-          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup></Project>
+          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup><ItemGroup><None Include="$work/README.md" Pack="true" PackagePath="contentFiles/any/any" /></ItemGroup></Project>
           EOF
               dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
             npm)
@@ -530,7 +535,7 @@ jobs:
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
-          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.files=Dir['lib/**/*.rb']; end
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
               (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
             Containers)
