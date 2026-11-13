@@ -45,7 +45,7 @@ namespace WindowsAGI.QuantumSDK.Types {
         LeftMZMIndex    : Int,
         RightMZMIndex   : Int,
         PairParity      : Int,
-        BraideHistory   : Int[],
+        BraidHistory    : Int[],
         ProtectionGap   : Double,
         IsStabilized    : Bool
     );
