@@ -37,8 +37,6 @@ namespace WindowsAGI.QuantumSDK.Circuits {
             }
         }
 
-        let coupledCount = inputCount < ancillaCount ? inputCount | ancillaCount;
-        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
