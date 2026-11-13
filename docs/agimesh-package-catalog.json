@@ -1,0 +1,1316 @@
+{
+  "version": 1,
+  "source": "pasted_content.txt",
+  "packages": [
+    {
+      "name": "AGIMesh.Core",
+      "category": "Core",
+      "ecosystem": "NuGet",
+      "id": "pkg-000",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-core",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "AGIMesh.Configuration",
+      "category": "Core",
+      "ecosystem": "NuGet",
+      "id": "pkg-001",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-configuration",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "AGIMesh.Diagnostics",
+      "category": "Core",
+      "ecosystem": "NuGet",
+      "id": "pkg-002",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-diagnostics",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "AGIMesh.Telemetry",
+      "category": "Core",
+      "ecosystem": "NuGet",
+      "id": "pkg-003",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-telemetry",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "AGIMesh.Security",
+      "category": "Core",
+      "ecosystem": "NuGet",
+      "id": "pkg-004",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-security",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "AGIMesh.Cryptography",
+      "category": "Core",
+      "ecosystem": "NuGet",
+      "id": "pkg-005",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-cryptography",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "AGIMesh.Identity",
+      "category": "Core",
+      "ecosystem": "NuGet",
+      "id": "pkg-006",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-identity",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "AGIMesh.Storage",
+      "category": "Core",
+      "ecosystem": "NuGet",
+      "id": "pkg-007",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-storage",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "AGIMesh.Serialization",
+      "category": "Core",
+      "ecosystem": "NuGet",
+      "id": "pkg-008",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-serialization",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "AGIMesh.Logging",
+      "category": "Core",
+      "ecosystem": "NuGet",
+      "id": "pkg-009",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-logging",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "@agimesh/runtime",
+      "category": "Core",
+      "ecosystem": "npm",
+      "id": "pkg-010",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-runtime",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "@agimesh/events",
+      "category": "Core",
+      "ecosystem": "npm",
+      "id": "pkg-011",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-events",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "@agimesh/config",
+      "category": "Core",
+      "ecosystem": "npm",
+      "id": "pkg-012",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-config",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "@agimesh/telemetry",
+      "category": "Core",
+      "ecosystem": "npm",
+      "id": "pkg-013",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-telemetry",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "@agimesh/auth",
+      "category": "Core",
+      "ecosystem": "npm",
+      "id": "pkg-014",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-auth",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-core",
+      "category": "Core",
+      "ecosystem": "Maven",
+      "id": "pkg-015",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-core",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-security",
+      "category": "Core",
+      "ecosystem": "Maven",
+      "id": "pkg-016",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-security",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-runtime",
+      "category": "Core",
+      "ecosystem": "Maven",
+      "id": "pkg-017",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-runtime",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-storage",
+      "category": "Core",
+      "ecosystem": "Maven",
+      "id": "pkg-018",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-storage",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-observability",
+      "category": "Core",
+      "ecosystem": "Maven",
+      "id": "pkg-019",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-observability",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-core",
+      "category": "Core",
+      "ecosystem": "RubyGems",
+      "id": "pkg-020",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-core",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-agent",
+      "category": "Core",
+      "ecosystem": "RubyGems",
+      "id": "pkg-021",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-agent",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-events",
+      "category": "Core",
+      "ecosystem": "RubyGems",
+      "id": "pkg-022",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-events",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-security",
+      "category": "Core",
+      "ecosystem": "RubyGems",
+      "id": "pkg-023",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-security",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-runtime",
+      "category": "Core",
+      "ecosystem": "RubyGems",
+      "id": "pkg-024",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-runtime",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-runtime",
+      "category": "Core",
+      "ecosystem": "Containers",
+      "id": "pkg-025",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-runtime",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-gateway",
+      "category": "Core",
+      "ecosystem": "Containers",
+      "id": "pkg-026",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-gateway",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-registry",
+      "category": "Core",
+      "ecosystem": "Containers",
+      "id": "pkg-027",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-registry",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-benchmark",
+      "category": "Core",
+      "ecosystem": "Containers",
+      "id": "pkg-028",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-benchmark",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "agimesh-observability",
+      "category": "Core",
+      "ecosystem": "Containers",
+      "id": "pkg-029",
+      "dependency_description": "Independent packages",
+      "slug": "agimesh-observability",
+      "source_level": "Dependência Nível 0 (Independentes)",
+      "level": "Level 0"
+    },
+    {
+      "name": "Zenith.Agent.Runtime",
+      "category": "Agent Framework",
+      "ecosystem": "NuGet",
+      "id": "pkg-030",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-runtime",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "Zenith.Agent.Memory",
+      "category": "Agent Framework",
+      "ecosystem": "NuGet",
+      "id": "pkg-031",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-memory",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "Zenith.Agent.Planner",
+      "category": "Agent Framework",
+      "ecosystem": "NuGet",
+      "id": "pkg-032",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-planner",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "Zenith.Agent.Tools",
+      "category": "Agent Framework",
+      "ecosystem": "NuGet",
+      "id": "pkg-033",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-tools",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "Zenith.Agent.Orchestrator",
+      "category": "Agent Framework",
+      "ecosystem": "NuGet",
+      "id": "pkg-034",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-orchestrator",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "Zenith.Agent.Workflow",
+      "category": "Agent Framework",
+      "ecosystem": "NuGet",
+      "id": "pkg-035",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-workflow",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "Zenith.Agent.Registry",
+      "category": "Agent Framework",
+      "ecosystem": "NuGet",
+      "id": "pkg-036",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-registry",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "Zenith.Agent.Graph",
+      "category": "Agent Framework",
+      "ecosystem": "NuGet",
+      "id": "pkg-037",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-graph",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "@zenith/agent-runtime",
+      "category": "Agent Framework",
+      "ecosystem": "npm",
+      "id": "pkg-038",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-runtime",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "@zenith/memory",
+      "category": "Agent Framework",
+      "ecosystem": "npm",
+      "id": "pkg-039",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-memory",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "@zenith/orchestrator",
+      "category": "Agent Framework",
+      "ecosystem": "npm",
+      "id": "pkg-040",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-orchestrator",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "@zenith/workflows",
+      "category": "Agent Framework",
+      "ecosystem": "npm",
+      "id": "pkg-041",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-workflows",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "@zenith/graph",
+      "category": "Agent Framework",
+      "ecosystem": "npm",
+      "id": "pkg-042",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-graph",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "zenith-agent-runtime",
+      "category": "Agent Framework",
+      "ecosystem": "Maven",
+      "id": "pkg-043",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-runtime",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "zenith-agent-memory",
+      "category": "Agent Framework",
+      "ecosystem": "Maven",
+      "id": "pkg-044",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-memory",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "zenith-agent-orchestration",
+      "category": "Agent Framework",
+      "ecosystem": "Maven",
+      "id": "pkg-045",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-orchestration",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "zenith-agent-tools",
+      "category": "Agent Framework",
+      "ecosystem": "Maven",
+      "id": "pkg-046",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-tools",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "zenith-agent-registry",
+      "category": "Agent Framework",
+      "ecosystem": "Maven",
+      "id": "pkg-047",
+      "dependency_description": "Core-dependent packages",
+      "slug": "zenith-agent-registry",
+      "source_level": "Dependência Nível 1 (Parcialmente Dependentes)",
+      "level": "Level 1"
+    },
+    {
+      "name": "Majorana.Core",
+      "category": "Quantum Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-048",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-core",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Majorana.Compiler",
+      "category": "Quantum Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-049",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-compiler",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Majorana.Simulator",
+      "category": "Quantum Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-050",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-simulator",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Majorana.Network",
+      "category": "Quantum Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-051",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-network",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Majorana.QKD",
+      "category": "Quantum Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-052",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-qkd",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Majorana.Cryptography",
+      "category": "Quantum Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-053",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-cryptography",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Majorana.Topology",
+      "category": "Quantum Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-054",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-topology",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Majorana.Entanglement",
+      "category": "Quantum Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-055",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-entanglement",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "@majorana/sdk",
+      "category": "Quantum Stack",
+      "ecosystem": "npm",
+      "id": "pkg-056",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-sdk",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "@majorana/telemetry",
+      "category": "Quantum Stack",
+      "ecosystem": "npm",
+      "id": "pkg-057",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-telemetry",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "@majorana/workbench",
+      "category": "Quantum Stack",
+      "ecosystem": "npm",
+      "id": "pkg-058",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-workbench",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "majorana-runtime",
+      "category": "Quantum Stack",
+      "ecosystem": "Maven",
+      "id": "pkg-059",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-runtime",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "majorana-network",
+      "category": "Quantum Stack",
+      "ecosystem": "Maven",
+      "id": "pkg-060",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-network",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "majorana-qkd",
+      "category": "Quantum Stack",
+      "ecosystem": "Maven",
+      "id": "pkg-061",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-qkd",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "majorana-simulator",
+      "category": "Quantum Stack",
+      "ecosystem": "Containers",
+      "id": "pkg-062",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-simulator",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "majorana-runtime",
+      "category": "Quantum Stack",
+      "ecosystem": "Containers",
+      "id": "pkg-063",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-runtime",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "majorana-azure-adapter",
+      "category": "Quantum Stack",
+      "ecosystem": "Containers",
+      "id": "pkg-064",
+      "dependency_description": "Co-dependent packages",
+      "slug": "majorana-azure-adapter",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Zenith.AI.Runtime",
+      "category": "AI Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-065",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-ai-runtime",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Zenith.AI.Inference",
+      "category": "AI Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-066",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-ai-inference",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Zenith.AI.VectorStore",
+      "category": "AI Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-067",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-ai-vectorstore",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Zenith.AI.Embeddings",
+      "category": "AI Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-068",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-ai-embeddings",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Zenith.AI.RAG",
+      "category": "AI Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-069",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-ai-rag",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Zenith.AI.Evaluation",
+      "category": "AI Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-070",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-ai-evaluation",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Zenith.AI.Reasoning",
+      "category": "AI Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-071",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-ai-reasoning",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "Zenith.AI.Finetuning",
+      "category": "AI Stack",
+      "ecosystem": "NuGet",
+      "id": "pkg-072",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-ai-finetuning",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "@zenith/ai-runtime",
+      "category": "AI Stack",
+      "ecosystem": "npm",
+      "id": "pkg-073",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-ai-runtime",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "@zenith/rag",
+      "category": "AI Stack",
+      "ecosystem": "npm",
+      "id": "pkg-074",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-rag",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "@zenith/evals",
+      "category": "AI Stack",
+      "ecosystem": "npm",
+      "id": "pkg-075",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-evals",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "@zenith/vectorstore",
+      "category": "AI Stack",
+      "ecosystem": "npm",
+      "id": "pkg-076",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-vectorstore",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "zenith-inference",
+      "category": "AI Stack",
+      "ecosystem": "Containers",
+      "id": "pkg-077",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-inference",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "zenith-rag",
+      "category": "AI Stack",
+      "ecosystem": "Containers",
+      "id": "pkg-078",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-rag",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "zenith-evaluation",
+      "category": "AI Stack",
+      "ecosystem": "Containers",
+      "id": "pkg-079",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-evaluation",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "zenith-training",
+      "category": "AI Stack",
+      "ecosystem": "Containers",
+      "id": "pkg-080",
+      "dependency_description": "Co-dependent packages",
+      "slug": "zenith-training",
+      "source_level": "Dependência Nível 2 (Codependentes)",
+      "level": "Level 2"
+    },
+    {
+      "name": "WindowsAGI.WindowsRuntime",
+      "category": "Windows",
+      "ecosystem": "NuGet",
+      "id": "pkg-081",
+      "dependency_description": "Ecosystem packages",
+      "slug": "windowsagi-windowsruntime",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "WindowsAGI.NPU",
+      "category": "Windows",
+      "ecosystem": "NuGet",
+      "id": "pkg-082",
+      "dependency_description": "Ecosystem packages",
+      "slug": "windowsagi-npu",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "WindowsAGI.DirectML",
+      "category": "Windows",
+      "ecosystem": "NuGet",
+      "id": "pkg-083",
+      "dependency_description": "Ecosystem packages",
+      "slug": "windowsagi-directml",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "WindowsAGI.CopilotRuntime",
+      "category": "Windows",
+      "ecosystem": "NuGet",
+      "id": "pkg-084",
+      "dependency_description": "Ecosystem packages",
+      "slug": "windowsagi-copilotruntime",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "WindowsAGI.WinUI",
+      "category": "Windows",
+      "ecosystem": "NuGet",
+      "id": "pkg-085",
+      "dependency_description": "Ecosystem packages",
+      "slug": "windowsagi-winui",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "AzureQuantumSDK",
+      "category": "Azure",
+      "ecosystem": "NuGet",
+      "id": "pkg-086",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azurequantumsdk",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "AzureAGIRuntime",
+      "category": "Azure",
+      "ecosystem": "NuGet",
+      "id": "pkg-087",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azureagiruntime",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "AzureAgentFabric",
+      "category": "Azure",
+      "ecosystem": "NuGet",
+      "id": "pkg-088",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azureagentfabric",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "AzureModelRegistry",
+      "category": "Azure",
+      "ecosystem": "NuGet",
+      "id": "pkg-089",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azuremodelregistry",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "AzureSemanticStorage",
+      "category": "Azure",
+      "ecosystem": "NuGet",
+      "id": "pkg-090",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azuresemanticstorage",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "@azure/agimesh",
+      "category": "Azure",
+      "ecosystem": "npm",
+      "id": "pkg-091",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azure-agimesh",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "@azure/agentfabric",
+      "category": "Azure",
+      "ecosystem": "npm",
+      "id": "pkg-092",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azure-agentfabric",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "@azure/quantum-runtime",
+      "category": "Azure",
+      "ecosystem": "npm",
+      "id": "pkg-093",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azure-quantum-runtime",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "azure-agi-runtime",
+      "category": "Azure",
+      "ecosystem": "Maven",
+      "id": "pkg-094",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azure-agi-runtime",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "azure-agent-fabric",
+      "category": "Azure",
+      "ecosystem": "Maven",
+      "id": "pkg-095",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azure-agent-fabric",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "azure-semantic-services",
+      "category": "Azure",
+      "ecosystem": "Maven",
+      "id": "pkg-096",
+      "dependency_description": "Ecosystem packages",
+      "slug": "azure-semantic-services",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "M365AgentConnector",
+      "category": "Microsoft 365",
+      "ecosystem": "NuGet",
+      "id": "pkg-097",
+      "dependency_description": "Ecosystem packages",
+      "slug": "m365agentconnector",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "M365SemanticIndex",
+      "category": "Microsoft 365",
+      "ecosystem": "NuGet",
+      "id": "pkg-098",
+      "dependency_description": "Ecosystem packages",
+      "slug": "m365semanticindex",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "M365CopilotAdapter",
+      "category": "Microsoft 365",
+      "ecosystem": "NuGet",
+      "id": "pkg-099",
+      "dependency_description": "Ecosystem packages",
+      "slug": "m365copilotadapter",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "M365KnowledgeGraph",
+      "category": "Microsoft 365",
+      "ecosystem": "NuGet",
+      "id": "pkg-100",
+      "dependency_description": "Ecosystem packages",
+      "slug": "m365knowledgegraph",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "@m365/agentconnector",
+      "category": "Microsoft 365",
+      "ecosystem": "npm",
+      "id": "pkg-101",
+      "dependency_description": "Ecosystem packages",
+      "slug": "m365-agentconnector",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "@m365/copilot-runtime",
+      "category": "Microsoft 365",
+      "ecosystem": "npm",
+      "id": "pkg-102",
+      "dependency_description": "Ecosystem packages",
+      "slug": "m365-copilot-runtime",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "GitHubAgentOps",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-103",
+      "dependency_description": "Ecosystem packages",
+      "slug": "githubagentops",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "GitHubReleaseFabric",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-104",
+      "dependency_description": "Ecosystem packages",
+      "slug": "githubreleasefabric",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "GitHubArtifactRegistry",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-105",
+      "dependency_description": "Ecosystem packages",
+      "slug": "githubartifactregistry",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "GitHubCopilotTelemetry",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-106",
+      "dependency_description": "Ecosystem packages",
+      "slug": "githubcopilottelemetry",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "@github/release-fabric",
+      "category": "GitHub",
+      "ecosystem": "npm",
+      "id": "pkg-107",
+      "dependency_description": "Ecosystem packages",
+      "slug": "github-release-fabric",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "@github/artifact-registry",
+      "category": "GitHub",
+      "ecosystem": "npm",
+      "id": "pkg-108",
+      "dependency_description": "Ecosystem packages",
+      "slug": "github-artifact-registry",
+      "source_level": "Dependência Nível 3 (Ecossistema)",
+      "level": "Level 3"
+    },
+    {
+      "name": "AGIMesh.Consciousness",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-109",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-consciousness",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "AGIMesh.CognitiveFabric",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-110",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-cognitivefabric",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "AGIMesh.GlobalMemory",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-111",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-globalmemory",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "AGIMesh.WorldModel",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-112",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-worldmodel",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "AGIMesh.ReasoningGraph",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-113",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-reasoninggraph",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "AGIMesh.KnowledgeFabric",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-114",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-knowledgefabric",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "AGIMesh.SemanticKernelBridge",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-115",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-semantickernelbridge",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "AGIMesh.ConversationalInteroperability",
+      "category": "GitHub",
+      "ecosystem": "NuGet",
+      "id": "pkg-116",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-conversationalinteroperability",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "@agimesh/worldmodel",
+      "category": "GitHub",
+      "ecosystem": "npm",
+      "id": "pkg-117",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-worldmodel",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "@agimesh/reasoning",
+      "category": "GitHub",
+      "ecosystem": "npm",
+      "id": "pkg-118",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-reasoning",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "@agimesh/memory-fabric",
+      "category": "GitHub",
+      "ecosystem": "npm",
+      "id": "pkg-119",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-memory-fabric",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-cognitive-fabric",
+      "category": "GitHub",
+      "ecosystem": "Maven",
+      "id": "pkg-120",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-cognitive-fabric",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-world-model",
+      "category": "GitHub",
+      "ecosystem": "Maven",
+      "id": "pkg-121",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-world-model",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-reasoning-graph",
+      "category": "GitHub",
+      "ecosystem": "Maven",
+      "id": "pkg-122",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-reasoning-graph",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-cognition",
+      "category": "GitHub",
+      "ecosystem": "RubyGems",
+      "id": "pkg-123",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-cognition",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-memory-fabric",
+      "category": "GitHub",
+      "ecosystem": "RubyGems",
+      "id": "pkg-124",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-memory-fabric",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-reasoning",
+      "category": "GitHub",
+      "ecosystem": "RubyGems",
+      "id": "pkg-125",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-reasoning",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-fabric",
+      "category": "GitHub",
+      "ecosystem": "Containers",
+      "id": "pkg-126",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-fabric",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-worldmodel",
+      "category": "GitHub",
+      "ecosystem": "Containers",
+      "id": "pkg-127",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-worldmodel",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-memory-cluster",
+      "category": "GitHub",
+      "ecosystem": "Containers",
+      "id": "pkg-128",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-memory-cluster",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-orchestrator",
+      "category": "GitHub",
+      "ecosystem": "Containers",
+      "id": "pkg-129",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-orchestrator",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    },
+    {
+      "name": "agimesh-autonomous-runtime",
+      "category": "GitHub",
+      "ecosystem": "Containers",
+      "id": "pkg-130",
+      "dependency_description": "AGI platform packages",
+      "slug": "agimesh-autonomous-runtime",
+      "source_level": "Ultra-Layer (Plataforma AGI)",
+      "level": "Ultra-Layer"
+    }
+  ]
+}

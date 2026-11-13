@@ -1,0 +1,600 @@
+name: AGIMesh Ecosystem Package Catalog
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/agimesh-package-catalog.json'
+      - 'docs/AGIMesh-Package-Ecosystem.md'
+      - '.github/workflows/AGIMesh-Ecosystem-Catalog.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  CATALOG: docs/agimesh-package-catalog.json
+  ARTIFACT_ROOT: artifacts/agimesh-ecosystem
+
+jobs:
+  discover:
+    name: Read and validate package catalog
+    runs-on: ubuntu-latest
+    outputs:
+      level0: ${{ steps.catalog.outputs.level0 }}
+      level1: ${{ steps.catalog.outputs.level1 }}
+      level2: ${{ steps.catalog.outputs.level2 }}
+      level3: ${{ steps.catalog.outputs.level3 }}
+      ultra: ${{ steps.catalog.outputs.ultra }}
+      count: ${{ steps.catalog.outputs.count }}
+    steps:
+      - name: Check out catalog
+        uses: actions/checkout@v4
+      - name: Validate catalog and create layer matrices
+        id: catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          data=json.loads(Path("docs/agimesh-package-catalog.json").read_text())
+          packages=data["packages"]
+          assert len(packages) == 131
+          assert len({p["id"] for p in packages}) == len(packages)
+          for p in packages:
+              assert all(p.get(k) for k in ("id","name","ecosystem","level","category"))
+          mapping={"Level 0":"level0","Level 1":"level1","Level 2":"level2","Level 3":"level3","Ultra-Layer":"ultra"}
+          for level,key in mapping.items():
+              items=[p for p in packages if p["level"]==level]
+              print(f"{key}="+json.dumps(items,separators=(",",":")))
+          print(f"count={len(packages)}")
+          PY
+
+  build-level0:
+    name: Build Level 0 package matrix
+    needs: discover
+    if: ${{ needs.discover.result == 'success' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 32
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.level0) }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install all supported build toolchains
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Java and Ruby toolchains
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - name: Install native packaging utilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends jq zip unzip tar gzip
+          python3 --version; node --version; dotnet --version; java -version; ruby --version
+      - name: Build selected catalog entry
+        env:
+          PACKAGE_JSON: ${{ toJSON(matrix.package) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
+          printf '%s\n' "$PACKAGE_JSON" > "$ARTIFACT_ROOT/${{ matrix.package.id }}/package/metadata.json"
+          name="${{ matrix.package.name }}"
+          ecosystem="${{ matrix.package.ecosystem }}"
+          safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
+          out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
+          case "$ecosystem" in
+            NuGet)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              cat > "$work/$safe.csproj" <<EOF
+          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup></Project>
+          EOF
+              dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
+            npm)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              cat > "$work/package.json" <<EOF
+          {"name":"$name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          EOF
+              npm pack "$work" --pack-destination "$out" ;;
+            Maven)
+              mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
+              printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
+              jar --create --file "$out/$safe-0.1.0.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt ;;
+            RubyGems)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
+              printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
+              cat > "$work/$safe.gemspec" <<EOF
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.files=Dir['lib/**/*.rb']; end
+          EOF
+              (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
+            Containers)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
+              docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
+            *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
+          esac
+          sha256sum "$out"/* >> "$out/sha256sums.txt"
+          cat > "$out/README.md" <<EOF
+          # $name
+
+          Generated by the AGIMesh Ecosystem Package Catalog workflow.
+          Ecosystem: $ecosystem
+          Dependency layer: ${{ matrix.package.level }}
+          Category: ${{ matrix.package.category }}
+          EOF
+          sha256sum "$out/README.md" >> "$out/sha256sums.txt"
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agimesh-${{ matrix.package.id }}
+          path: artifacts/agimesh-ecosystem/${{ matrix.package.id }}
+          if-no-files-found: error
+          compression-level: 6
+
+  build-level1:
+    name: Build Level 1 package matrix
+    needs: [discover, build-level0]
+    if: ${{ needs.discover.result == 'success' && needs.build-level0.result == 'success' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 32
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.level1) }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install all supported build toolchains
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Java and Ruby toolchains
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - name: Install native packaging utilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends jq zip unzip tar gzip
+          python3 --version; node --version; dotnet --version; java -version; ruby --version
+      - name: Build selected catalog entry
+        env:
+          PACKAGE_JSON: ${{ toJSON(matrix.package) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
+          printf '%s\n' "$PACKAGE_JSON" > "$ARTIFACT_ROOT/${{ matrix.package.id }}/package/metadata.json"
+          name="${{ matrix.package.name }}"
+          ecosystem="${{ matrix.package.ecosystem }}"
+          safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
+          out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
+          case "$ecosystem" in
+            NuGet)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              cat > "$work/$safe.csproj" <<EOF
+          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup></Project>
+          EOF
+              dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
+            npm)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              cat > "$work/package.json" <<EOF
+          {"name":"$name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          EOF
+              npm pack "$work" --pack-destination "$out" ;;
+            Maven)
+              mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
+              printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
+              jar --create --file "$out/$safe-0.1.0.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt ;;
+            RubyGems)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
+              printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
+              cat > "$work/$safe.gemspec" <<EOF
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.files=Dir['lib/**/*.rb']; end
+          EOF
+              (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
+            Containers)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
+              docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
+            *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
+          esac
+          sha256sum "$out"/* >> "$out/sha256sums.txt"
+          cat > "$out/README.md" <<EOF
+          # $name
+
+          Generated by the AGIMesh Ecosystem Package Catalog workflow.
+          Ecosystem: $ecosystem
+          Dependency layer: ${{ matrix.package.level }}
+          Category: ${{ matrix.package.category }}
+          EOF
+          sha256sum "$out/README.md" >> "$out/sha256sums.txt"
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agimesh-${{ matrix.package.id }}
+          path: artifacts/agimesh-ecosystem/${{ matrix.package.id }}
+          if-no-files-found: error
+          compression-level: 6
+
+  build-level2:
+    name: Build Level 2 package matrix
+    needs: [discover, build-level1]
+    if: ${{ needs.discover.result == 'success' && needs.build-level1.result == 'success' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 32
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.level2) }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install all supported build toolchains
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Java and Ruby toolchains
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - name: Install native packaging utilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends jq zip unzip tar gzip
+          python3 --version; node --version; dotnet --version; java -version; ruby --version
+      - name: Build selected catalog entry
+        env:
+          PACKAGE_JSON: ${{ toJSON(matrix.package) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
+          printf '%s\n' "$PACKAGE_JSON" > "$ARTIFACT_ROOT/${{ matrix.package.id }}/package/metadata.json"
+          name="${{ matrix.package.name }}"
+          ecosystem="${{ matrix.package.ecosystem }}"
+          safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
+          out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
+          case "$ecosystem" in
+            NuGet)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              cat > "$work/$safe.csproj" <<EOF
+          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup></Project>
+          EOF
+              dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
+            npm)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              cat > "$work/package.json" <<EOF
+          {"name":"$name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          EOF
+              npm pack "$work" --pack-destination "$out" ;;
+            Maven)
+              mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
+              printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
+              jar --create --file "$out/$safe-0.1.0.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt ;;
+            RubyGems)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
+              printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
+              cat > "$work/$safe.gemspec" <<EOF
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.files=Dir['lib/**/*.rb']; end
+          EOF
+              (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
+            Containers)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
+              docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
+            *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
+          esac
+          sha256sum "$out"/* >> "$out/sha256sums.txt"
+          cat > "$out/README.md" <<EOF
+          # $name
+
+          Generated by the AGIMesh Ecosystem Package Catalog workflow.
+          Ecosystem: $ecosystem
+          Dependency layer: ${{ matrix.package.level }}
+          Category: ${{ matrix.package.category }}
+          EOF
+          sha256sum "$out/README.md" >> "$out/sha256sums.txt"
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agimesh-${{ matrix.package.id }}
+          path: artifacts/agimesh-ecosystem/${{ matrix.package.id }}
+          if-no-files-found: error
+          compression-level: 6
+
+  build-level3:
+    name: Build Level 3 package matrix
+    needs: [discover, build-level2]
+    if: ${{ needs.discover.result == 'success' && needs.build-level2.result == 'success' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 32
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.level3) }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install all supported build toolchains
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Java and Ruby toolchains
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - name: Install native packaging utilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends jq zip unzip tar gzip
+          python3 --version; node --version; dotnet --version; java -version; ruby --version
+      - name: Build selected catalog entry
+        env:
+          PACKAGE_JSON: ${{ toJSON(matrix.package) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
+          printf '%s\n' "$PACKAGE_JSON" > "$ARTIFACT_ROOT/${{ matrix.package.id }}/package/metadata.json"
+          name="${{ matrix.package.name }}"
+          ecosystem="${{ matrix.package.ecosystem }}"
+          safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
+          out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
+          case "$ecosystem" in
+            NuGet)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              cat > "$work/$safe.csproj" <<EOF
+          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup></Project>
+          EOF
+              dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
+            npm)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              cat > "$work/package.json" <<EOF
+          {"name":"$name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          EOF
+              npm pack "$work" --pack-destination "$out" ;;
+            Maven)
+              mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
+              printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
+              jar --create --file "$out/$safe-0.1.0.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt ;;
+            RubyGems)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
+              printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
+              cat > "$work/$safe.gemspec" <<EOF
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.files=Dir['lib/**/*.rb']; end
+          EOF
+              (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
+            Containers)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
+              docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
+            *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
+          esac
+          sha256sum "$out"/* >> "$out/sha256sums.txt"
+          cat > "$out/README.md" <<EOF
+          # $name
+
+          Generated by the AGIMesh Ecosystem Package Catalog workflow.
+          Ecosystem: $ecosystem
+          Dependency layer: ${{ matrix.package.level }}
+          Category: ${{ matrix.package.category }}
+          EOF
+          sha256sum "$out/README.md" >> "$out/sha256sums.txt"
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agimesh-${{ matrix.package.id }}
+          path: artifacts/agimesh-ecosystem/${{ matrix.package.id }}
+          if-no-files-found: error
+          compression-level: 6
+
+  build-ultra:
+    name: Build Ultra-Layer package matrix
+    needs: [discover, build-level3]
+    if: ${{ needs.discover.result == 'success' && needs.build-level3.result == 'success' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 32
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.ultra) }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install all supported build toolchains
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Java and Ruby toolchains
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - name: Install native packaging utilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends jq zip unzip tar gzip
+          python3 --version; node --version; dotnet --version; java -version; ruby --version
+      - name: Build selected catalog entry
+        env:
+          PACKAGE_JSON: ${{ toJSON(matrix.package) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
+          printf '%s\n' "$PACKAGE_JSON" > "$ARTIFACT_ROOT/${{ matrix.package.id }}/package/metadata.json"
+          name="${{ matrix.package.name }}"
+          ecosystem="${{ matrix.package.ecosystem }}"
+          safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
+          out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
+          case "$ecosystem" in
+            NuGet)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              cat > "$work/$safe.csproj" <<EOF
+          <Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><PackageId>$name</PackageId><Version>0.1.0-ci.${GITHUB_RUN_ID}</Version><PackageDescription>AGIMesh catalog package $name</PackageDescription><PackageLicenseExpression>MIT</PackageLicenseExpression><IncludeBuildOutput>false</IncludeBuildOutput><NoBuild>true</NoBuild></PropertyGroup></Project>
+          EOF
+              dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
+            npm)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              cat > "$work/package.json" <<EOF
+          {"name":"$name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          EOF
+              npm pack "$work" --pack-destination "$out" ;;
+            Maven)
+              mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
+              printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
+              jar --create --file "$out/$safe-0.1.0.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt ;;
+            RubyGems)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
+              printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
+              cat > "$work/$safe.gemspec" <<EOF
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.files=Dir['lib/**/*.rb']; end
+          EOF
+              (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
+            Containers)
+              work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
+              docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
+            *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
+          esac
+          sha256sum "$out"/* >> "$out/sha256sums.txt"
+          cat > "$out/README.md" <<EOF
+          # $name
+
+          Generated by the AGIMesh Ecosystem Package Catalog workflow.
+          Ecosystem: $ecosystem
+          Dependency layer: ${{ matrix.package.level }}
+          Category: ${{ matrix.package.category }}
+          EOF
+          sha256sum "$out/README.md" >> "$out/sha256sums.txt"
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agimesh-${{ matrix.package.id }}
+          path: artifacts/agimesh-ecosystem/${{ matrix.package.id }}
+          if-no-files-found: error
+          compression-level: 6
+
+  release:
+    name: Aggregate artifacts and publish release
+    needs: [discover, build-level0, build-level1, build-level2, build-level3, build-ultra]
+    if: ${{ always() && needs.discover.result == 'success' && needs.build-level0.result == 'success' && needs.build-level1.result == 'success' && needs.build-level2.result == 'success' && needs.build-level3.result == 'success' && needs.build-ultra.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release repository
+        uses: actions/checkout@v4
+      - name: Download all package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: agimesh-pkg-*
+          path: release-assets
+          merge-multiple: true
+      - name: Create catalog and aggregate SHA-256 manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "$CATALOG" release-assets/agimesh-package-catalog.json
+          cp docs/AGIMesh-Package-Ecosystem.md release-assets/AGIMesh-Package-Ecosystem.md
+          find release-assets -type f -print0 | sort -z | xargs -0 -r sha256sum > release-assets/all-artifacts.sha256
+          test -s release-assets/all-artifacts.sha256
+      - name: Create draft release
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="agimesh-ecosystem-${GITHUB_SHA:0:12}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          gh release create "$tag" --draft --title "AGIMesh Ecosystem Catalog ${GITHUB_SHA:0:12}" --notes "Automated catalog build for 131 NuGet, npm, Maven, RubyGems, and OCI entries. All per-package artifacts and SHA-256 manifests were generated by GitHub Actions Bot."
+      - name: Upload all package artifacts and digests
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          find release-assets -type f -print0 | sort -z | while IFS= read -r -d '' file; do gh release upload "${{ steps.release.outputs.tag }}" "$file" --clobber; done
+      - name: Publish official release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ steps.release.outputs.tag }}" --draft=false
