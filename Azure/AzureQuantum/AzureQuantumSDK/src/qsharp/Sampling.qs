@@ -292,7 +292,8 @@ namespace WindowsAGI.QuantumSDK.Sampling {
         shotCount    : Int,
         importanceWeights: Double[]
     ) : Double {
-        ValidateExperiment(qubitCount, shotCount);
+ValidateExperiment(qubitCount, shotCount);
+        if Length(importanceWeights) == 0 { fail "ImportanceSampling: importanceWeights must not be empty."; }
 
         mutable weightedSum = 0.0;
         mutable totalWeight = 0.0;
