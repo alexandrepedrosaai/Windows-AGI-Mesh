@@ -38,10 +38,6 @@ namespace WindowsAGI.QuantumSDK.Circuits {
         }
 
         let coupledCount = inputCount < ancillaCount ? inputCount | ancillaCount;
-        if coupledCount > 0 {
-            for index in 0..coupledCount - 1 {
-                Controlled Rz([input[index]], (thetaZ * PI() / 8.0, ancillas[index]));
-            }
         }
     }
 
