@@ -16,8 +16,8 @@ namespace WindowsAGI.QuantumSDK.Buffers {
     // Quantum ring buffer (circular qubit register)
     // ─────────────────────────────────────────────────────────────────────────
     operation InitRingBuffer(qubits : Qubit[], size : Int) : Unit {
-        if size > Length(qubits) {
-            fail $"Ring buffer size {size} exceeds qubit count {Length(qubits)}.";
+        if size <= 0 or size > Length(qubits) {
+            fail $"Ring buffer size {size} must be in [1, {Length(qubits)}].";
         }
         ResetAll(qubits);
     }
