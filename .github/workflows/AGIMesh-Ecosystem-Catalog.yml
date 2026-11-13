@@ -129,7 +129,8 @@ jobs:
               cat > "$work/$safe.gemspec" <<EOF
           Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
-              (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
+              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.gem"
+              (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
             Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
@@ -231,7 +232,8 @@ jobs:
               cat > "$work/$safe.gemspec" <<EOF
           Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
-              (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
+              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.gem"
+              (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
             Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
@@ -333,7 +335,8 @@ jobs:
               cat > "$work/$safe.gemspec" <<EOF
           Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
-              (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
+              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.gem"
+              (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
             Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
@@ -435,7 +438,8 @@ jobs:
               cat > "$work/$safe.gemspec" <<EOF
           Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
-              (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
+              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.gem"
+              (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
             Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
@@ -537,7 +541,8 @@ jobs:
               cat > "$work/$safe.gemspec" <<EOF
           Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
-              (cd "$work" && gem build "$safe.gemspec" --output "$out/$safe-0.1.0.gem") ;;
+              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.gem"
+              (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
             Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
