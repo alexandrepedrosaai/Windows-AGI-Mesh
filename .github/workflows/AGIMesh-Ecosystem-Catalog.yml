@@ -117,8 +117,14 @@ jobs:
               dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
             npm)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              npm_owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+              if [[ "$name" == @*/* ]]; then
+                npm_name="@$npm_owner/${name#*/}"
+              else
+                npm_name="@$npm_owner/$safe"
+              fi
               cat > "$work/package.json" <<EOF
-          {"name":"$name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             Maven)
@@ -253,8 +259,14 @@ jobs:
               dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
             npm)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              npm_owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+              if [[ "$name" == @*/* ]]; then
+                npm_name="@$npm_owner/${name#*/}"
+              else
+                npm_name="@$npm_owner/$safe"
+              fi
               cat > "$work/package.json" <<EOF
-          {"name":"$name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             Maven)
@@ -389,8 +401,14 @@ jobs:
               dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
             npm)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              npm_owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+              if [[ "$name" == @*/* ]]; then
+                npm_name="@$npm_owner/${name#*/}"
+              else
+                npm_name="@$npm_owner/$safe"
+              fi
               cat > "$work/package.json" <<EOF
-          {"name":"$name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             Maven)
@@ -525,8 +543,14 @@ jobs:
               dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
             npm)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              npm_owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+              if [[ "$name" == @*/* ]]; then
+                npm_name="@$npm_owner/${name#*/}"
+              else
+                npm_name="@$npm_owner/$safe"
+              fi
               cat > "$work/package.json" <<EOF
-          {"name":"$name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             Maven)
@@ -661,8 +685,14 @@ jobs:
               dotnet pack "$work/$safe.csproj" -c Release -o "$out" ;;
             npm)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
+              npm_owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+              if [[ "$name" == @*/* ]]; then
+                npm_name="@$npm_owner/${name#*/}"
+              else
+                npm_name="@$npm_owner/$safe"
+              fi
               cat > "$work/package.json" <<EOF
-          {"name":"$name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             Maven)
