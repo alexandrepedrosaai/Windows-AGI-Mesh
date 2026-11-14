@@ -137,7 +137,8 @@ jobs:
               jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
               cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
           <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
-          EOF ;;
+          EOF
+              ;;
             rubygems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
@@ -283,7 +284,8 @@ jobs:
               jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
               cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
           <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
-          EOF ;;
+          EOF
+              ;;
             rubygems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
@@ -429,7 +431,8 @@ jobs:
               jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
               cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
           <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
-          EOF ;;
+          EOF
+              ;;
             rubygems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
@@ -575,7 +578,8 @@ jobs:
               jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
               cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
           <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
-          EOF ;;
+          EOF
+              ;;
             rubygems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
@@ -721,7 +725,8 @@ jobs:
               jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
               cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
           <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
-          EOF ;;
+          EOF
+              ;;
             rubygems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
