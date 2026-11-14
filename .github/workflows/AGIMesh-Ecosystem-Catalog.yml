@@ -128,7 +128,7 @@ jobs:
                 npm_name="@$npm_owner/$safe"
               fi
               cat > "$work/package.json" <<EOF
-          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             maven)
@@ -275,7 +275,7 @@ jobs:
                 npm_name="@$npm_owner/$safe"
               fi
               cat > "$work/package.json" <<EOF
-          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             maven)
@@ -422,7 +422,7 @@ jobs:
                 npm_name="@$npm_owner/$safe"
               fi
               cat > "$work/package.json" <<EOF
-          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             maven)
@@ -569,7 +569,7 @@ jobs:
                 npm_name="@$npm_owner/$safe"
               fi
               cat > "$work/package.json" <<EOF
-          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             maven)
@@ -716,7 +716,7 @@ jobs:
                 npm_name="@$npm_owner/$safe"
               fi
               cat > "$work/package.json" <<EOF
-          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             maven)
