@@ -109,7 +109,7 @@ jobs:
           safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
           out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
           case "$ecosystem_key" in
-            NuGet)
+            nuget)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
@@ -252,7 +252,7 @@ jobs:
           safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
           out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
           case "$ecosystem_key" in
-            NuGet)
+            nuget)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
@@ -395,7 +395,7 @@ jobs:
           safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
           out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
           case "$ecosystem_key" in
-            NuGet)
+            nuget)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
@@ -538,7 +538,7 @@ jobs:
           safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
           out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
           case "$ecosystem_key" in
-            NuGet)
+            nuget)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
@@ -681,7 +681,7 @@ jobs:
           safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
           out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
           case "$ecosystem_key" in
-            NuGet)
+            nuget)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
