@@ -96,6 +96,8 @@ jobs:
       - name: Build selected catalog entry
         env:
           PACKAGE_JSON: ${{ toJSON(matrix.package) }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         shell: bash
         run: |
           set -euo pipefail
@@ -122,19 +124,50 @@ jobs:
             Maven)
               mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
-              jar --create --file "$out/$safe-0.1.0.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt ;;
+              jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
+              cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
+          <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
+          EOF ;;
             RubyGems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
-          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0.${GITHUB_RUN_ID}'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
-              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.gem"
+              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem"
               (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
             Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
               docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
+            *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
+          esac
+          echo "Publishing $name to GitHub Packages ($ecosystem)"
+          owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+          case "$ecosystem" in
+            NuGet)
+              dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
+            npm)
+              npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
+              npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
+            Maven)
+              cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
+          <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
+          EOF
+              mvn --batch-mode deploy:deploy-file -Dfile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -DpomFile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" -DrepositoryId=github -Durl="https://maven.pkg.github.com/$owner/$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" -s "$RUNNER_TEMP/maven-settings.xml" ;;
+            RubyGems)
+              mkdir -p "$HOME/.gem"
+              cat > "$HOME/.gem/credentials" <<EOF
+          ---
+          :github: Bearer $GITHUB_TOKEN
+          EOF
+              chmod 600 "$HOME/.gem/credentials"
+              gem push "$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem" --key github --host "https://rubygems.pkg.github.com/$owner" ;;
+            Containers)
+              image="ghcr.io/$owner/$safe:0.1.0-ci.${GITHUB_RUN_ID}"
+              docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
+              docker build -t "$image" "$work"
+              docker push "$image" ;;
             *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
           esac
           sha256sum "$out"/* >> "$out/sha256sums.txt"
@@ -199,6 +232,8 @@ jobs:
       - name: Build selected catalog entry
         env:
           PACKAGE_JSON: ${{ toJSON(matrix.package) }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         shell: bash
         run: |
           set -euo pipefail
@@ -225,19 +260,50 @@ jobs:
             Maven)
               mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
-              jar --create --file "$out/$safe-0.1.0.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt ;;
+              jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
+              cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
+          <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
+          EOF ;;
             RubyGems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
-          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0.${GITHUB_RUN_ID}'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
-              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.gem"
+              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem"
               (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
             Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
               docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
+            *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
+          esac
+          echo "Publishing $name to GitHub Packages ($ecosystem)"
+          owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+          case "$ecosystem" in
+            NuGet)
+              dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
+            npm)
+              npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
+              npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
+            Maven)
+              cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
+          <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
+          EOF
+              mvn --batch-mode deploy:deploy-file -Dfile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -DpomFile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" -DrepositoryId=github -Durl="https://maven.pkg.github.com/$owner/$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" -s "$RUNNER_TEMP/maven-settings.xml" ;;
+            RubyGems)
+              mkdir -p "$HOME/.gem"
+              cat > "$HOME/.gem/credentials" <<EOF
+          ---
+          :github: Bearer $GITHUB_TOKEN
+          EOF
+              chmod 600 "$HOME/.gem/credentials"
+              gem push "$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem" --key github --host "https://rubygems.pkg.github.com/$owner" ;;
+            Containers)
+              image="ghcr.io/$owner/$safe:0.1.0-ci.${GITHUB_RUN_ID}"
+              docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
+              docker build -t "$image" "$work"
+              docker push "$image" ;;
             *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
           esac
           sha256sum "$out"/* >> "$out/sha256sums.txt"
@@ -302,6 +368,8 @@ jobs:
       - name: Build selected catalog entry
         env:
           PACKAGE_JSON: ${{ toJSON(matrix.package) }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         shell: bash
         run: |
           set -euo pipefail
@@ -328,19 +396,50 @@ jobs:
             Maven)
               mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
-              jar --create --file "$out/$safe-0.1.0.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt ;;
+              jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
+              cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
+          <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
+          EOF ;;
             RubyGems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
-          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0.${GITHUB_RUN_ID}'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
-              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.gem"
+              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem"
               (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
             Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
               docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
+            *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
+          esac
+          echo "Publishing $name to GitHub Packages ($ecosystem)"
+          owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+          case "$ecosystem" in
+            NuGet)
+              dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
+            npm)
+              npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
+              npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
+            Maven)
+              cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
+          <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
+          EOF
+              mvn --batch-mode deploy:deploy-file -Dfile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -DpomFile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" -DrepositoryId=github -Durl="https://maven.pkg.github.com/$owner/$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" -s "$RUNNER_TEMP/maven-settings.xml" ;;
+            RubyGems)
+              mkdir -p "$HOME/.gem"
+              cat > "$HOME/.gem/credentials" <<EOF
+          ---
+          :github: Bearer $GITHUB_TOKEN
+          EOF
+              chmod 600 "$HOME/.gem/credentials"
+              gem push "$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem" --key github --host "https://rubygems.pkg.github.com/$owner" ;;
+            Containers)
+              image="ghcr.io/$owner/$safe:0.1.0-ci.${GITHUB_RUN_ID}"
+              docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
+              docker build -t "$image" "$work"
+              docker push "$image" ;;
             *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
           esac
           sha256sum "$out"/* >> "$out/sha256sums.txt"
@@ -405,6 +504,8 @@ jobs:
       - name: Build selected catalog entry
         env:
           PACKAGE_JSON: ${{ toJSON(matrix.package) }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         shell: bash
         run: |
           set -euo pipefail
@@ -431,19 +532,50 @@ jobs:
             Maven)
               mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
-              jar --create --file "$out/$safe-0.1.0.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt ;;
+              jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
+              cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
+          <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
+          EOF ;;
             RubyGems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
-          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0.${GITHUB_RUN_ID}'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
-              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.gem"
+              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem"
               (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
             Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
               docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
+            *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
+          esac
+          echo "Publishing $name to GitHub Packages ($ecosystem)"
+          owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+          case "$ecosystem" in
+            NuGet)
+              dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
+            npm)
+              npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
+              npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
+            Maven)
+              cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
+          <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
+          EOF
+              mvn --batch-mode deploy:deploy-file -Dfile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -DpomFile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" -DrepositoryId=github -Durl="https://maven.pkg.github.com/$owner/$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" -s "$RUNNER_TEMP/maven-settings.xml" ;;
+            RubyGems)
+              mkdir -p "$HOME/.gem"
+              cat > "$HOME/.gem/credentials" <<EOF
+          ---
+          :github: Bearer $GITHUB_TOKEN
+          EOF
+              chmod 600 "$HOME/.gem/credentials"
+              gem push "$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem" --key github --host "https://rubygems.pkg.github.com/$owner" ;;
+            Containers)
+              image="ghcr.io/$owner/$safe:0.1.0-ci.${GITHUB_RUN_ID}"
+              docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
+              docker build -t "$image" "$work"
+              docker push "$image" ;;
             *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
           esac
           sha256sum "$out"/* >> "$out/sha256sums.txt"
@@ -508,6 +640,8 @@ jobs:
       - name: Build selected catalog entry
         env:
           PACKAGE_JSON: ${{ toJSON(matrix.package) }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         shell: bash
         run: |
           set -euo pipefail
@@ -534,19 +668,50 @@ jobs:
             Maven)
               mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
-              jar --create --file "$out/$safe-0.1.0.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt ;;
+              jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
+              cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
+          <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
+          EOF ;;
             RubyGems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
-          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
+          Gem::Specification.new do |s|; s.name='$safe'; s.version='0.1.0.${GITHUB_RUN_ID}'; s.summary='AGIMesh catalog package'; s.authors=['Windows-AGI-Mesh Team']; s.email=['agi-mesh@example.invalid']; s.files=Dir['lib/**/*.rb']; end
           EOF
-              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.gem"
+              gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem"
               (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
             Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
               docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
+            *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
+          esac
+          echo "Publishing $name to GitHub Packages ($ecosystem)"
+          owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+          case "$ecosystem" in
+            NuGet)
+              dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
+            npm)
+              npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
+              npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
+            Maven)
+              cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
+          <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
+          EOF
+              mvn --batch-mode deploy:deploy-file -Dfile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -DpomFile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" -DrepositoryId=github -Durl="https://maven.pkg.github.com/$owner/$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" -s "$RUNNER_TEMP/maven-settings.xml" ;;
+            RubyGems)
+              mkdir -p "$HOME/.gem"
+              cat > "$HOME/.gem/credentials" <<EOF
+          ---
+          :github: Bearer $GITHUB_TOKEN
+          EOF
+              chmod 600 "$HOME/.gem/credentials"
+              gem push "$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem" --key github --host "https://rubygems.pkg.github.com/$owner" ;;
+            Containers)
+              image="ghcr.io/$owner/$safe:0.1.0-ci.${GITHUB_RUN_ID}"
+              docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
+              docker build -t "$image" "$work"
+              docker push "$image" ;;
             *) echo "Unsupported ecosystem: $ecosystem" >&2; exit 1 ;;
           esac
           sha256sum "$out"/* >> "$out/sha256sums.txt"
