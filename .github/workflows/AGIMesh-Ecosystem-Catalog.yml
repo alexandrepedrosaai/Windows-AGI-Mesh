@@ -109,7 +109,7 @@ jobs:
           safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
           out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
           case "$ecosystem_key" in
-            nuget)
+            nuget|NuGet)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
@@ -128,14 +128,14 @@ jobs:
           {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
-            maven)
+            maven|Maven)
               mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
               jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
               cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
           <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
           EOF ;;
-            rubygems)
+            rubygems|RubyGems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
@@ -143,7 +143,7 @@ jobs:
           EOF
               gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem"
               (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
-            containers)
+            containers|Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
               docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
@@ -152,17 +152,17 @@ jobs:
           echo "Publishing $name to GitHub Packages ($ecosystem)"
           owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
           case "$ecosystem_key" in
-            nuget)
+            nuget|NuGet)
               dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
             npm)
               npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
               npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
-            maven)
+            maven|Maven)
               cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
           <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
           EOF
               mvn --batch-mode deploy:deploy-file -Dfile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -DpomFile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" -DrepositoryId=github -Durl="https://maven.pkg.github.com/$owner/$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" -s "$RUNNER_TEMP/maven-settings.xml" ;;
-            rubygems)
+            rubygems|RubyGems)
               mkdir -p "$HOME/.gem"
               cat > "$HOME/.gem/credentials" <<EOF
           ---
@@ -170,7 +170,7 @@ jobs:
           EOF
               chmod 600 "$HOME/.gem/credentials"
               gem push "$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem" --key github --host "https://rubygems.pkg.github.com/$owner" ;;
-            containers)
+            containers|Containers)
               image="ghcr.io/$owner/$safe:0.1.0-ci.${GITHUB_RUN_ID}"
               docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
               docker build -t "$image" "$work"
@@ -252,7 +252,7 @@ jobs:
           safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
           out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
           case "$ecosystem_key" in
-            nuget)
+            nuget|NuGet)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
@@ -271,14 +271,14 @@ jobs:
           {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
-            maven)
+            maven|Maven)
               mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
               jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
               cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
           <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
           EOF ;;
-            rubygems)
+            rubygems|RubyGems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
@@ -286,7 +286,7 @@ jobs:
           EOF
               gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem"
               (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
-            containers)
+            containers|Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
               docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
@@ -295,17 +295,17 @@ jobs:
           echo "Publishing $name to GitHub Packages ($ecosystem)"
           owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
           case "$ecosystem_key" in
-            nuget)
+            nuget|NuGet)
               dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
             npm)
               npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
               npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
-            maven)
+            maven|Maven)
               cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
           <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
           EOF
               mvn --batch-mode deploy:deploy-file -Dfile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -DpomFile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" -DrepositoryId=github -Durl="https://maven.pkg.github.com/$owner/$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" -s "$RUNNER_TEMP/maven-settings.xml" ;;
-            rubygems)
+            rubygems|RubyGems)
               mkdir -p "$HOME/.gem"
               cat > "$HOME/.gem/credentials" <<EOF
           ---
@@ -313,7 +313,7 @@ jobs:
           EOF
               chmod 600 "$HOME/.gem/credentials"
               gem push "$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem" --key github --host "https://rubygems.pkg.github.com/$owner" ;;
-            containers)
+            containers|Containers)
               image="ghcr.io/$owner/$safe:0.1.0-ci.${GITHUB_RUN_ID}"
               docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
               docker build -t "$image" "$work"
@@ -395,7 +395,7 @@ jobs:
           safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
           out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
           case "$ecosystem_key" in
-            nuget)
+            nuget|NuGet)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
@@ -414,14 +414,14 @@ jobs:
           {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
-            maven)
+            maven|Maven)
               mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
               jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
               cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
           <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
           EOF ;;
-            rubygems)
+            rubygems|RubyGems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
@@ -429,7 +429,7 @@ jobs:
           EOF
               gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem"
               (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
-            containers)
+            containers|Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
               docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
@@ -438,17 +438,17 @@ jobs:
           echo "Publishing $name to GitHub Packages ($ecosystem)"
           owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
           case "$ecosystem_key" in
-            nuget)
+            nuget|NuGet)
               dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
             npm)
               npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
               npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
-            maven)
+            maven|Maven)
               cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
           <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
           EOF
               mvn --batch-mode deploy:deploy-file -Dfile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -DpomFile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" -DrepositoryId=github -Durl="https://maven.pkg.github.com/$owner/$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" -s "$RUNNER_TEMP/maven-settings.xml" ;;
-            rubygems)
+            rubygems|RubyGems)
               mkdir -p "$HOME/.gem"
               cat > "$HOME/.gem/credentials" <<EOF
           ---
@@ -456,7 +456,7 @@ jobs:
           EOF
               chmod 600 "$HOME/.gem/credentials"
               gem push "$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem" --key github --host "https://rubygems.pkg.github.com/$owner" ;;
-            containers)
+            containers|Containers)
               image="ghcr.io/$owner/$safe:0.1.0-ci.${GITHUB_RUN_ID}"
               docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
               docker build -t "$image" "$work"
@@ -538,7 +538,7 @@ jobs:
           safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
           out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
           case "$ecosystem_key" in
-            nuget)
+            nuget|NuGet)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
@@ -557,14 +557,14 @@ jobs:
           {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
-            maven)
+            maven|Maven)
               mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
               jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
               cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
           <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
           EOF ;;
-            rubygems)
+            rubygems|RubyGems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
@@ -572,7 +572,7 @@ jobs:
           EOF
               gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem"
               (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
-            containers)
+            containers|Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
               docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
@@ -581,17 +581,17 @@ jobs:
           echo "Publishing $name to GitHub Packages ($ecosystem)"
           owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
           case "$ecosystem_key" in
-            nuget)
+            nuget|NuGet)
               dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
             npm)
               npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
               npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
-            maven)
+            maven|Maven)
               cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
           <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
           EOF
               mvn --batch-mode deploy:deploy-file -Dfile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -DpomFile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" -DrepositoryId=github -Durl="https://maven.pkg.github.com/$owner/$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" -s "$RUNNER_TEMP/maven-settings.xml" ;;
-            rubygems)
+            rubygems|RubyGems)
               mkdir -p "$HOME/.gem"
               cat > "$HOME/.gem/credentials" <<EOF
           ---
@@ -599,7 +599,7 @@ jobs:
           EOF
               chmod 600 "$HOME/.gem/credentials"
               gem push "$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem" --key github --host "https://rubygems.pkg.github.com/$owner" ;;
-            containers)
+            containers|Containers)
               image="ghcr.io/$owner/$safe:0.1.0-ci.${GITHUB_RUN_ID}"
               docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
               docker build -t "$image" "$work"
@@ -681,7 +681,7 @@ jobs:
           safe=$(printf '%s' "$name" | tr '@/' '__' | tr -cs '[:alnum:]._-`' '-')
           out="$ARTIFACT_ROOT/${{ matrix.package.id }}/package"
           case "$ecosystem_key" in
-            nuget)
+            nuget|NuGet)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$work/README.md"
               cat > "$work/$safe.csproj" <<EOF
@@ -700,14 +700,14 @@ jobs:
           {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
-            maven)
+            maven|Maven)
               mkdir -p "$RUNNER_TEMP/maven/$safe/classes"
               printf 'AGIMesh catalog package: %s\n' "$name" > "$RUNNER_TEMP/maven/$safe/classes/README.txt"
               jar --create --file "$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -C "$RUNNER_TEMP/maven/$safe/classes" README.txt
               cat > "$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" <<EOF
           <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>com.github.${GITHUB_REPOSITORY_OWNER}</groupId><artifactId>$safe</artifactId><version>0.1.0-ci.${GITHUB_RUN_ID}</version><packaging>jar</packaging><name>$name</name></project>
           EOF ;;
-            rubygems)
+            rubygems|RubyGems)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work/lib"
               printf '# Generated AGIMesh catalog package\n' > "$work/lib/$safe.rb"
               cat > "$work/$safe.gemspec" <<EOF
@@ -715,7 +715,7 @@ jobs:
           EOF
               gem_output="$GITHUB_WORKSPACE/$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem"
               (cd "$work" && gem build "$safe.gemspec" --output "$gem_output") ;;
-            containers)
+            containers|Containers)
               work="$RUNNER_TEMP/$safe"; mkdir -p "$work"
               printf 'FROM scratch\nLABEL org.opencontainers.image.title="%s"\n' "$name" > "$work/Dockerfile"
               docker build -q -t "$safe:ci" "$work" > "$out/$safe.image-id" ;;
@@ -724,17 +724,17 @@ jobs:
           echo "Publishing $name to GitHub Packages ($ecosystem)"
           owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
           case "$ecosystem_key" in
-            nuget)
+            nuget|NuGet)
               dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
             npm)
               npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
               npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
-            maven)
+            maven|Maven)
               cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
           <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
           EOF
               mvn --batch-mode deploy:deploy-file -Dfile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.jar" -DpomFile="$out/$safe-0.1.0.${GITHUB_RUN_ID}.pom" -DrepositoryId=github -Durl="https://maven.pkg.github.com/$owner/$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" -s "$RUNNER_TEMP/maven-settings.xml" ;;
-            rubygems)
+            rubygems|RubyGems)
               mkdir -p "$HOME/.gem"
               cat > "$HOME/.gem/credentials" <<EOF
           ---
@@ -742,7 +742,7 @@ jobs:
           EOF
               chmod 600 "$HOME/.gem/credentials"
               gem push "$out/$safe-0.1.0.${GITHUB_RUN_ID}.gem" --key github --host "https://rubygems.pkg.github.com/$owner" ;;
-            containers)
+            containers|Containers)
               image="ghcr.io/$owner/$safe:0.1.0-ci.${GITHUB_RUN_ID}"
               docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin <<< "$GITHUB_TOKEN"
               docker build -t "$image" "$work"
