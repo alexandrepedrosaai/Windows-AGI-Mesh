@@ -127,8 +127,9 @@ jobs:
               else
                 npm_name="@$npm_owner/$safe"
               fi
+              npm_version="0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
               cat > "$work/package.json" <<EOF
-          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"$npm_version","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             maven)
@@ -160,7 +161,16 @@ jobs:
               dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
             npm)
               npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
-              npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
+              if npm view "${npm_name}@${npm_version}" version --registry "https://npm.pkg.github.com" >/dev/null 2>&1; then
+                echo "Version ${npm_version} of ${npm_name} already exists; skipping publish"
+              elif npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted; then
+                :
+              elif npm view "${npm_name}@${npm_version}" version --registry "https://npm.pkg.github.com" >/dev/null 2>&1; then
+                echo "Version ${npm_version} of ${npm_name} appeared during publish; treating as duplicate"
+              else
+                echo "Failed to publish ${npm_name}@${npm_version}, and the version is not present" >&2
+                exit 1
+              fi ;;
             maven)
               cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
           <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
@@ -274,8 +284,9 @@ jobs:
               else
                 npm_name="@$npm_owner/$safe"
               fi
+              npm_version="0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
               cat > "$work/package.json" <<EOF
-          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"$npm_version","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             maven)
@@ -307,7 +318,16 @@ jobs:
               dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
             npm)
               npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
-              npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
+              if npm view "${npm_name}@${npm_version}" version --registry "https://npm.pkg.github.com" >/dev/null 2>&1; then
+                echo "Version ${npm_version} of ${npm_name} already exists; skipping publish"
+              elif npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted; then
+                :
+              elif npm view "${npm_name}@${npm_version}" version --registry "https://npm.pkg.github.com" >/dev/null 2>&1; then
+                echo "Version ${npm_version} of ${npm_name} appeared during publish; treating as duplicate"
+              else
+                echo "Failed to publish ${npm_name}@${npm_version}, and the version is not present" >&2
+                exit 1
+              fi ;;
             maven)
               cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
           <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
@@ -421,8 +441,9 @@ jobs:
               else
                 npm_name="@$npm_owner/$safe"
               fi
+              npm_version="0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
               cat > "$work/package.json" <<EOF
-          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"$npm_version","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             maven)
@@ -454,7 +475,16 @@ jobs:
               dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
             npm)
               npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
-              npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
+              if npm view "${npm_name}@${npm_version}" version --registry "https://npm.pkg.github.com" >/dev/null 2>&1; then
+                echo "Version ${npm_version} of ${npm_name} already exists; skipping publish"
+              elif npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted; then
+                :
+              elif npm view "${npm_name}@${npm_version}" version --registry "https://npm.pkg.github.com" >/dev/null 2>&1; then
+                echo "Version ${npm_version} of ${npm_name} appeared during publish; treating as duplicate"
+              else
+                echo "Failed to publish ${npm_name}@${npm_version}, and the version is not present" >&2
+                exit 1
+              fi ;;
             maven)
               cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
           <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
@@ -568,8 +598,9 @@ jobs:
               else
                 npm_name="@$npm_owner/$safe"
               fi
+              npm_version="0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
               cat > "$work/package.json" <<EOF
-          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"$npm_version","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             maven)
@@ -601,7 +632,16 @@ jobs:
               dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
             npm)
               npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
-              npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
+              if npm view "${npm_name}@${npm_version}" version --registry "https://npm.pkg.github.com" >/dev/null 2>&1; then
+                echo "Version ${npm_version} of ${npm_name} already exists; skipping publish"
+              elif npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted; then
+                :
+              elif npm view "${npm_name}@${npm_version}" version --registry "https://npm.pkg.github.com" >/dev/null 2>&1; then
+                echo "Version ${npm_version} of ${npm_name} appeared during publish; treating as duplicate"
+              else
+                echo "Failed to publish ${npm_name}@${npm_version}, and the version is not present" >&2
+                exit 1
+              fi ;;
             maven)
               cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
           <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
@@ -715,8 +755,9 @@ jobs:
               else
                 npm_name="@$npm_owner/$safe"
               fi
+              npm_version="0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
               cat > "$work/package.json" <<EOF
-          {"name":"$npm_name","version":"0.1.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}","description":"AGIMesh catalog package $name","private":false}
+          {"name":"$npm_name","version":"$npm_version","description":"AGIMesh catalog package $name","private":false}
           EOF
               npm pack "$work" --pack-destination "$out" ;;
             maven)
@@ -748,7 +789,16 @@ jobs:
               dotnet nuget push "$out"/*.nupkg --source "https://nuget.pkg.github.com/$owner/index.json" --api-key "$GITHUB_TOKEN" --skip-duplicate ;;
             npm)
               npm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_TOKEN"
-              npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted ;;
+              if npm view "${npm_name}@${npm_version}" version --registry "https://npm.pkg.github.com" >/dev/null 2>&1; then
+                echo "Version ${npm_version} of ${npm_name} already exists; skipping publish"
+              elif npm publish "$out"/*.tgz --registry "https://npm.pkg.github.com" --access restricted; then
+                :
+              elif npm view "${npm_name}@${npm_version}" version --registry "https://npm.pkg.github.com" >/dev/null 2>&1; then
+                echo "Version ${npm_version} of ${npm_name} appeared during publish; treating as duplicate"
+              else
+                echo "Failed to publish ${npm_name}@${npm_version}, and the version is not present" >&2
+                exit 1
+              fi ;;
             maven)
               cat > "$RUNNER_TEMP/maven-settings.xml" <<EOF
           <settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>
